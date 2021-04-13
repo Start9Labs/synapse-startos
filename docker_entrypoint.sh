@@ -4,13 +4,13 @@ export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 
 if ! [ -f /data/homeserver.yaml ]; then
     SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=yes /setup.py generate
-    yq w -i /data/homeserver.yaml "federation_certificate_verification_whitelist.0" "*.onion"
+    yq e -i ".federation_certificate_verification_whitelist.0 = \"*.onion\"" /data/homeserver.yaml
 fi
 
-if [ "$(yq r /data/start9/config.yaml "enable-registration" )" = "true" ]; then
-    yq w -i /data/homeserver.yaml "enable_registration" "true"
+if [ "$(yq e ".enable-registration" /data/start9/config.yaml)" = "true" ]; then
+    yq e -i ".enable_registration = true" /data/homeserver.yaml
 else
-    yq w -i /data/homeserver.yaml "enable_registration" "false"
+    yq e -i ".enable_registration = false" /data/homeserver.yaml
 fi
 
 cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].base_url = \"http://${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
@@ -41,6 +41,5 @@ fi
 
 cp /etc/torsocks.conf.template /etc/torsocks.conf
 echo "server = $HOST_IP" >> /etc/torsocks.conf
-
 nginx
 exec tini torsocks python /start.py
