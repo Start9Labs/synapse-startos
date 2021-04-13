@@ -1,0 +1,6 @@
+[submodule "synapse"]
+	path = synapse
+	url = https://github.com/matrix-org/synapse
+[submodule "element-web"]
+	path = element-web
+	url = https://github.com/vector-im/element-web.git

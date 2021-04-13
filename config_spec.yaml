@@ -1,1 +1,5 @@
-{}
+enable-registration:
+  type: boolean
+  name: Enable Registration
+  description: Allow users to sign up on this homeserver. It is recommended that you disable this after creating your first user.
+  default: true

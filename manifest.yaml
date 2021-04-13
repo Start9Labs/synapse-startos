@@ -1,6 +1,6 @@
 compat: v0
-id: hello-world
-version: 0.1.0
+id: synapse
+version: 1.31.0
 title: hello-world
 description:
   short: "A simple, minimal project to serve as a template for creating an app for the Embassy."
@@ -9,11 +9,12 @@ release-notes: Initial release.
 ports:
   - internal: 80
     tor: 80
+  - internal: 
 image:
   type: tar
 mount: /root
 has-instructions: true
-os-version-required: ">=0.2.4"
-os-version-recommended: ">=0.2.4"
+os-version-required: ">=0.2.12"
+os-version-recommended: ">=0.2.12"
 assets: []
 hidden-service-version: v3
