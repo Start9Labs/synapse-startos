@@ -3,6 +3,7 @@
 set -e
 
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
+echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then
     SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=yes /start.py generate
@@ -42,9 +43,6 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
         # Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
         client_max_body_size 50M;
     }
-    location /_synapse/ {
-        proxy_pass http://localhost:8008/_synapse/;
-    }
 }
 EOT
 
@@ -52,7 +50,7 @@ if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
 fi
 
-cp /etc/tor/torsocks.conf.template /etc/tor/torsocks.conf
-echo "TorAddress $HOST_IP" >> /etc/tor/torsocks.conf
 nginx
-exec tini torsocks /usr/local/bin/python /start.py
+privoxy /etc/privoxy/config
+export HTTPS_PROXY="http://localhost:8118"
+exec tini /start.py

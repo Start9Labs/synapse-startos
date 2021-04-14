@@ -8,7 +8,7 @@ RUN apt-get update \
     curl \
     jq \
     openssl \
-    torsocks \
+    privoxy \
     iproute2 \
     wget
 
@@ -17,7 +17,7 @@ RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/
 
 ADD ./element-web/webapp /var/www
 ADD ./cert.conf /etc/ssl/cert.conf
-ADD ./torsocks.conf.template /etc/tor/torsocks.conf.template
+ADD ./priv-config /etc/privoxy/config
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
 ADD ./renew.sh /usr/local/bin/renew.sh

@@ -1,4 +1,0 @@
-TorPort 9050
-OnionAddrRange 127.42.0.0/16
-AllowInbound 1
-AllowOutboundLocalhost 1
