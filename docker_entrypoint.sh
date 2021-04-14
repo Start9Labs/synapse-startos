@@ -1,9 +1,11 @@
 #!/bin/sh
 
+set -e
+
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 
 if ! [ -f /data/homeserver.yaml ]; then
-    SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=yes /setup.py generate
+    SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=yes /start.py generate
     yq e -i ".federation_certificate_verification_whitelist.0 = \"*.onion\"" /data/homeserver.yaml
 fi
 

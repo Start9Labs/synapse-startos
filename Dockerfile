@@ -1,18 +1,19 @@
-FROM matrixdotorg/synapse:v1.26.0
+FROM matrixdotorg/synapse:v1.31.0
 
 RUN apt-get update \
-    && apt-get install -y software-properties-common gnupg \
-    && add-apt-repository ppa:rmescandon/yq \
-    && apt-get update \
     && apt-get install -y \
-        tini \
-        ca-certificates \
-        nginx \
-        curl \
-        jq \
-        yq \
-        openssl \
-        torsocks
+    tini \
+    ca-certificates \
+    nginx \
+    curl \
+    jq \
+    openssl \
+    torsocks \
+    iproute2 \
+    wget
+
+RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_arm \
+    && chmod a+x /usr/local/bin/yq
 
 ADD ./element-web/webapp /var/www
 ADD ./cert.conf /etc/ssl/cert.conf
@@ -26,6 +27,6 @@ WORKDIR /root
 
 RUN mkdir /run/nginx
 
-EXPOSE 8448 443
+EXPOSE 8448 443 80
 
 ENTRYPOINT ["/usr/local/bin/docker_entrypoint.sh"]
