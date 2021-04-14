@@ -42,6 +42,9 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
         # Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
         client_max_body_size 50M;
     }
+    location /_synapse/ {
+        proxy_pass http://localhost:8008/_synapse/;
+    }
 }
 EOT
 
@@ -49,7 +52,7 @@ if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
 fi
 
-cp /etc/torsocks.conf.template /etc/torsocks.conf
-echo "server = $HOST_IP" >> /etc/torsocks.conf
+cp /etc/tor/torsocks.conf.template /etc/tor/torsocks.conf
+echo "TorAddress $HOST_IP" >> /etc/tor/torsocks.conf
 nginx
-exec tini torsocks python /start.py
+exec tini torsocks /usr/local/bin/python /start.py
