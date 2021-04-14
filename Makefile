@@ -15,7 +15,7 @@ synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instruc
 instructions.md: README.md
 	cp README.md instructions.md
 
-image.tar: Dockerfile docker_entrypoint.sh element-web/webapp #base-image.tar
+image.tar: Dockerfile docker_entrypoint.sh element-web/webapp torsocks.conf.template #base-image.tar
 	# docker load < base-image.tar
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse --platform=linux/arm/v7 -o type=docker,dest=image.tar .
 
