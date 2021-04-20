@@ -52,5 +52,5 @@ fi
 
 nginx
 privoxy /etc/privoxy/config
-export HTTPS_PROXY="http://localhost:8118"
+export HTTPS_PROXY="http://127.0.0.1:8118"
 exec tini /start.py
