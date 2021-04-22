@@ -9,7 +9,7 @@ release-notes: Initial release.
 ports:
   - internal: 80
     tor: 80
-    lan: standard
+    lan: null
   - internal: 443
     tor: 443
   - internal: 8448

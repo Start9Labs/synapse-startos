@@ -20,6 +20,8 @@ fi
 cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].base_url = \"http://${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
 cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].server_name = \"${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
 
+LAN_ADDRESS="$(echo "$TOR_ADDRESS" | sed -r 's/(.+)\.onion/\1.local/g')"
+
 echo "" > /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 server_names_hash_bucket_size 128;
@@ -31,6 +33,7 @@ server {
     ssl_certificate_key /data/key.pem;
 EOT
 echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
+echo "    server_name ${LAN_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     root /var/www;
     location ~* ^(\/_matrix|\/_synapse\/client) {
@@ -52,5 +55,5 @@ fi
 
 nginx
 privoxy /etc/privoxy/config
-export HTTPS_PROXY="http://127.0.0.1:8118"
+export https_proxy="127.0.0.1:8118"
 exec tini /start.py
