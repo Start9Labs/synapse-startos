@@ -23,7 +23,7 @@ image.tar: Dockerfile docker_entrypoint.sh element-web/webapp priv-config base-i
 	docker buildx use $(DOCKER_CUR_ENGINE)
 	docker save start9/synapse > image.tar
 
-base-image.tar: synapse/docker/Dockerfile ./synapse
+base-image.tar: synapse/docker/Dockerfile $(SYNAPSE_SRC)
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.31.0 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
 
 element-web/webapp: element-web/node_modules $(ELEMENT_SRC) element-web/config.json
