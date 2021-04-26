@@ -1,11 +1,11 @@
 compat: v0
 id: synapse
 version: 1.29.0
-title: Synapse
+title: Synapse + Element
 description:
-  short: Synapse is a homeserver for the Matrix protocol
-  long: Synapse is the reference implementation of the Matrix protocol, a next-generation, federated messaging protocol (see matrix.org for details). Element is a Matrix client, bundled with Synapse as part of this release and served as a web application. Matrix is a federated network, meaning that users are registered with Matrix homeservers, which then share user/conversation data with other homeservers as users on different server interact with each other. Thus, there is no central server for the Matrix protocol.
-release-notes: 
+  short: Synapse is a homeserver for the Matrix protocol, and Element is a Matrix client
+  long: Synapse is the reference implementation of the Matrix protocol, a next-generation, federated messaging protocol (see matrix.org for details). Element is a Matrix client, bundled with Synapse as part of this release and served as a web application. Matrix is a federated network, meaning that users are registered with Matrix homeservers, which then share user/conversation data with other homeservers as users on different servers interact with each other. Thus, there is no central server for the Matrix protocol.
+release-notes: https://github.com/matrix-org/synapse/releases/tag/v1.29.0
 ports:
   - internal: 80
     tor: 80

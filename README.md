@@ -1,6 +1,6 @@
-# Wrapper for hello-world
+# Wrapper for synapse
 
-`hello-world` is a simple, minimal project to serve as a template for creating an app for the Embassy.
+`Synapse` is a homeserver for the Matrix protocol, and `Element` is a Matrix client
 
 ## Dependencies
 
@@ -60,8 +60,8 @@ Now you are ready to build your first EmbassyOS service
 Clone the project locally. Note the submodule link to the original project(s). 
 
 ```
-git clone https://github.com/Start9Labs/hello-world-wrapper.git
-cd hello-world-wrapper
+git clone https://github.com/Start9Labs/synapse-wrapper.git
+cd synapse-wrapper
 ```
 
 ## Building
@@ -79,5 +79,5 @@ SSH into an Embassy device.
 Run the following command to determine successful install:
 
 ```
-sudo appmgr install hello-world.s9pk
+sudo appmgr install synapse.s9pk
 ```
