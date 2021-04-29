@@ -3,3 +3,84 @@ enable-registration:
   name: Enable Registration
   description: Allow users to sign up on this homeserver. It is recommended that you disable this after creating your first user.
   default: true
+advanced:
+  type: object
+  name: Advanced
+  nullable: false
+  spec:
+    smtp:
+      type: union
+      name: SMTP Settings
+      description: Configuration for sending emails.
+      tag:
+        id: enabled
+        name: Enabled
+        variantNames:
+          'true': 'True'
+          'false': 'False'
+      default: 'false'
+      variants:
+        'true':
+          address:
+            type: string
+            name: Server Address
+            description: The fully qualified domain name of your SMTP server
+            nullable: false
+          port:
+            type: number
+            name: Port
+            description: The TCP port of your SMTP server
+            default: 25
+            integral: true
+            range: '[0,65535]'
+            nullable: false
+          from-address:
+            type: string
+            name: From Address
+            description: Email address to use as the "from" field of emails sent by synapse
+            nullable: false
+          authentication:
+            type: union
+            name: Authentication
+            description: Settings for authenticating to your SMTP server
+            tag:
+              id: type
+              name: Type
+              variantNames:
+                none: None
+                plain: Plain
+            default: none
+            variants:
+              none: {}
+              plain:
+                username:
+                  type: string
+                  name: Username
+                  description: The username for logging into your SMTP server
+                  nullable: true
+                password:
+                  type: string
+                  name: Password
+                  description: The password for logging into your SMTP server
+                  nullable: true
+          require-transport-security:
+            type: boolean
+            name: Require Transport Security
+            description: Require TLS transport security for SMTP. By default, Synapse will connect over plain text, and will then switch to TLS via STARTTLS *if the SMTP server supports it*. If this option is set, Synapse will refuse to connect unless the server supports STARTTLS.
+            default: false
+          app-name:
+            type: string
+            name: App Name
+            description: Defines the default value for '%(app)s' in notif_from and email subjects. It defaults to 'Matrix'.
+            nullable: true
+          enable-notifs:
+            type: boolean
+            name: Email Notifications
+            description: Enable sending emails for messages that the user has missed. Disabled by default.
+            default: false
+          notif-for-new-users:
+            type: boolean
+            name: New User Email Notifications
+            description: Set to false to disable automatic subscription to email notifications for new users. Enabled by default.
+            default: true
+        'false': {}

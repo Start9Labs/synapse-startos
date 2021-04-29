@@ -17,6 +17,39 @@ else
     yq e -i ".enable_registration = false" /data/homeserver.yaml
 fi
 
+if [ "$(yq e ".advanced.smtp.enabled" /data/start9/config.yaml)" = "true" ]; then
+    yq e -i ".public_baseurl = \"$TOR_ADDRESS\"" /data/homeserver.yaml
+    SMTP_SERVER="$(yq e ".advanced.smtp.address" /data/start9/config.yaml)"
+    yq e -i ".email.smtp_host = \"$SMTP_SERVER\"" /data/homeserver.yaml
+    SMTP_PORT="$(yq e ".advanced.smtp.port" /data/start9/config.yaml)"
+    yq e -i ".email.smtp_port = \"$SMTP_PORT\"" /data/homeserver.yaml
+    SMTP_FROM_ADDRESS="$(yq e ".advanced.smtp.from-address" /data/start9/config.yaml)"
+    SMTP_NOTIF_FROM="Your Friendly %(app)s homeserver <$SMTP_FROM_ADDRESS>"
+    yq e -i ".email.notif_from = \"$SMTP_NOTIF_FROM\"" /data/homeserver.yaml
+    if yq e -e ".advanced.smtp.authentication.username" /data/start9/config.yaml > /dev/null; then
+        SMTP_LOGIN="$(yq e ".advanced.smtp.authentication.username" /data/start9/config.yaml)"
+        yq e -i ".email.smtp_user = \"$SMTP_LOGIN\"" /data/homeserver.yaml
+    fi
+    if yq e -e ".advanced.smtp.authentication.password" /data/start9/config.yaml > /dev/null; then
+        SMTP_PASSWORD="$(yq e ".advanced.smtp.authentication.password" /data/start9/config.yaml)"
+        yq e -i ".email.smtp_pass = \"$SMTP_PASSWORD\"" /data/homeserver.yaml
+    fi
+    if yq e -e ".advanced.smtp.require-transport-security" /data/start9/config.yaml > /dev/null; then
+        yq e -i ".email.require_transport_security = true" /data/homeserver.yaml
+    fi
+    if yq e -e ".advanced.smtp.app-name" /data/start9/config.yaml > /dev/null; then
+        SMTP_APP_NAME="$(yq e ".advanced.smtp.app-name" /data/start9/config.yaml)"
+        yq e -i ".email.app_name = \"$SMTP_APP_NAME\"" /data/homeserver.yaml
+    fi
+    if yq e -e ".advanced.smtp.enable-notifs" /data/start9/config.yaml > /dev/null; then
+        yq e -i ".email.enable_notifs = true" /data/homeserver.yaml
+    fi
+    if yq e -e ".advanced.smtp.notif-for-new-users" /data/start9/config.yaml > /dev/null; then
+        yq e -i ".email.require_transport_security = true" /data/homeserver.yaml
+    fi
+
+fi
+
 cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].base_url = \"http://${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
 cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].server_name = \"${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
 
