@@ -16,7 +16,7 @@ synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instruc
 instructions.md: README.md
 	cp README.md instructions.md
 
-image.tar: Dockerfile docker_entrypoint.sh element-web/webapp priv-config base-image.tar
+image.tar: Dockerfile docker_entrypoint.sh element-web/webapp priv-config base-image.tar configurator.py
 	docker load < base-image.tar
 	docker buildx use default
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse --platform=linux/arm/v7 .
@@ -24,7 +24,7 @@ image.tar: Dockerfile docker_entrypoint.sh element-web/webapp priv-config base-i
 	docker save start9/synapse > image.tar
 
 base-image.tar: synapse/docker/Dockerfile $(SYNAPSE_SRC)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.31.0 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.32.2 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
 
 element-web/webapp: element-web/node_modules $(ELEMENT_SRC) element-web/config.json
 	NODE_OPTIONS=--max-old-space-size=2048 npm --prefix element-web run build

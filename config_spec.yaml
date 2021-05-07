@@ -21,12 +21,12 @@ advanced:
       default: 'false'
       variants:
         'true':
-          address:
+          smtp-host:
             type: string
             name: Server Address
             description: The fully qualified domain name of your SMTP server
             nullable: false
-          port:
+          smtp-port:
             type: number
             name: Port
             description: The TCP port of your SMTP server
@@ -39,30 +39,17 @@ advanced:
             name: From Address
             description: Email address to use as the "from" field of emails sent by synapse
             nullable: false
-          authentication:
-            type: union
-            name: Authentication
-            description: Settings for authenticating to your SMTP server
-            tag:
-              id: type
-              name: Type
-              variantNames:
-                none: None
-                plain: Plain
-            default: none
-            variants:
-              none: {}
-              plain:
-                username:
-                  type: string
-                  name: Username
-                  description: The username for logging into your SMTP server
-                  nullable: true
-                password:
-                  type: string
-                  name: Password
-                  description: The password for logging into your SMTP server
-                  nullable: true
+          smtp-user:
+            type: string
+            name: Username
+            description: The username for logging into your SMTP server
+            nullable: true
+          smtp-pass:
+            type: string
+            name: Password
+            description: The password for logging into your SMTP server
+            nullable: true
+            masked: true
           require-transport-security:
             type: boolean
             name: Require Transport Security
