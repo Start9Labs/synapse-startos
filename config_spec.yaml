@@ -50,8 +50,8 @@ email-notifications:
             name: From Address
             description: Email address to display in the "from" field when receiving emails from your Synapse server.
             nullable: false
-            pattern: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
-            patternDescription: Must be a valid email address
+            # pattern: '/^([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})$/i' #doesn't work
+            # patternDescription: Must be a valid email address
           smtp-user:
             type: string
             name: Username
