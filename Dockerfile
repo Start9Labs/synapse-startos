@@ -12,8 +12,8 @@ RUN apt-get update \
     iproute2 \
     wget
 
-# RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_arm \
-#     && chmod a+x /usr/local/bin/yq
+RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_arm \
+    && chmod a+x /usr/local/bin/yq
 
 RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 
