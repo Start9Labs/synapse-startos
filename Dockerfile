@@ -27,7 +27,7 @@ RUN chmod a+x /configurator.py
 ADD ./renew.sh /usr/local/bin/renew.sh
 RUN chmod a+x /usr/local/bin/renew.sh
 
-WORKDIR /root
+WORKDIR /data
 
 RUN mkdir /run/nginx
 
