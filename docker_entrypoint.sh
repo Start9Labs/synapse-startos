@@ -6,7 +6,7 @@ export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then
-    SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=yes /start.py generate
+    SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=no /start.py generate
     yq e -i ".federation_certificate_verification_whitelist[0] = \"*.onion\"" /data/homeserver.yaml
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
 fi
@@ -45,6 +45,12 @@ EOT
 
 if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then 
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
+fi
+
+if [ "$(yq e ".tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
+    cp /root/priv-config-forward-all /etc/privoxy/config
+else
+    cp /root/priv-config-forward-onion /etc/privoxy/config
 fi
 
 python /configurator.py

@@ -3,6 +3,11 @@ enable-registration:
   name: Enable Registration
   description: Allow users to sign up on this homeserver. It is recommended that you disable this after creating your first user.
   default: true
+tor-only-mode:
+  type: boolean
+  name: Tor Only Mode
+  description: Forward all traffic over the Tor network. This will be slower, but more private.
+  default: false
 advanced:
   type: object
   name: Advanced

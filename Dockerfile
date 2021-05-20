@@ -19,7 +19,8 @@ RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 
 ADD ./element-web/webapp /var/www
 ADD ./cert.conf /etc/ssl/cert.conf
-ADD ./priv-config /etc/privoxy/config
+ADD ./priv-config-forward-onion /root
+ADD ./priv-config-forward-all /root
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
 ADD ./configurator.py /configurator.py
