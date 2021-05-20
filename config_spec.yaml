@@ -8,24 +8,24 @@ tor-only-mode:
   name: Tor Only Mode
   description: Forward all traffic over the Tor network. This will be slower, but more private.
   default: false
-advanced:
-  type: object
-  name: Advanced
-  nullable: false
-  spec:
-    smtp:
-      type: union
-      name: SMTP Settings
-      description: Configuration for sending emails.
-      tag:
-        id: enabled
-        name: Enabled
-        variantNames:
-          'true': 'True'
-          'false': 'False'
-      default: 'false'
-      variants:
-        'true':
+email-notifications:
+  type: union
+  name: Email Notifications
+  description: Enable this setting to receive email notifications from your Matrix server. Requires inputting SMTP credentials.
+  tag:
+    id: enabled
+    name: Enabled
+    variantNames:
+      'true': 'True'
+      'false': 'False'
+  default: 'false'
+  variants:
+    'true':
+      smtp-settings:
+        type: object
+        name: SMTP Settings
+        nullable: false
+        spec:
           smtp-host:
             type: string
             name: Server Address
@@ -39,11 +39,19 @@ advanced:
             integral: true
             range: '[0,65535]'
             nullable: false
+          from-name:
+            type: string
+            name: From Name
+            description: Name to display in the "from" field when receiving emails from your Synapse server.
+            nullable: false
+            default: Synapse
           from-address:
             type: string
             name: From Address
-            description: Email address to use as the "from" field of emails sent by synapse
+            description: Email address to display in the "from" field when receiving emails from your Synapse server.
             nullable: false
+            # pattern: '/^([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})$/i' #doesn't work
+            # patternDescription: Must be a valid email address
           smtp-user:
             type: string
             name: Username
@@ -60,19 +68,4 @@ advanced:
             name: Require Transport Security
             description: Require TLS transport security for SMTP. By default, Synapse will connect over plain text, and will then switch to TLS via STARTTLS *if the SMTP server supports it*. If this option is set, Synapse will refuse to connect unless the server supports STARTTLS.
             default: false
-          app-name:
-            type: string
-            name: App Name
-            description: Defines the default value for '%(app)s' in notif_from and email subjects. It defaults to 'Matrix'.
-            nullable: true
-          enable-notifs:
-            type: boolean
-            name: Email Notifications
-            description: Enable sending emails for messages that the user has missed. Disabled by default.
-            default: false
-          notif-for-new-users:
-            type: boolean
-            name: New User Email Notifications
-            description: Set to false to disable automatic subscription to email notifications for new users. Enabled by default.
-            default: true
-        'false': {}
+    'false': {}

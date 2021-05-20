@@ -14,7 +14,6 @@ RUN apt-get update \
 
 RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_arm \
     && chmod a+x /usr/local/bin/yq
-
 RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 
 ADD ./element-web/webapp /var/www

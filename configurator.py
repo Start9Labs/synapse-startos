@@ -2,10 +2,7 @@
 import os
 import yaml
 
-EMAIL_CFG_KEYS = ["smtp-host", "smtp-port", "from-address", "smtp-user", 
-    "smtp-pass", "require-transport-security", "app-name", "enable-notifs", 
-    "notif-for-new-users"
-]
+EMAIL_CFG_KEYS = ["smtp-host", "smtp-port", "smtp-user", "smtp-pass", "require-transport-security"]
 
 def main():
     with open(r'/data/homeserver.yaml') as hs:
@@ -25,19 +22,19 @@ def main():
     else:
         homeserver_cfg["enable_registration"] = False
 
-    if s9_cfg.get("advanced").get("smtp").get("enabled"):
-        homeserver_cfg["public_baseurl"] = os.getenv('TOR_ADDRESS')
-        homeserver_email_cfg = {}
-        s9_email_cfg = s9_cfg.get("advanced").get("smtp")
+    homeserver_email_cfg = None
+    if s9_cfg.get("email-notifications").get("enabled") == "true":
+        s9_email_cfg = s9_cfg.get("email-notifications").get("smtp-settings")
+        homeserver_email_cfg = {
+          "enable_notifs": True,
+          "notif_from": s9_email_cfg["from-name"] + " <" + s9_email_cfg["from-address"] + ">"
+        }
         for s9_key in EMAIL_CFG_KEYS:
             if s9_email_cfg.get(s9_key):
-                if s9_key == "from-address":
-                    homeserver_email_cfg["notif_from"] = "Your Friendly" + \
-                        " %(app)s homeserver <" + s9_email_cfg[s9_key] + ">"
-                else:
-                    homeserver_email_cfg[s9_key.replace("-", "_")] = s9_email_cfg[s9_key]
+                homeserver_email_cfg[s9_key.replace("-", "_")] = s9_email_cfg[s9_key]
+        homeserver_cfg["public_baseurl"] = os.getenv('TOR_ADDRESS')
+    homeserver_cfg["email"] = homeserver_email_cfg
         # print(homeserver_email_cfg)
-        homeserver_cfg["email"] = homeserver_email_cfg
         # print(homeserver_cfg)
 
     with open(r'/data/homeserver.yaml', 'w') as hs:

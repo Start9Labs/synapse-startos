@@ -2,10 +2,12 @@ compat: v0
 id: synapse
 version: 1.32.2
 title: Synapse + Element
+licenseName: Apache-2.0
+licenseLink: https://github.com/matrix-org/synapse/blob/develop/LICENSE
 description:
   short: Synapse is a homeserver for the Matrix protocol, and Element is a Matrix client
   long: Synapse is the reference implementation of the Matrix protocol, a next-generation, federated messaging protocol (see matrix.org for details). Element is a Matrix client, bundled with Synapse as part of this release and served as a web application. Matrix is a federated network, meaning that users are registered with Matrix homeservers, which then share user/conversation data with other homeservers as users on different servers interact with each other. Thus, there is no central server for the Matrix protocol.
-release-notes: https://github.com/matrix-org/synapse/releases/tag/v1.29.0
+release-notes: https://github.com/matrix-org/synapse/releases/tag/v1.32.2
 install-alert: "IMPORTANT: You MUST disable user registration after creating the first user. Otherwise, anyone who knows your onion address can attack your embassy by flooding it with data via users they create."
 start-alert: "IMPORTANT: You MUST disable user registration after creating the first user. Otherwise, anyone who knows your onion address can attack your embassy by flooding it with data via users they create."
 ports:
@@ -20,7 +22,7 @@ image:
   type: tar
 mount: /data
 has-instructions: true
-os-version-required: ">=0.2.11"
-os-version-recommended: ">=0.2.11"
+os-version-required: ">=0.2.12"
+os-version-recommended: ">=0.2.12"
 assets: []
 hidden-service-version: v3
