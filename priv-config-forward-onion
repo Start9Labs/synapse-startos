@@ -1,0 +1,9 @@
+listen-address  127.0.0.1:8118
+
+logdir /var/log/privoxy
+logfile privoxy.log
+confdir /etc/privoxy
+debug 9216
+
+forward .   .
+forward-socks5t .onion  tor:9050 .
