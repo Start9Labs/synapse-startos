@@ -22,7 +22,7 @@ image:
   type: tar
 mount: /data
 has-instructions: true
-os-version-required: ">=0.2.12"
-os-version-recommended: ">=0.2.12"
+os-version-required: ">=0.2.13"
+os-version-recommended: ">=0.2.13"
 assets: []
 hidden-service-version: v3
