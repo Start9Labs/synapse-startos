@@ -5,11 +5,10 @@ title: Synapse
 licenseName: Apache-2.0
 licenseLink: https://github.com/matrix-org/synapse/blob/develop/LICENSE
 description:
-  short: Synapse is a homeserver for the Matrix protocol
+  short: Synapse is a homeserver for the Matrix protocol.
   long: Synapse is the reference implementation of the Matrix protocol, a next-generation, federated messaging protocol (see matrix.org for details). Matrix is a federated network, meaning that users are registered with Matrix homeservers, which then share user/conversation data with other homeservers as users on different servers interact with each other. Thus, there is no central server for the Matrix protocol.
 release-notes: https://github.com/matrix-org/synapse/releases/tag/v1.32.2
-install-alert: "IMPORTANT: You MUST disable user registration after creating the first user. Otherwise, anyone who knows your onion address can attack your embassy by flooding it with data via users they create."
-start-alert: "IMPORTANT: You MUST disable user registration after creating the first user. Otherwise, anyone who knows your onion address can attack your embassy by flooding it with data via users they create."
+start-alert: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 ports:
   - internal: 80
     tor: 80
