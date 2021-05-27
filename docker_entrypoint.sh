@@ -58,29 +58,12 @@ if [ "$1" = "reset-first-user" ]; then
     query() {
         sqlite3 /data/homeserver.db "$*"
     }
-
     password=$(cat /dev/urandom | base64 | head -c 16)
     hashed_password=$(hash_password -p "$password")
     first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
-    echo 'version: 2' > /data/start9/stats.yaml
-    echo 'data:' >> /data/start9/stats.yaml
-    echo '  Default Username:' >> /data/start9/stats.yaml
-    echo '    type: string' >> /data/start9/stats.yaml
-    echo '    value: "'"$first_user_name"'"' >> /data/start9/stats.yaml
-    echo '    description: This is your default username. While it is not necessary, you may change it inside your File Browser web application. That change, however, will not be reflected here. If you change your default username and forget your new username, you can regain access by resetting the first user.' >> /data/start9/stats.yaml
-    echo '    copyable: true' >> /data/start9/stats.yaml
-    echo '    masked: false' >> /data/start9/stats.yaml
-    echo '    qr: false' >> /data/start9/stats.yaml
-    echo '  Default Password:' >> /data/start9/stats.yaml
-    echo '    type: string' >> /data/start9/stats.yaml
-    echo '    value: "'"$password"'"' >> /data/start9/stats.yaml
-    echo '    description: This is your randomly-generated, default password. While it is not necessary, you may change it inside your Element web application (or whatever client software you use to connect to Synapse). That change, however, will not be reflected here.' >> /data/start9/stats.yaml
-    echo '    copyable: true' >> /data/start9/stats.yaml
-    echo '    masked: true' >> /data/start9/stats.yaml
-    echo '    qr: false' >> /data/start9/stats.yaml
     query "update users set password_hash=\"$hashed_password\" where name=\"$first_user_name\""
     echo "Your new password is: $password"
-    echo 'This will also be reflected in `Properties` for this service.'
+    echo "Please store it in a password manager."
     exit 0
 fi
 

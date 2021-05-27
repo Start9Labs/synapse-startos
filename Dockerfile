@@ -17,7 +17,6 @@ RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/
     && chmod a+x /usr/local/bin/yq
 RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 
-ADD ./element-web/webapp /var/www
 ADD ./cert.conf /etc/ssl/cert.conf
 ADD ./priv-config-forward-onion /root
 ADD ./priv-config-forward-all /root

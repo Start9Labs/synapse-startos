@@ -6,7 +6,7 @@ enable-registration:
 tor-only-mode:
   type: boolean
   name: Tor Only Mode
-  description: Forward all traffic over the Tor network. This will be slower, but more private.
+  description: Route traffic to clearnet domains through the Tor network. This will be slower, but more private.
   default: false
 email-notifications:
   type: union
@@ -35,7 +35,7 @@ email-notifications:
             type: number
             name: Port
             description: The TCP port of your SMTP server
-            default: 25
+            default: 587
             integral: true
             range: '[0,65535]'
             nullable: false

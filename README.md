@@ -1,6 +1,6 @@
 # Wrapper for synapse
 
-`Synapse` is a homeserver for the Matrix protocol, and `Element` is a Matrix client
+`Synapse` is a homeserver for the Matrix protocol
 
 ## Dependencies
 
