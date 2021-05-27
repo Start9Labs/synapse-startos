@@ -1,0 +1,15 @@
+body {
+  margin: 36px;
+  background: #2e2e2e;
+  color: #f8f8ff;
+  font-family: Verdana;
+}
+
+h1 {
+  color: #0ece98;
+}
+
+a {
+  text-decoration: none;
+  color: #0ece98;
+}
