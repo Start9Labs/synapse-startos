@@ -26,3 +26,12 @@ os-version-required: ">=0.2.13"
 os-version-recommended: ">=0.2.13"
 assets: []
 hidden-service-version: v3
+actions:
+  - id: reset-first-user
+    name: Reset First User
+    description: This action will reset the password of the first user in your database to a random value and update the Properties section with the username that was updated and its new password.
+    allowed-statuses:
+      - STOPPED
+    command:
+      - docker_entrypoint.sh
+      - reset-first-user

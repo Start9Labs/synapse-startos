@@ -10,7 +10,8 @@ RUN apt-get update \
     openssl \
     privoxy \
     iproute2 \
-    wget
+    wget \
+    sqlite
 
 RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_arm \
     && chmod a+x /usr/local/bin/yq
