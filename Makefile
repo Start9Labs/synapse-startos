@@ -12,10 +12,7 @@ synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instruc
 	appmgr -vv pack $(shell pwd) -o synapse.s9pk
 	appmgr -vv verify synapse.s9pk
 
-instructions.md: README.md
-	cp README.md instructions.md
-
-image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion base-image.tar configurator.py
+image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion base-image.tar configurator.py $(shell find ./www)
 	docker load < base-image.tar
 	docker buildx use default
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse --platform=linux/arm/v7 .
