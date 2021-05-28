@@ -1,108 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Embassy Synapse Instructions</title>
-    <link rel="stylesheet" href="./main.css" />
-  </head>
-  <body>
-    <h1>Welcome To Synapse!</h1>
-    <p>This is your personal gateway to the <a href="https://matrix.org/" target="_blank">Matrix</a> federation. Through it, you can communicate with anyone, anywhere, without restriction, without permission, independently, and in total, trustless privacy.</p>
-    <h2>Embassy Usage Instructions</h2>
-    <p>Synapse is an incredibly powerful and complex piece of software. Please read these instructions carefully. If you find yourself in trouble, the best thing to do is stop clicking and contact support.</p>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Embassy Synapse Instructions</title>
+  <link rel="stylesheet" href="./main.css" />
+</head>
+
+<body>
+  <h1>Welcome To Synapse!</h1>
+  <p>This is your personal gateway to the <a href="https://matrix.org/" target="_blank">Matrix</a> federation. Through
+    it, you can communicate with anyone, anywhere, without restriction, without permission, independently, and in total,
+    trustless privacy.</p>
+  <h2>Embassy Usage Instructions</h2>
+  <p>Synapse is an incredibly powerful and complex piece of software. Please read these instructions carefully. If you
+    find yourself in trouble, the best thing to do is stop clicking and contact support.</p>
+  <ul>
+    <li>
+      <h3>Selecting a Client</h3>
+      <p>In order to use your Synapse Server, you will need to select a client app. Currently, the only app we recommend
+        is <a href="https://element.io" target="_blank">Element</a>. Element offers native apps for various platform,
+        each of which is listed below with specific usage instructions.</p>
+    </li>
     <ul>
       <li>
-        <h3>Selecting a Client</h3>
-        <p>In order to use your Synapse Server, you will need to select a client app. Currently, the only app we recommend is <a href="https://element.io" target="_blank">Element</a>. Element offers native apps for various platform, each of which is listed below with specific usage instructions.</p>
+        <h4>MacOS</h4>
+        <ol>
+          <li>Configure your MacOS device to run Tor following these <a
+              href="https://docs.start9.com/misc-guides/tor-os/mac.html">instructions</a>.</li>
+          <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for MacOS</a>.</li>
+          <li>Download the <a href="/ElementOnion.dmg" download>Element Onion</a> Apple Script from your Embassy and
+            place it in the Applications folder on your MacOS device. To use Element, you <b>WILL NOT</b> open the
+            Element app. Instead, you will open the Element Onion app. When you open Element Onion, it opens Element
+            configured to use the Tor service running on your MacOS device.</li>
+        </ol>
       </li>
-      <ul>
-        <li>
-          <h4>MacOS</h4>
-          <ol>
-            <li>Configure your MacOS device to run Tor following these <a href="https://docs.start9.com/misc-guides/tor-os/mac.html">instructions</a>.</li>
-            <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for MacOS</a>.</li>
-            <li>Download the <a href="/Element%20Onion.app" download>Element Onion</a> Apple Script from your Embassy and place it in the Applications folder on your MacOS device. To use Element, you <b>WILL NOT</b> open the Element app. Instead, you will open the Element Onion app. When you open Element Onion, it opens Element configured to use the Tor service running on your MacOS device.</li>
-          </ol>
-        </li>
-        <li>
-          <h4>Linux</h4>
-          <ol>
-            <li>Configure your Linux device to run Tor following these <a href="https://docs.start9.com/misc-guides/tor-os/linux.html">instructions</a>.</li>
-            <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Linux</a>.</li>
-            <li>Because the Element app is not Tor-enabled by default, you must launch it from the command line using the following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
-          </ol>
-        </li>
-        <li>
-          <h4>Windows</h4>
-          <ol>
-            <li>Configure your Windows device to run Tor following these <a href="https://docs.start9.com/misc-guides/tor-os/windows.html">instructions</a>.</li>
-            <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Windows</a>.</li>
-            <li>Right click on the Element app or app shortcut.</li>
-            <li>Click "Properties".</li>
-            <li>On the "Shortcut" tab, add <code>--proxy-server=socks5://127.0.0.1:9050</code> to the end of the "Target" field. Please note, there must be a space between <code>...Element.exe</code> and <code>--proxy...</code></li>
-          </ol>
-        </li>
-        <li>
-          <h4>Android</h4>
-          <ol>
-            <li>Configure your Android device to run Tor following these <a href="https://docs.start9.com/misc-guides/tor-os/android.html">instructions</a>.</li>
-            <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Android</a>.</li>
-            <li>Add Element to the list of VPN apps inside Orbot.</li>
-          </ol>
-        </li>
-        <li>
-          <h4>iOS</h4>
-          <p>Unfortunately, iOS devices are not capable of running Tor, and the Element app itself is not configured to run Tor. As such, it is not currently possible to use Element on iOS. The Start9 team is working to integrate Tor into the iOS Element app. Stay tuned.</p>
-        </li>
-      </ul>
       <li>
-        <h3>Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
-        <p><u>Encryption Keys</u>: Matrix uses end-to-end (E2E) encryption, meaning all encryption/decryption is performed locally on your phone/computer using keys stored on the device. To further complicate things, these keys are frequently changed to ensure maximum security. And to even further complicate things, when you log out of Element, these keys are purged from memory. Meaning, if you log out of all your Element client apps, you will lose your keys and be unable to decrypt your own message history!</p>
-        <p><u>Message History</u>: Additionally, your entire (encrypted) message history is stored on your personal Synapse server, which is running on your physical Embassy device. So there are two, separate types of backups that are needed: (1) the encryption keys on your device and (2) the message history on your Embassy.</p>
-        <ul>
-          <li>
-            <h4>Backing up encryption keys</h4>
-            <p>There are two methods of backing up encryption keys: Manual and Automatic</p>
-            <ul>
-              <li>
-                <h5>Manual</h5>
-                <p>Because your encryption keys are rotated frequently, it is almost impossible to perform manual backups and guarantee that all messages can be recovered. However, performing periodic backups can at least ensure the recovery of all messages up until that point in time.</p>
-                <ol>
-                  <li>
-                    In your Element app, go to Settings --> Security and Privacy --> Encryption/Cryptography --> "Export E2E Room Keys"
-                  </li>
-                  <li>
-                    Optionally enter a passphrase to protect the backup and save the file somewhere safe
-                  </li>
-                  <li>
-                    Remember, the keys involved in this backup will only be capable of decrypting messages up until the time of backup. New messages will likely be unrecoverable
-                  </li>
-                </ol>
-              </li>
-              <li>
-                <h5>Automatic</h5>
-                <p>The Element app has a built-in way of backing up encryption keys called Key Backup. This is a hosted service offered by Element that will store an encrypted backup of your keys whenever they are rotated. Note, even though the Key Backup service is hosted, you are not trusting Element with your encryption keys. The keys themselves are encrypted on the using a secret only you know.</p>
-                <ol>
-                  <li>
-                    In your Element app, go to Settings --> Security and Privacy --> Encryption/SecureBackup --> "Setup".
-                  </li>
-                  <li>
-                    Choose between "Generate a Security Key" OR "Enter a Security Phrase". If you choose "Generate a Security Key", the Element app will automatically generate a key for you. If you choose "Enter a Security Phrase", you will be prompted to provide your own password/passphrase.
-                  </li>
-                  <li>
-                    Regardless of which option you choose, you must store the value somewhere safe. <b>Do not lose it!</b>. We recommend creating a secure note in your self-hosted Bitwarden.
-                  </li>
-                </ol>
-              </li>
-            </ul>
+        <h4>Linux</h4>
+        <ol>
+          <li>Configure your Linux device to run Tor following these <a
+              href="https://docs.start9.com/misc-guides/tor-os/linux.html">instructions</a>.</li>
+          <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Linux</a>.</li>
+          <li>Because the Element app is not Tor-enabled by default, you must launch it from the command line using the
+            following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
+        </ol>
+      </li>
+      <li>
+        <h4>Windows</h4>
+        <ol>
+          <li>Configure your Windows device to run Tor following these <a
+              href="https://docs.start9.com/misc-guides/tor-os/windows.html">instructions</a>.</li>
+          <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Windows</a>.</li>
+          <li>Right click on the Element app or app shortcut.</li>
+          <li>Click "Properties".</li>
+          <li>On the "Shortcut" tab, add <code>--proxy-server=socks5://127.0.0.1:9050</code> to the end of the "Target"
+            field. Please note, there must be a space between <code>...Element.exe</code> and <code>--proxy...</code>
           </li>
-          <li>
-            <h4>Backing up message history</h4>
-            <p>All your (encrypted) messages are stored on your physical Embassy device. Therefore, it is critical to create frequent backups of Synapse on your Embassy.</p>
-          </li>
-        </ul>
+        </ol>
+      </li>
+      <li>
+        <h4>Android</h4>
+        <ol>
+          <li>Configure your Android device to run Tor following these <a
+              href="https://docs.start9.com/misc-guides/tor-os/android.html">instructions</a>.</li>
+          <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Android</a>.</li>
+          <li>Add Element to the list of VPN apps inside Orbot.</li>
+        </ol>
+      </li>
+      <li>
+        <h4>iOS</h4>
+        <p>Unfortunately, iOS devices are not capable of running Tor, and the Element app itself is not configured to
+          run Tor. As such, it is not currently possible to use Element on iOS. The Start9 team is working to integrate
+          Tor into the iOS Element app. Stay tuned.</p>
       </li>
     </ul>
-  </body>
+    <li>
+      <h3>Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
+      <p><u>Encryption Keys</u>: Matrix uses end-to-end (E2E) encryption, meaning all encryption/decryption is performed
+        locally on your phone/computer using keys stored on the device. To further complicate things, these keys are
+        frequently changed to ensure maximum security. And to even further complicate things, when you log out of
+        Element, these keys are purged from memory. Meaning, if you log out of all your Element client apps, you will
+        lose your keys and be unable to decrypt your own message history!</p>
+      <p><u>Message History</u>: Additionally, your entire (encrypted) message history is stored on your personal
+        Synapse server, which is running on your physical Embassy device. So there are two, separate types of backups
+        that are needed: (1) the encryption keys on your device and (2) the message history on your Embassy.</p>
+      <ul>
+        <li>
+          <h4>Backing up encryption keys</h4>
+          <p>There are two methods of backing up encryption keys: Manual and Automatic</p>
+          <ul>
+            <li>
+              <h5>Manual</h5>
+              <p>Because your encryption keys are rotated frequently, it is almost impossible to perform manual backups
+                and guarantee that all messages can be recovered. However, performing periodic backups can at least
+                ensure the recovery of all messages up until that point in time.</p>
+              <ol>
+                <li>
+                  In your Element app, go to Settings --> Security and Privacy --> Encryption/Cryptography --> "Export
+                  E2E Room Keys"
+                </li>
+                <li>
+                  Optionally enter a passphrase to protect the backup and save the file somewhere safe
+                </li>
+                <li>
+                  Remember, the keys involved in this backup will only be capable of decrypting messages up until the
+                  time of backup. New messages will likely be unrecoverable
+                </li>
+              </ol>
+            </li>
+            <li>
+              <h5>Automatic</h5>
+              <p>The Element app has a built-in way of backing up encryption keys called Key Backup. This is a hosted
+                service offered by Element that will store an encrypted backup of your keys whenever they are rotated.
+                Note, even though the Key Backup service is hosted, you are not trusting Element with your encryption
+                keys. The keys themselves are encrypted on the using a secret only you know.</p>
+              <ol>
+                <li>
+                  In your Element app, go to Settings --> Security and Privacy --> Encryption/SecureBackup --> "Setup".
+                </li>
+                <li>
+                  Choose between "Generate a Security Key" OR "Enter a Security Phrase". If you choose "Generate a
+                  Security Key", the Element app will automatically generate a key for you. If you choose "Enter a
+                  Security Phrase", you will be prompted to provide your own password/passphrase.
+                </li>
+                <li>
+                  Regardless of which option you choose, you must store the value somewhere safe. <b>Do not lose
+                    it!</b>. We recommend creating a secure note in your self-hosted Bitwarden.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>Backing up message history</h4>
+          <p>All your (encrypted) messages are stored on your physical Embassy device. Therefore, it is critical to
+            create frequent backups of Synapse on your Embassy.</p>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</body>
+
 </html>
