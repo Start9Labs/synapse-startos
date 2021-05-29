@@ -5,8 +5,8 @@ title: Synapse
 licenseName: Apache-2.0
 licenseLink: https://github.com/matrix-org/synapse/blob/develop/LICENSE
 description:
-  short: Synapse is a homeserver for the Matrix protocol.
-  long: Synapse is the reference implementation of the Matrix protocol, a next-generation, federated messaging protocol (see matrix.org for details). Matrix is a federated network, meaning that users are registered with Matrix homeservers, which then share user/conversation data with other homeservers as users on different servers interact with each other. Thus, there is no central server for the Matrix protocol.
+  short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
+  long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
 release-notes: https://github.com/matrix-org/synapse/releases/tag/v1.32.2
 start-alert: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 ports:
@@ -28,7 +28,7 @@ hidden-service-version: v3
 actions:
   - id: reset-first-user
     name: Reset First User
-    description: This action will reset the password of the first user in your database to a random value and update the Properties section with the username that was updated and its new password.
+    description: This action will reset the password of the first user in your database to a random value.
     allowed-statuses:
       - STOPPED
     command:
