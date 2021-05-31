@@ -103,7 +103,7 @@
               <h5>Manual</h5>
               <p>Because your encryption keys are rotated frequently, it is almost impossible to perform manual backups
                 and guarantee that all messages can be recovered. However, performing periodic backups can at least
-                ensure the recovery of all messages up until that point in time.</p>
+                ensure the recovery of messages up until that point in time.</p>
               <ol>
                 <li>
                   In your Element app, go to Settings --> Security and Privacy --> Encryption/Cryptography --> "Export
@@ -120,22 +120,25 @@
             </li>
             <li>
               <h5>Automatic</h5>
-              <p>The Element app has a built-in way of backing up encryption keys called Key Backup. This is a hosted
-                service offered by Element that will store an encrypted backup of your keys whenever they are rotated.
-                Note, even though the Key Backup service is hosted, you are not trusting Element with your encryption
-                keys. The keys themselves are encrypted on the using a secret only you know.</p>
+              <p>This option will <i>automatically</i> store encrypted backups of your keys on your Embassy whenever they are rotated
+                and is the recommended way of doing key backup</p>
               <ol>
                 <li>
                   In your Element app, go to Settings --> Security and Privacy --> Encryption/SecureBackup --> "Setup".
                 </li>
                 <li>
-                  Choose between "Generate a Security Key" OR "Enter a Security Phrase". If you choose "Generate a
-                  Security Key", the Element app will automatically generate a key for you. If you choose "Enter a
-                  Security Phrase", you will be prompted to provide your own password/passphrase.
+                  You will be prompted to select either <code>Generate a Security Key</code> or <code>Enter a Security Phrase</code>.
+                  This is a misleading choice. Either way, Element will generate a security key.
+                  If you select <code>Generate a Security Key</code> (recommended), Element will display the Security Key for you to store on your own.
+                  If you select <code>Enter a Security Phrase</code>, Element will encrypt the Security Key with your Security Phrase,
+                  then store it on your Embassy. In the former case, you will need to keep and protect a private key.
+                  In the latter case, you will need to keep and protect a chosen passphrase. Either way, you will need to store something.
+                  The reason it is recommended to select <code>Generate a Security Key</code> is because, if someone gets access to your Synapse server,
+                  it is <i>far</i> more likely they will guess your chosen passphrase than be able to brute force a private key.
                 </li>
                 <li>
                   Regardless of which option you choose, you must store the value somewhere safe. <b>Do not lose
-                    it!</b>. We recommend creating a secure note in your self-hosted Bitwarden.
+                    it!</b>. It is recommended to store it in your self-hosted Bitwarden.
                 </li>
               </ol>
             </li>
