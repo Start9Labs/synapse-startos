@@ -3,11 +3,6 @@ enable-registration:
   name: Enable Registration
   description: Allow users to sign up on this homeserver. It is recommended that you disable this after creating your first user.
   default: true
-tor-only-mode:
-  type: boolean
-  name: Tor Only Mode
-  description: Route traffic to clearnet domains through the Tor network. This will be slower, but more private.
-  default: false
 email-notifications:
   type: union
   name: Email Notifications
@@ -69,3 +64,13 @@ email-notifications:
             description: Require TLS transport security for SMTP. By default, Synapse will connect over plain text, and will then switch to TLS via STARTTLS *if the SMTP server supports it*. If this option is set, Synapse will refuse to connect unless the server supports STARTTLS.
             default: false
     'false': {}
+advanced:
+  type: object
+  name: Advanced
+  nullable: false
+  spec:
+    tor-only-mode:
+      type: boolean
+      name: Tor Only Mode
+      description: Route traffic to clearnet domains through the Tor network. This will be slower, but more private.
+      default: false
