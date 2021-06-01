@@ -11,9 +11,6 @@ if ! [ -f /data/homeserver.yaml ]; then
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
 fi
 
-cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].base_url = \"http://${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
-cat /var/www/config.json | jq ".default_server_config[\"m.homeserver\"].server_name = \"${TOR_ADDRESS}\"" > /var/www/config.json.tmp && mv /var/www/config.json.tmp /var/www/config.json
-
 echo "" > /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 server_names_hash_bucket_size 128;
@@ -44,7 +41,7 @@ if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
 fi
 
-if [ "$(yq e ".tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
+if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
     cp /root/priv-config-forward-all /etc/privoxy/config
 else
     cp /root/priv-config-forward-onion /etc/privoxy/config
