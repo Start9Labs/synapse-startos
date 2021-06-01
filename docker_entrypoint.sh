@@ -37,6 +37,8 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 }
 EOT
 
+cat /var/www/index.html.template | sed "s/{{TOR_ADDRESS}}/${TOR_ADDRESS}/g" > /var/www/index.html
+
 if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then 
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
 fi
