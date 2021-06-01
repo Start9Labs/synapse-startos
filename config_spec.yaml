@@ -40,18 +40,11 @@ email-notifications:
             description: Name to display in the "from" field when receiving emails from your Synapse server.
             nullable: false
             default: Synapse
-          from-address:
-            type: string
-            name: From Address
-            description: Email address to display in the "from" field when receiving emails from your Synapse server.
-            nullable: false
-            # pattern: '/^([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})$/i' #doesn't work
-            # patternDescription: Must be a valid email address
           smtp-user:
             type: string
             name: Username
             description: The username for logging into your SMTP server
-            nullable: true
+            nullable: false
           smtp-pass:
             type: string
             name: Password
