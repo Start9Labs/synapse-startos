@@ -7,3 +7,4 @@ homeserver.yaml
 .vscode/
 config.yaml
 homeserver1.yaml
+.DS_Store
