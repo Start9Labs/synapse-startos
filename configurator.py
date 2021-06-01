@@ -27,7 +27,7 @@ def main():
         s9_email_cfg = s9_cfg.get("email-notifications").get("smtp-settings")
         homeserver_email_cfg = {
           "enable_notifs": True,
-          "notif_from": s9_email_cfg["from-name"] + " <" + s9_email_cfg["from-address"] + ">"
+          "notif_from": s9_email_cfg["from-name"] + "<" + s9_email_cfg["from-address"] + ">"
         }
         for s9_key in EMAIL_CFG_KEYS:
             if s9_email_cfg.get(s9_key):

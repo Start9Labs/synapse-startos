@@ -72,5 +72,8 @@ advanced:
     tor-only-mode:
       type: boolean
       name: Tor Only Mode
-      description: Route traffic to clearnet domains through the Tor network. This will be slower, but more private.
+      description: |
+        If enabled, communications with clearnet homeservers will be exclusively
+        routed over Tor using Tor exit nodes instead of encrypted clearnet (https).
+        This is not necessarily more private, and it is slower.
       default: false
