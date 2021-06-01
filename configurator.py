@@ -17,6 +17,7 @@ def main():
         # print(s9_cfg)
         s9.close()
 
+    homeserver_cfg["public_baseurl"] = 'http://' + os.getenv('TOR_ADDRESS')
     if s9_cfg.get("enable-registration"):
         homeserver_cfg["enable_registration"] = True
     else:
@@ -32,7 +33,6 @@ def main():
         for s9_key in EMAIL_CFG_KEYS:
             if s9_email_cfg.get(s9_key):
                 homeserver_email_cfg[s9_key.replace("-", "_")] = s9_email_cfg[s9_key]
-        homeserver_cfg["public_baseurl"] = os.getenv('TOR_ADDRESS')
     homeserver_cfg["email"] = homeserver_email_cfg
         # print(homeserver_email_cfg)
         # print(homeserver_cfg)
