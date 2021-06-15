@@ -35,8 +35,8 @@
             browser</i> (Tor Browser or Firefox, but <b>not</b> Brave).</li>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code>.</li>
+        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code></li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -55,8 +55,8 @@
             downloaded it from your own Embassy!</i></p>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code>.</li>
+        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code></li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -70,8 +70,8 @@
           following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code>.</li>
+        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code></li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -88,8 +88,8 @@
         </li>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code>.</li>
+        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code></li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
