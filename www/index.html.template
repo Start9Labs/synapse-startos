@@ -20,7 +20,7 @@
   <br />
   <h2><u>Instructions</u></h2>
 
-  <h3>Step 1: Selecting a Client</h3>
+  <h3>Selecting a Client</h3>
   <p>In order to use your new Synapse server, you will need to select a client app. Currently, the only client we
     recommend is
     <a href="https://element.io" target="_blank">Element</a>, which offers native apps for various platforms.
@@ -35,8 +35,8 @@
             browser</i> (Tor Browser or Firefox, but <b>not</b> Brave).</li>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code></li>
+        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code>.</li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -55,8 +55,8 @@
             downloaded it from your own Embassy!</i></p>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code></li>
+        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code>.</li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -70,8 +70,8 @@
           following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code></li>
+        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code>.</li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -88,8 +88,8 @@
         </li>
         <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
           created your account.</li>
-        <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-          <code>http://{{TOR_ADDRESS}}</code></li>
+        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code>.</li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -100,7 +100,10 @@
             href="https://docs.start9.com/misc-guides/tor-os/android.html">instructions</a>.</li>
         <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Android</a>.</li>
         <li>Add Element to the list of VPN apps inside Orbot.</li>
-        <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://{{TOR_ADDRESS}}</code></li>
+        <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
+          created your account.</li>
+        <li>Beneath "Host Account On", click <code>Edit</code> and change "matrix.org" to
+          <code>http://{{TOR_ADDRESS}}</code>.</li>
         <li>Complete sign in or account creation.</li>
       </ol>
     </li>
@@ -116,7 +119,7 @@
   <hr style="border: 1px dashed #bbb;" />
   <br />
 
-  <h3>Step 2: Enable Cross Signing</h3>
+  <h3>Enable Cross Signing</h3>
   <ol>
     <li>Go to Settings --> Security and Privacy --> Cross Signing.</li>
     <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go.</li>
@@ -135,7 +138,7 @@
   <hr style="border: 1px dashed #bbb;" />
   <br />
 
-  <h3>Step 3: Joining a Room</h3>
+  <h3>Joining a Room</h3>
   <ol>
     <li>On the main dashboard, select <code>Join a Public Room</code>.</li>
     <li>In the search field, paste in the alias of the room you want to join. Room aliases start with #. For example,
@@ -158,7 +161,7 @@
   <hr style="border: 1px dashed #bbb;" />
   <br />
 
-  <h3>Step 4: Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
+  <h3>Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
   <p><u>Encryption Keys</u>: Matrix uses end-to-end (E2E) encryption, meaning all encryption/decryption is performed
     locally on your phone/computer using keys stored on the device. To further complicate things, these keys are
     frequently changed to ensure maximum security. And to even further complicate things, when you log out of
