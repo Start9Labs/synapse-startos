@@ -20,4 +20,4 @@ image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-f
 	docker save start9/synapse > image.tar
 
 base-image.tar: synapse/docker/Dockerfile $(SYNAPSE_SRC)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.32.2 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.36.0 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
