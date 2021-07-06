@@ -1,6 +1,6 @@
 compat: v0
 id: synapse
-version: 1.36.0
+version: 1.37.1
 title: Synapse
 licenseName: Apache-2.0
 licenseLink: https://github.com/matrix-org/synapse/blob/develop/LICENSE
@@ -8,8 +8,8 @@ description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
 release-notes: |
-  - Support for Matrix Spaces
-  - Various other features and bugfixes: https://github.com/matrix-org/synapse/releases/tag/v1.36.0
+  - resolves issues where one busy room could cause all federated traffic to fall behind
+  - Various other features and bugfixes: https://github.com/matrix-org/synapse/releases/tag/v1.37.1
 start-alert: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 ports:
   - internal: 80
