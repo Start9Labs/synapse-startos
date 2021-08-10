@@ -8,16 +8,16 @@ all: synapse.s9pk
 install: synapse.s9pk
 	appmgr install synapse.s9pk
 
-synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instructions.md
+synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar
 	appmgr -vv pack $(shell pwd) -o synapse.s9pk
 	appmgr -vv verify synapse.s9pk
 
 image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion base-image.tar configurator.py $(shell find ./www)
 	docker load < base-image.tar
 	docker buildx use default
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse --platform=linux/arm/v7 .
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse --platform=linux/arm64 .
 	docker buildx use $(DOCKER_CUR_ENGINE)
 	docker save start9/synapse > image.tar
 
 base-image.tar: synapse/docker/Dockerfile $(SYNAPSE_SRC)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.37.1 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.37.1 --platform=linux/arm64 -o type=docker,dest=base-image.tar ./synapse

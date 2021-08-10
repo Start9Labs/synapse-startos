@@ -10,7 +10,7 @@ email-notifications:
   tag:
     id: enabled
     name: Enabled
-    variantNames:
+    variant-names:
       'true': 'True'
       'false': 'False'
   default: 'false'
