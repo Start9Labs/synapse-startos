@@ -32,58 +32,77 @@ config:
     type: docker
     image: compat
     system: true
-    entrypoint: config
+    entrypoint: compat
     args: 
+      - "config"
       - "get"
-      - "/root"
-    mounts: {}
+      - "/data/start9/config.yaml"
+      - "/mnt/assets/config_spec.yaml"
+    mounts:
+      compat: "/mnt/assets"
+      main: "/data"
     io-format: yaml
   set:
     type: docker
     image: compat
     system: true
-    entrypoint: config
+    entrypoint: compat
     args:
+      - "config"
       - "set"
-      - "/root"
-    mounts: {}
+      - "/data/start9/config.yaml"
+    mounts:
+      main: "/data"
     io-format: yaml
 dependencies: {}
 volumes: {}
 interfaces:
-  main:
+  instructions:
+    name: Instructions
+    description: Displays instructions when visited in a browser
     tor-config:
       port-mapping:
         80: "80"
-        443: "443"
-        8448: "8448"
     ui: true
     protocols:
       - tcp
       - http
+  matrix:
+    name: Matrix Protocol
+    description: Listens for Matrix clients and peers to federate with
+    tor-config:
+      port-mapping:
+        443: "443"
+        8448: "8448"
+    ui: false
+    protocols:
+      - tcp
+      - http
+      - matrix
 backup:
   create:
     type: docker
-    image: compat
+    image: duplicity
     system: true
-    entrypoint: "true"
-    args: []
-    mounts: {}
+    entrypoint: duplicity
+    args:
+      - /data
+      - file:///mnt/backup
+    mounts:
+      BACKUP: "/mnt/backup"
+      main: "/data"
   restore:
     type: docker
-    image: compat
+    image: duplicity
     system: true
-    entrypoint: "true"
-    args: []
-    mounts: {} 
+    entrypoint: duplicity
+    args:
+      - file:///mnt/backup
+      - /data
+    mounts:
+      BACKUP: "/mnt/backup"
+      main: "/data" 
 start-alert: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
-image:
-  type: tar
-mount: /data
-has-instructions: true
-os-version-required: ">=0.2.13"
-os-version-recommended: ">=0.2.13"
-hidden-service-version: v3
 actions:
   reset-first-user:
     name: Reset First User

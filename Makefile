@@ -1,16 +1,19 @@
 SYNAPSE_SRC := $(shell find ./synapse)
 DOCKER_CUR_ENGINE := $(shell docker buildx ls | grep "*" | awk '{print $$1;}')
+S9PK_PATH=$(shell find . -name synapse.s9pk -print)
 
 .DELETE_ON_ERROR:
 
-all: synapse.s9pk
+all: verify
 
-install: synapse.s9pk
-	appmgr install synapse.s9pk
+install: 
+	embassy-cli install synapse
 
-synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar
-	appmgr -vv pack $(shell pwd) -o synapse.s9pk
-	appmgr -vv verify synapse.s9pk
+verify: synapse.s9pk
+	embassy-sdk verify synapse.s9pk
+
+synapse.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar
+	embassy-sdk pack
 
 image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion base-image.tar configurator.py $(shell find ./www)
 	docker load < base-image.tar
