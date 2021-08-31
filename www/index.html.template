@@ -101,7 +101,7 @@
         <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Android</a>.</li>
         <li>Add Element to the list of VPN apps inside Orbot.</li>
         <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://{{TOR_ADDRESS}}</code></li>
-        <li>Complete sign in or account creation.</li>
+        <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor.</li>
       </ol>
     </li>
     <li>
