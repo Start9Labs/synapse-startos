@@ -10,10 +10,10 @@ install:
 	embassy-cli install synapse
 
 verify: synapse.s9pk
-	embassy-sdk verify synapse.s9pk
+	sudo embassy-sdk verify synapse.s9pk
 
 synapse.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar
-	embassy-sdk pack
+	sudo embassy-sdk pack
 
 image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion base-image.tar configurator.py $(shell find ./www)
 	docker load < base-image.tar

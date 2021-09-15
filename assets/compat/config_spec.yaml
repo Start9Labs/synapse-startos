@@ -1,3 +1,11 @@
+tor-address:
+  name: Tor Address
+  description: The homeserver's Tor address for federation and client access
+  type: pointer
+  subtype: package
+  package-id: synapse
+  target: tor-address
+  interface: matrix
 enable-registration:
   type: boolean
   name: Enable Registration
@@ -11,11 +19,11 @@ email-notifications:
     id: enabled
     name: Enabled
     variant-names:
-      'true': 'True'
-      'false': 'False'
-  default: 'false'
+      true: True
+      false: False
+  default: false
   variants:
-    'true':
+    true:
       smtp-settings:
         type: object
         name: SMTP Settings
@@ -32,7 +40,7 @@ email-notifications:
             description: The TCP port of your SMTP server
             default: 587
             integral: true
-            range: '[0,65535]'
+            range: "[0,65535]"
             nullable: false
           from-name:
             type: string
@@ -56,7 +64,7 @@ email-notifications:
             name: Require Transport Security
             description: Require TLS transport security for SMTP. By default, Synapse will connect over plain text, and will then switch to TLS via STARTTLS *if the SMTP server supports it*. If this option is set, Synapse will refuse to connect unless the server supports STARTTLS.
             default: false
-    'false': {}
+    false: {}
 advanced:
   type: object
   name: Advanced

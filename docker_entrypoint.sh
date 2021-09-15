@@ -3,6 +3,7 @@
 set -e
 
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
+export TOR_ADDRESS=$(yq e '.tor-address' /data/start9/config.yaml)
 echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then

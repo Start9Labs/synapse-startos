@@ -1,15 +1,14 @@
-compat: v0
 id: synapse
-version: 1.37.1~1
+title: Synapse
+version: 1.37.1.1
 release-notes: "Upgrade to EmbassyOS v0.3.0"
 license: apache
-wrapper-repo: "https://github.com/Start9Labs/filebrowser-wrapper"
-upstream-repo: "https://github.com/filebrowser/filebrowser"
+wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
+upstream-repo: https://github.com/Start9Labs/synapse
+support-site: https://github.com/matrix-org/synapse/issues
+marketing-site: https://matrix.org/
 build: ["make"]
 min-os-version: "0.3.0"
-title: Synapse
-licenseName: Apache-2.0
-licenseLink: https://github.com/matrix-org/synapse/blob/develop/LICENSE
 description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
@@ -18,13 +17,14 @@ assets:
   icon: icon.png
   instructions: instructions.md
   docker-images: image.tar
-  icon-type: png
 main:
   type: docker
   image: main
-  entrypoint: "/usr/local/bin/docker_entrypoint.sh"
+  entrypoint: docker_entrypoint.sh
   args: []
-  mounts: {}
+  mounts:
+    main: /data
+    compat: /mnt/assets
   io-format: yaml
 health-checks: {}
 config:
@@ -34,13 +34,13 @@ config:
     system: true
     entrypoint: compat
     args: 
-      - "config"
-      - "get"
-      - "/data/start9/config.yaml"
-      - "/mnt/assets/config_spec.yaml"
+      - config
+      - get
+      - /data
+      - /mnt/assets/config_spec.yaml
     mounts:
-      compat: "/mnt/assets"
-      main: "/data"
+      compat: /mnt/assets
+      main: /data
     io-format: yaml
   set:
     type: docker
@@ -48,14 +48,33 @@ config:
     system: true
     entrypoint: compat
     args:
-      - "config"
-      - "set"
-      - "/data/start9/config.yaml"
+      - config
+      - set
+      - synapse
+      - /data
+      - /mnt/assets/config_rules.yaml
     mounts:
-      main: "/data"
+      compat: /mnt/assets
+      main: /data
     io-format: yaml
-dependencies: {}
-volumes: {}
+properties:
+  type: docker
+  image: compat
+  system: true
+  entrypoint: compat
+  args:
+    - properties
+    - /data
+  mounts:
+    main: /data
+  io-format: yaml
+volumes:
+  main:
+    type: data
+  compat:
+    type: assets
+alerts: 
+  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
   instructions:
     name: Instructions
@@ -79,30 +98,35 @@ interfaces:
       - tcp
       - http
       - matrix
+dependencies: {}
 backup:
   create:
     type: docker
-    image: duplicity
+    image: compat
     system: true
-    entrypoint: duplicity
+    entrypoint: compat
     args:
+      - duplicity
+      - create
+      - synapse
+      - /mnt/backup
       - /data
-      - file:///mnt/backup
     mounts:
-      BACKUP: "/mnt/backup"
-      main: "/data"
+      backup: /mnt/backup
+      main: /data
   restore:
     type: docker
-    image: duplicity
+    image: compat
     system: true
-    entrypoint: duplicity
+    entrypoint: /mnt/assets/backup-restore.sh
     args:
-      - file:///mnt/backup
+      - restore
+      - synapse
       - /data
+      - /mnt/backup
     mounts:
-      BACKUP: "/mnt/backup"
-      main: "/data" 
-start-alert: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
+      backup: /mnt/backup
+      main: /data 
 actions:
   reset-first-user:
     name: Reset First User
