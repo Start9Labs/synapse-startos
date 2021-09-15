@@ -27,8 +27,6 @@ ADD ./configurator.py /configurator.py
 RUN chmod a+x /configurator.py
 ADD ./renew.sh /usr/local/bin/renew.sh
 RUN chmod a+x /usr/local/bin/renew.sh
-ADD ./config.sh /usr/local/bin/config
-RUN chmod a+x /usr/local/bin/config
 
 WORKDIR /data
 
