@@ -59,8 +59,14 @@ if [ "$1" = "reset-first-user" ]; then
     hashed_password=$(hash_password -p "$password")
     first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
     query "update users set password_hash=\"$hashed_password\" where name=\"$first_user_name\""
-    echo "Your new password is: $password"
-    echo "Please store it in a password manager."
+    action_result="    {
+        \"version\": \"0\",
+        \"message\": \"Here is your new password. Please store it in a password manager.\",
+        \"value\": \"$password\",
+        \"copyable\": true,
+        \"qr\": false
+    }"
+    echo $action_result
     exit 0
 fi
 

@@ -135,8 +135,10 @@ actions:
       - stopped
     implementation:
       type: docker
-      image: compat
-      system: true
+      image: main
+      system: false
       entrypoint: docker_entrypoint.sh
       args: ["reset-first-user"]
-      mounts: {}
+      mounts:
+        main: /data
+      io-format: json
