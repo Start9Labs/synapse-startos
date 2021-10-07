@@ -5,7 +5,7 @@ tor-address:
   subtype: package
   package-id: synapse
   target: tor-address
-  interface: matrix
+  interface: main
 enable-registration:
   type: boolean
   name: Enable Registration

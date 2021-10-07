@@ -26,7 +26,29 @@ main:
     main: /data
     compat: /mnt/assets
   io-format: yaml
-health-checks: {}
+health-checks:
+  federation:
+    type: docker
+    image: main
+    system: false
+    entrypoint: curl
+    args:
+      - "-k"
+      - https://synapse.embassy/_matrix/federation/v1/version
+    mounts: {}
+    io-format: yaml
+    critical: false
+  user-signups-off:
+    type: docker
+    image: utils
+    system: true
+    entrypoint: /mnt/assets/user-signups-off.sh
+    args: []
+    mounts:
+      main: /data
+      utils: /mnt/assets
+    io-format: yaml
+    critical: false
 config:
   get:
     type: docker
@@ -73,27 +95,21 @@ volumes:
     type: data
   compat:
     type: assets
+  utils:
+    type: assets
 alerts: 
   start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
-  instructions:
-    name: Instructions
-    description: Displays instructions when visited in a browser
+  main:
+    name: Main Interface
+    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser.
     tor-config:
       port-mapping:
         80: "80"
-    ui: true
-    protocols:
-      - tcp
-      - http
-  matrix:
-    name: Matrix Protocol
-    description: Listens for Matrix clients and peers to federate with
-    tor-config:
-      port-mapping:
         443: "443"
         8448: "8448"
-    ui: false
+    ui: true
+    ssl: true
     protocols:
       - tcp
       - http
@@ -126,7 +142,7 @@ backup:
       - /mnt/backup
     mounts:
       backup: /mnt/backup
-      main: /data 
+      main: /data
 actions:
   reset-first-user:
     name: Reset First User
