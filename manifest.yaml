@@ -131,20 +131,21 @@ backup:
       - /mnt/backup
       - /data
     mounts:
-      backup: /mnt/backup
+      BACKUP: /mnt/backup
       main: /data
   restore:
     type: docker
     image: compat
     system: true
-    entrypoint: /mnt/assets/backup-restore.sh
+    entrypoint: compat
     args:
+      - duplicity
       - restore
       - synapse
-      - /data
       - /mnt/backup
+      - /data
     mounts:
-      backup: /mnt/backup
+      BACKUP: /mnt/backup
       main: /data
 actions:
   reset-first-user:
