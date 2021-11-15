@@ -25,7 +25,7 @@ main:
   mounts:
     main: /data
     compat: /mnt/assets
-    # cert: /mnt/cert
+    cert: /mnt/cert
   io-format: yaml
 health-checks:
   federation:
@@ -98,8 +98,9 @@ volumes:
     type: assets
   utils:
     type: assets
-  # cert:
-    # type: certificate
+  cert:
+    type: certificate
+    interface-id: main
 alerts: 
   start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
@@ -127,12 +128,12 @@ backup:
     args:
       - duplicity
       - create
-      - synapse
       - /mnt/backup
       - /data
     mounts:
       BACKUP: /mnt/backup
       main: /data
+    io-format: yaml
   restore:
     type: docker
     image: compat
@@ -141,12 +142,12 @@ backup:
     args:
       - duplicity
       - restore
-      - synapse
       - /mnt/backup
       - /data
     mounts:
       BACKUP: /mnt/backup
       main: /data
+    io-format: yaml
 actions:
   reset-first-user:
     name: Reset First User

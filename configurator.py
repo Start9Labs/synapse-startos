@@ -52,7 +52,7 @@ def main():
                 "SSL Cert SHA256 Fingerprint": {
                     "type": "string",
                     "value": os.popen(
-                        "openssl x509 -noout -fingerprint -sha256 -in /data/cert.pem"
+                        "openssl x509 -noout -fingerprint -sha256 -in /mnt/cert/main.cert.pem"
                     )
                     .read()
                     .strip()

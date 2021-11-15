@@ -31,8 +31,8 @@ server {
     listen 80;
     listen 443 ssl;
     listen 8448 ssl;
-    ssl_certificate /data/cert.pem;
-    ssl_certificate_key /data/key.pem;
+    ssl_certificate /mnt/cert/main.cert.pem;
+    ssl_certificate_key /mnt/cert/main.key.pem;
 EOT
 echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
@@ -51,10 +51,6 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 EOT
 
 cat /var/www/index.html.template | sed "s/{{TOR_ADDRESS}}/${TOR_ADDRESS}/g" > /var/www/index.html
-
-if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then 
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
-fi
 
 if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
     cp /root/priv-config-forward-all /etc/privoxy/config

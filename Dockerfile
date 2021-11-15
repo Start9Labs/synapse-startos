@@ -118,8 +118,6 @@ ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
 ADD ./configurator.py /configurator.py
 RUN chmod a+x /configurator.py
-ADD ./renew.sh /usr/local/bin/renew.sh
-RUN chmod a+x /usr/local/bin/renew.sh
 
 WORKDIR /data
 
