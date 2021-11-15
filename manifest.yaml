@@ -39,6 +39,7 @@ health-checks:
     mounts: {}
     io-format: yaml
     critical: false
+    inject: true
   user-signups-off:
     type: docker
     image: utils
