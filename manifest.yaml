@@ -29,6 +29,8 @@ main:
   io-format: yaml
 health-checks:
   federation:
+    name: Federation
+    description: Activates once your homerserver is federating properly
     type: docker
     image: main
     system: false
@@ -38,9 +40,11 @@ health-checks:
       - https://synapse.embassy/_matrix/federation/v1/version
     mounts: {}
     io-format: yaml
-    critical: false
+    severity: warning
     inject: true
   user-signups-off:
+    name: User Signups Off
+    description: Indicates whether new user registrations have been disabled. If they are enabled but you're not expecting any new user signups, you should turn the "Enable Registration" toggle off in Config, as anyone who knows your onion URL can create accounts on your server.
     type: docker
     image: utils
     system: true
@@ -50,7 +54,7 @@ health-checks:
       main: /data
       utils: /mnt/assets
     io-format: yaml
-    critical: false
+    severity: warning
 config:
   get:
     type: docker
