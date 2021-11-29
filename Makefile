@@ -11,7 +11,7 @@ install:
 verify: synapse.s9pk
 	embassy-sdk verify synapse.s9pk
 
-synapse.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar
+synapse.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml assets/utils/check-federation.sh assets/utils/user-signups-off.sh image.tar
 	embassy-sdk pack
 
 image.tar: Dockerfile docker_entrypoint.sh assets/utils/user-signups-off.sh priv-config-forward-all priv-config-forward-onion configurator.py $(shell find ./www)
