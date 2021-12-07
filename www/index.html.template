@@ -91,6 +91,8 @@
         <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
           <code>http://{{TOR_ADDRESS}}</code></li>
         <li>Complete sign in or account creation.</li>
+        <li>*Note: Upon updating the Matrix Windows client <code>--proxy-server=socks5://127.0.0.1:9050</code> may be removed from the shortcut and the above procedure must be repeated. If any additonal text is added in the "Start in" box 
+        in the "shortcut" tab, please remove everything so the "target" box is empty. Hit apply, then OK.<li>
       </ol>
     </li>
     <li>
