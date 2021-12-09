@@ -32,27 +32,24 @@ health-checks:
     name: Federation
     description: Activates once your homerserver is federating properly
     type: docker
-    image: utils
-    system: true
-    entrypoint: /mnt/assets/check-federation.sh
+    image: main
+    system: false
+    entrypoint: check-federation.sh
     args: []
-    mounts:
-      utils: /mnt/assets
+    mounts: {}
     io-format: yaml
-    severity: warning
+    inject: true
   user-signups-off:
     name: User Signups Off
     description: Indicates whether new user registrations have been disabled. If they are enabled but you're not expecting any new user signups, you should turn the "Enable Registration" toggle off in Config, as anyone who knows your onion URL can create accounts on your server.
     type: docker
-    image: utils
-    system: true
-    entrypoint: /mnt/assets/user-signups-off.sh
+    image: main
+    system: false
+    entrypoint: user-signups-off.sh
     args: []
-    mounts:
-      main: /data
-      utils: /mnt/assets
+    mounts: {}
     io-format: yaml
-    severity: warning
+    inject: true
 config:
   get:
     type: docker
@@ -98,8 +95,6 @@ volumes:
   main:
     type: data
   compat:
-    type: assets
-  utils:
     type: assets
   cert:
     type: certificate

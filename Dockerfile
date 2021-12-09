@@ -116,6 +116,10 @@ ADD ./priv-config-forward-onion /root
 ADD ./priv-config-forward-all /root
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
+ADD ./check-federation.sh /usr/local/bin/check-federation.sh
+RUN chmod a+x /usr/local/bin/check-federation.sh
+ADD ./user-signups-off.sh /usr/local/bin/user-signups-off.sh
+RUN chmod a+x /usr/local/bin/user-signups-off.sh
 ADD ./configurator.py /configurator.py
 RUN chmod a+x /configurator.py
 
