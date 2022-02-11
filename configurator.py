@@ -1,23 +1,27 @@
 #!/usr/local/bin/python
 import os
 import yaml
+import subprocess
 
-EMAIL_CFG_KEYS = ["smtp-host", "smtp-port", "smtp-user", "smtp-pass", "require-transport-security"]
+EMAIL_CFG_KEYS = [
+    "smtp-host",
+    "smtp-port",
+    "smtp-user",
+    "smtp-pass",
+    "require-transport-security",
+]
+
 
 def main():
-    with open(r'/data/homeserver.yaml') as hs:
-    # with open(r'homeserver.yaml') as hs:
+    with open(r"/data/homeserver.yaml") as hs:
         homeserver_cfg = yaml.full_load(hs)
-        # print(homeserver_cfg)
         hs.close()
 
-    with open(r'/data/start9/config.yaml') as s9:
-    # with open(r'config.yaml') as s9:
+    with open(r"/data/start9/config.yaml") as s9:
         s9_cfg = yaml.full_load(s9)
-        # print(s9_cfg)
         s9.close()
 
-    homeserver_cfg["public_baseurl"] = 'http://' + os.getenv('TOR_ADDRESS')
+    homeserver_cfg["public_baseurl"] = "http://" + os.getenv("TOR_ADDRESS")
     if s9_cfg.get("enable-registration"):
         homeserver_cfg["enable_registration"] = True
     else:
@@ -27,19 +31,41 @@ def main():
     if s9_cfg.get("email-notifications").get("enabled") == "true":
         s9_email_cfg = s9_cfg.get("email-notifications").get("smtp-settings")
         homeserver_email_cfg = {
-          "enable_notifs": True,
-          "notif_from": s9_email_cfg["from-name"] + "<" + s9_email_cfg["smtp-user"] + ">"
+            "enable_notifs": True,
+            "notif_from": s9_email_cfg["from-name"]
+            + "<"
+            + s9_email_cfg["smtp-user"]
+            + ">",
         }
         for s9_key in EMAIL_CFG_KEYS:
             if s9_email_cfg.get(s9_key):
                 homeserver_email_cfg[s9_key.replace("-", "_")] = s9_email_cfg[s9_key]
     homeserver_cfg["email"] = homeserver_email_cfg
-        # print(homeserver_email_cfg)
-        # print(homeserver_cfg)
 
-    with open(r'/data/homeserver.yaml', 'w') as hs:
-    # with open(r'homeserver1.yaml', 'w') as hs:
-        data1 = yaml.dump(homeserver_cfg, hs)
+    with open(r"/data/homeserver.yaml", "w") as hs:
+        yaml.dump(homeserver_cfg, hs)
+
+    with open(r"/data/start9/stats.yaml", "w") as s:
+        stats = {
+            "version": 2,
+            "data": {
+                "SSL Cert SHA256 Fingerprint": {
+                    "type": "string",
+                    "value": os.popen(
+                        "openssl x509 -noout -fingerprint -sha256 -in /mnt/cert/main.cert.pem"
+                    )
+                    .read()
+                    .strip()
+                    .split("=")[-1],
+                    "description": "Your SSL Certificate's unique public identifier. No one can impersonate your homeserver without access to the corresponding private key",
+                    "copyable": True,
+                    "qr": False,
+                    "masked": False,
+                }
+            },
+        }
+        yaml.dump(stats, s)
+
 
 if __name__ == "__main__":
     main()

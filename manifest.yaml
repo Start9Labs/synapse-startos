@@ -1,38 +1,163 @@
-compat: v0
 id: synapse
-version: 1.37.1
 title: Synapse
-licenseName: Apache-2.0
-licenseLink: https://github.com/matrix-org/synapse/blob/develop/LICENSE
+version: 1.42.0
+release-notes: "Upgrade to EmbassyOS v0.3.0 and upgrade upstream to 1.42.0"
+license: apache
+wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
+upstream-repo: https://github.com/Start9Labs/synapse
+support-site: https://github.com/matrix-org/synapse/issues
+marketing-site: https://matrix.org/
+build: ["make"]
+min-os-version: "0.3.0"
 description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
-release-notes: |
-  - resolves issues where one busy room could cause all federated traffic to fall behind
-  - Various other features and bugfixes: https://github.com/matrix-org/synapse/releases/tag/v1.37.1
-start-alert: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
-ports:
-  - internal: 80
-    tor: 80
-    lan: null
-  - internal: 443
-    tor: 443
-  - internal: 8448
-    tor: 8448
-image:
-  type: tar
-mount: /data
-has-instructions: false
-os-version-required: ">=0.2.13"
-os-version-recommended: ">=0.2.13"
-assets: []
-hidden-service-version: v3
+assets:
+  license: LICENSE
+  icon: icon.png
+  instructions: instructions.md
+  docker-images: image.tar
+main:
+  type: docker
+  image: main
+  entrypoint: docker_entrypoint.sh
+  args: []
+  mounts:
+    main: /data
+    compat: /mnt/assets
+    cert: /mnt/cert
+  io-format: yaml
+health-checks:
+  federation:
+    name: Federation
+    description: Activates once your homerserver is federating properly
+    type: docker
+    image: main
+    system: false
+    entrypoint: check-federation.sh
+    args: []
+    mounts: {}
+    io-format: yaml
+    inject: true
+  user-signups-off:
+    name: User Signups Off
+    description: Indicates whether new user registrations have been disabled. If they are enabled but you're not expecting any new user signups, you should turn the "Enable Registration" toggle off in Config, as anyone who knows your onion URL can create accounts on your server.
+    type: docker
+    image: main
+    system: false
+    entrypoint: user-signups-off.sh
+    args: []
+    mounts: {}
+    io-format: yaml
+    inject: true
+config:
+  get:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args: 
+      - config
+      - get
+      - /data
+      - /mnt/assets/config_spec.yaml
+    mounts:
+      compat: /mnt/assets
+      main: /data
+    io-format: yaml
+  set:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - config
+      - set
+      - synapse
+      - /data
+      - /mnt/assets/config_rules.yaml
+    mounts:
+      compat: /mnt/assets
+      main: /data
+    io-format: yaml
+properties:
+  type: docker
+  image: compat
+  system: true
+  entrypoint: compat
+  args:
+    - properties
+    - /data
+  mounts:
+    main: /data
+  io-format: yaml
+volumes:
+  main:
+    type: data
+  compat:
+    type: assets
+  cert:
+    type: certificate
+    interface-id: main
+alerts: 
+  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
+interfaces:
+  main:
+    name: Main Interface
+    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser.
+    tor-config:
+      port-mapping:
+        80: "80"
+        443: "443"
+        8448: "8448"
+    ui: true
+    ssl: true
+    protocols:
+      - tcp
+      - http
+      - matrix
+dependencies: {}
+backup:
+  create:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - create
+      - /mnt/backup
+      - /data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /data
+    io-format: yaml
+  restore:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - restore
+      - /mnt/backup
+      - /data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /data
+    io-format: yaml
 actions:
-  - id: reset-first-user
+  reset-first-user:
     name: Reset First User
     description: This action will reset the password of the first user in your database to a random value.
     allowed-statuses:
-      - STOPPED
-    command:
-      - docker_entrypoint.sh
-      - reset-first-user
+      - stopped
+    implementation:
+      type: docker
+      image: main
+      system: false
+      entrypoint: docker_entrypoint.sh
+      args: ["reset-first-user"]
+      mounts:
+        main: /data
+      io-format: json

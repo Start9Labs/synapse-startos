@@ -1,3 +1,11 @@
+tor-address:
+  name: Tor Address
+  description: The homeserver's Tor address for federation and client access
+  type: pointer
+  subtype: package
+  package-id: synapse
+  target: tor-address
+  interface: main
 enable-registration:
   type: boolean
   name: Enable Registration
@@ -10,7 +18,7 @@ email-notifications:
   tag:
     id: enabled
     name: Enabled
-    variantNames:
+    variant-names:
       'true': 'True'
       'false': 'False'
   default: 'false'
@@ -32,7 +40,7 @@ email-notifications:
             description: The TCP port of your SMTP server
             default: 587
             integral: true
-            range: '[0,65535]'
+            range: "[0,65535]"
             nullable: false
           from-name:
             type: string

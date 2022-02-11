@@ -3,9 +3,22 @@
 set -e
 
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
+export TOR_ADDRESS=$(yq e '.tor-address' /data/start9/config.yaml)
 echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then
+    if [ "$1" = "reset-first-user" ]; then
+        cat << EOF
+{
+    "version": "0",
+    "message": "Reset First User Failed",
+    "value": "Database not found. Please start your homeserver and register a user before runnning this action.",
+    "copyable": false,
+    "qr": false
+}
+EOF
+        exit 0
+    fi
     SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=no /start.py generate
     yq e -i ".federation_certificate_verification_whitelist[0] = \"*.onion\"" /data/homeserver.yaml
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
@@ -18,8 +31,8 @@ server {
     listen 80;
     listen 443 ssl;
     listen 8448 ssl;
-    ssl_certificate /data/cert.pem;
-    ssl_certificate_key /data/key.pem;
+    ssl_certificate /mnt/cert/main.cert.pem;
+    ssl_certificate_key /mnt/cert/main.key.pem;
 EOT
 echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
@@ -39,10 +52,6 @@ EOT
 
 cat /var/www/index.html.template | sed "s/{{TOR_ADDRESS}}/${TOR_ADDRESS}/g" > /var/www/index.html
 
-if ! [ -f /data/cert.pem ] || ! [ -f /data/key.pem ]; then 
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/key.pem -out /data/cert.pem -config /etc/ssl/cert.conf
-fi
-
 if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
     cp /root/priv-config-forward-all /etc/privoxy/config
 else
@@ -58,8 +67,15 @@ if [ "$1" = "reset-first-user" ]; then
     hashed_password=$(hash_password -p "$password")
     first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
     query "update users set password_hash=\"$hashed_password\" where name=\"$first_user_name\""
-    echo "Your new password is: $password"
-    echo "Please store it in a password manager."
+    cat << EOF
+{
+    "version": "0",
+    "message": "Here is your new password. Please store it in a password manager.",
+    "value": "$password",
+    "copyable": true,
+    "qr": false
+}
+EOF
     exit 0
 fi
 

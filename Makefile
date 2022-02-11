@@ -1,23 +1,18 @@
 SYNAPSE_SRC := $(shell find ./synapse)
-DOCKER_CUR_ENGINE := $(shell docker buildx ls | grep "*" | awk '{print $$1;}')
+VERSION := $(shell yq e ".version" manifest.yaml)
 
 .DELETE_ON_ERROR:
 
-all: synapse.s9pk
+all: verify
 
-install: synapse.s9pk
-	appmgr install synapse.s9pk
+install: 
+	embassy-cli install synapse
 
-synapse.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instructions.md
-	appmgr -vv pack $(shell pwd) -o synapse.s9pk
-	appmgr -vv verify synapse.s9pk
+verify: synapse.s9pk
+	embassy-sdk verify s9pk synapse.s9pk
 
-image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion base-image.tar configurator.py $(shell find ./www)
-	docker load < base-image.tar
-	docker buildx use default
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse --platform=linux/arm/v7 .
-	docker buildx use $(DOCKER_CUR_ENGINE)
-	docker save start9/synapse > image.tar
+synapse.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar
+	embassy-sdk pack
 
-base-image.tar: synapse/docker/Dockerfile $(SYNAPSE_SRC)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:v1.37.1 --platform=linux/arm/v7 -o type=docker,dest=base-image.tar ./synapse
+image.tar: Dockerfile docker_entrypoint.sh priv-config-forward-all priv-config-forward-onion configurator.py $(shell find ./www)
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse/main:$(VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .
