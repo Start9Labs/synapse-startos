@@ -9,7 +9,7 @@ install:
 	embassy-cli install synapse
 
 verify: synapse.s9pk
-	embassy-sdk verify synapse.s9pk
+	embassy-sdk verify s9pk synapse.s9pk
 
 synapse.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar
 	embassy-sdk pack
