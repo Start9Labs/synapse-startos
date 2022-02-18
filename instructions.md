@@ -1,0 +1,1 @@
+For full instructions: start Synapse, then visit your Synapse onion address in a Tor-enabled browser.

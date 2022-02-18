@@ -30,14 +30,14 @@ main:
 health-checks:
   federation:
     name: Federation
-    description: Activates once your homerserver is federating properly
+    description: Activates once your homeserver is federating properly
     type: docker
     image: main
     system: false
     entrypoint: check-federation.sh
     args: []
     mounts: {}
-    io-format: yaml
+    io-format: json
     inject: true
   user-signups-off:
     name: User Signups Off

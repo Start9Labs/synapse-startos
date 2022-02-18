@@ -1,12 +1,13 @@
 #!/bin/bash
 
-curl_result=$(curl -s -k https://synapse.embassy/_matrix/federation/v1/version)
-exit_code=$?
-
-if [[ "$exit_code" == 0 ]]; then
-    exit 0
-else
+DURATION=$(</dev/stdin)
+if (($DURATION <= 30000 )); then
     exit 60
+else
+    curl -s -k https://synapse.embassy/_matrix/federation/v1/version
+    RES=$?
+    if test "$RES" != 0; then
+        echo "Homeserver is unreachable" >&2
+        exit 1
+    fi
 fi
-
-exit $exit_code

@@ -2,7 +2,6 @@
 synapse.s9pk
 image.tar
 base-image.tar
-instructions.md
 homeserver.yaml
 .vscode/
 config.yaml
