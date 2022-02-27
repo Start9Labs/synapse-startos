@@ -8,7 +8,6 @@ upstream-repo: https://github.com/Start9Labs/synapse
 support-site: https://github.com/matrix-org/synapse/issues
 marketing-site: https://matrix.org/
 build: ["make"]
-min-os-version: "0.3.0"
 description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
@@ -30,7 +29,7 @@ main:
 health-checks:
   federation:
     name: Federation
-    description: Activates once your homerserver is federating properly
+    success-message: Homeserver is federating properly
     type: docker
     image: main
     system: false
@@ -41,7 +40,7 @@ health-checks:
     inject: true
   user-signups-off:
     name: User Signups Off
-    description: Indicates whether new user registrations have been disabled. If they are enabled but you're not expecting any new user signups, you should turn the "Enable Registration" toggle off in Config, as anyone who knows your onion URL can create accounts on your server.
+    success-message: New user registrations are disabled
     type: docker
     image: main
     system: false
@@ -111,7 +110,6 @@ interfaces:
         443: "443"
         8448: "8448"
     ui: true
-    ssl: true
     protocols:
       - tcp
       - http
