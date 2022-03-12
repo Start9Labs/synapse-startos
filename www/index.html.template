@@ -120,7 +120,7 @@
   <ol>
     <li>Go to Settings --> Security and Privacy --> Cross Signing.</li>
     <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go.</li>
-    <li>If you see <code>Cross Signing has not been set up</code>, then click <code>Set Up</code>, then follow te
+    <li>If you see <code>Cross Signing has not been set up</code>, then click <code>Set Up</code>, then follow the
       instructions to complete setup.</li>
   </ol>
   <p>Explanation: The Matrix protocol uses advanced cryptography to ensure that you are, in fact, communicating with the
@@ -146,13 +146,6 @@
     <li>Joining a room can take a while, depending on how many users are currently in the room. If it fails, simply try
       again.</li>
   </ol>
-  <p>Explanation: The Matrix protocol uses advanced cryptography to ensure that you are, in fact, communicating with the
-    people you think you are,
-    and not impostors. To make this as simple as possible, Matrix offers something called Cross Signing, which allows
-    users to verify each other, and then for each user to verify their own various devices. The alternative is that
-    every user would need to verify every
-    device of everyone they interact with, which is simply annoying. You can read more about Cross Signing <a href=""
-      target="_blank">here</a>.</p>
 
   <br />
   <hr style="border: 1px dashed #bbb;" />
