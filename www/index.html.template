@@ -123,9 +123,9 @@
 
   <h3>Step 2: Enable Cross Signing</h3>
   <ol>
-    <li>Go to Settings --> Security & Privacy --> Cross Signing.</li>
+    <li>Go to Settings --> Security & Privacy --> Cross-signing.</li>
     <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go.</li>
-    <li>If you see <code>Cross Signing has not been set up</code>, then click <code>Set Up</code>, then follow the
+    <li>If you see <code>Cross-signing has not been set up</code>, then click <code>Set Up</code>, then follow the
       instructions to complete setup.</li>
     <li>Alternatively, if you see <code>Cross-signing is ready but keys are not backed up</code>, follow the backup instructions in Step 4</li>
   </ol>
@@ -134,8 +134,9 @@
     and not impostors. To make this as simple as possible, Matrix offers something called Cross Signing, which allows
     users to verify each other, and then for each user to verify their own various devices. The alternative is that
     every user would need to verify every
-    device of everyone they interact with, which is simply annoying. You can read more about Cross Signing <a href=""
-      target="_blank">here</a>.</p>
+    device of everyone they interact with, which is simply annoying. You can read more about Cross Signing 
+    <a href="https://element.io/blog/e2e-encryption-by-default-cross-signing-is-here/" target="_blank">here</a>.
+  </p>
 
   <br />
   <hr style="border: 1px dashed #bbb;" />
