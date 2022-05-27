@@ -123,10 +123,11 @@
 
   <h3>Step 2: Enable Cross Signing</h3>
   <ol>
-    <li>Go to Settings --> Security and Privacy --> Cross Signing.</li>
+    <li>Go to Settings --> Security & Privacy --> Cross Signing.</li>
     <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go.</li>
     <li>If you see <code>Cross Signing has not been set up</code>, then click <code>Set Up</code>, then follow the
       instructions to complete setup.</li>
+    <li>Alternatively, if you see <code>Cross-signing is ready but keys are not backed up</code>, follow the backup instructions in Step 4</li>
   </ol>
   <p>Explanation: The Matrix protocol uses advanced cryptography to ensure that you are, in fact, communicating with the
     people you think you are,
@@ -142,7 +143,7 @@
 
   <h3>Step 3: Joining a Room</h3>
   <ol>
-    <li>On the main dashboard, select <code>Join a Public Room</code>.</li>
+    <li>On the main dashboard, select <code>Explore Public Rooms</code>.</li>
     <li>In the search field, paste in the alias of the room you want to join. Room aliases start with #. For example,
       Start9's Tor Party room
       is <a href="https://matrix.to/#/#tor-party:matrix.privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion"
@@ -177,8 +178,8 @@
             ensure the recovery of messages up until that point in time.</p>
           <ol>
             <li>
-              In your Element app, go to Settings --> Security and Privacy --> Encryption/Cryptography --> "Export
-              E2E Room Keys"
+              In your Element app, go to Settings --> Security & Privacy --> Cryptography --> "Export
+              E2E room keys"
             </li>
             <li>
               Optionally enter a passphrase to protect the backup and save the file somewhere safe
@@ -196,7 +197,7 @@
             and is the recommended way of doing key backup</p>
           <ol>
             <li>
-              In your Element app, go to Settings --> Security and Privacy --> Encryption/SecureBackup --> "Setup".
+              In your Element app, go to Settings --> Security & Privacy --> Secure Backup --> "Set up".
             </li>
             <li>
               You will be prompted to select either <code>Generate a Security Key</code> or
