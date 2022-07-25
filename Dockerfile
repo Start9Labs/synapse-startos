@@ -54,14 +54,19 @@ RUN \
 # NB: In poetry 1.2 `poetry export` will be moved into a plugin; we'll need to also
 # pip install poetry-plugin-export (https://github.com/python-poetry/poetry-plugin-export).
 RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install --user git+https://github.com/python-poetry/poetry.git@fb13b3a676f476177f7937ffa480ee5cff9a90a5
+  pip install --user "poetry-core==1.1.0a7" git+https://github.com/python-poetry/poetry.git@fb13b3a676f476177f7937ffa480ee5cff9a90a5
 
 WORKDIR /synapse
 
 # Copy just what we need to run `poetry export`...
 COPY synapse/pyproject.toml synapse/poetry.lock synapse/README.rst /synapse/
 
-RUN /root/.local/bin/poetry export --extras all -o /synapse/requirements.txt
+# If specified, we won't verify the hashes of dependencies.
+# This is only needed if the hashes of dependencies cannot be checked for some
+# reason, such as when a git repository is used directly as a dependency.
+ARG TEST_ONLY_SKIP_DEP_HASH_VERIFICATION
+
+RUN /root/.local/bin/poetry export --extras all -o /synapse/requirements.txt ${TEST_ONLY_SKIP_DEP_HASH_VERIFICATION:+--without-hashes}
 
 ###
 ### Stage 1: builder
@@ -89,6 +94,7 @@ RUN \
     openssl \
     rustc \
     zlib1g-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # To speed up rebuilds, install all of the dependencies before we copy over
@@ -105,7 +111,7 @@ COPY synapse/synapse /synapse/synapse/
 # ... and what we need to `pip install`.
 # TODO: once pyproject.toml declares poetry-core as its build system, we'll need to copy
 # pyproject.toml here, ditching setup.py and MANIFEST.in.
-COPY synapse/setup.py synapse/MANIFEST.in synapse/README.rst /synapse/
+COPY synapse/pyproject.toml synapse/README.rst /synapse/
 
 # Install the synapse package itself.
 RUN pip install --prefix="/install" --no-deps --no-warn-script-location /synapse

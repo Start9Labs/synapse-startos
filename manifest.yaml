@@ -1,14 +1,14 @@
 id: synapse
 title: Synapse
-version: 1.57.1
-release-notes: "Upgrade upstream to 1.57.1"
+version: 1.63.1
+release-notes: "Upgrade upstream to 1.63.1"
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
 support-site: https://github.com/matrix-org/synapse/issues
 marketing-site: https://matrix.org/
 build: ["make"]
-min-os-version: "0.3.0"
+min-os-version: "0.3.1"
 description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
