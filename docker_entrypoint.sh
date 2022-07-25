@@ -80,6 +80,9 @@ EOF
 fi
 
 python /configurator.py
+#Fixes and last minute config changes
+echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
+echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
 nginx
 privoxy /etc/privoxy/config
 export https_proxy="127.0.0.1:8118"
