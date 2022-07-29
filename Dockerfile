@@ -25,7 +25,7 @@
 
 
 
-ARG PYTHON_VERSION=3.9
+ARG PYTHON_VERSION=3.10
 
 ###
 ### Stage 0: generate requirements.txt

@@ -1,3 +1,3 @@
 [submodule "synapse"]
 	path = synapse
-	url = https://github.com/k0gen/synapse
+	url = https://github.com/matrix-org/synapse
