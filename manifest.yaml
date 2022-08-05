@@ -27,12 +27,10 @@ main:
   args: []
   mounts:
     main: /data
-    compat: /mnt/assets
     cert: /mnt/cert
 health-checks:
   federation:
     name: Federation
-    description: Activates once your homeserver is federating properly.
     type: docker
     image: main
     system: false
@@ -43,7 +41,6 @@ health-checks:
     inject: true
   user-signups-off:
     name: User Signups Off
-    description: Indicates whether new user registrations have been disabled. If they are enabled but you're not expecting any new user signups, you should turn the "Enable Registration" toggle off in Config, as anyone who knows your onion URL can create accounts on your server.
     type: docker
     image: main
     system: false
@@ -62,8 +59,6 @@ properties:
 volumes:
   main:
     type: data
-  compat:
-    type: assets
   cert:
     type: certificate
     interface-id: main
@@ -76,10 +71,8 @@ interfaces:
     tor-config:
       port-mapping:
         80: "80"
-        443: "443"
         8448: "8448"
     ui: true
-    ssl: true
     protocols:
       - tcp
       - http
