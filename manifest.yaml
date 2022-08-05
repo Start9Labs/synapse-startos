@@ -4,6 +4,7 @@ version: 1.63.1
 release-notes: |
   * Upgrade Synapse to 1.63.1
   * Explore rooms in Spaces now work as expected
+  * Switch to using new eOS APIs for faster configuration and properties
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
@@ -28,7 +29,6 @@ main:
     main: /data
     compat: /mnt/assets
     cert: /mnt/cert
-  io-format: yaml
 health-checks:
   federation:
     name: Federation
@@ -54,45 +54,11 @@ health-checks:
     inject: true
 config:
   get:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args: 
-      - config
-      - get
-      - /data
-      - /mnt/assets/config_spec.yaml
-    mounts:
-      compat: /mnt/assets
-      main: /data
-    io-format: yaml
+    type: script
   set:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - set
-      - synapse
-      - /data
-      - /mnt/assets/config_rules.yaml
-    mounts:
-      compat: /mnt/assets
-      main: /data
-    io-format: yaml
+    type: script
 properties:
-  type: docker
-  image: compat
-  system: true
-  entrypoint: compat
-  args:
-    - properties
-    - /data
-  mounts:
-    main: /data
-  io-format: yaml
+  type: script
 volumes:
   main:
     type: data
@@ -133,7 +99,6 @@ backup:
     mounts:
       BACKUP: /mnt/backup
       main: /data
-    io-format: yaml
   restore:
     type: docker
     image: compat
@@ -147,7 +112,6 @@ backup:
     mounts:
       BACKUP: /mnt/backup
       main: /data
-    io-format: yaml
 actions:
   reset-first-user:
     name: Reset First User
