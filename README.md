@@ -44,9 +44,10 @@ curl https://sh.rustup.rs -sSf | sh
 # Choose nr 1 (default install)
 source $HOME/.cargo/env
 ```
-7. Install toml
+7. Install toml and deno
 ```
 cargo install toml-cli
+cargo install deno --locked
 ```
 8. Build and install sdk
 ```
