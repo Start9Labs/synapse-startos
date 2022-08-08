@@ -71,6 +71,7 @@ interfaces:
     tor-config:
       port-mapping:
         80: "80"
+        443: "443"
         8448: "8448"
     ui: true
     protocols:
