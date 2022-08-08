@@ -43,6 +43,7 @@ jobs:
       run: |
            sudo snap install yq
            sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
+           cargo install deno --locked
       
       #check out service package for synapse
     - name: Checkout tools repo
