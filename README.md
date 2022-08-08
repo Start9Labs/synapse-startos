@@ -10,6 +10,7 @@
 - [toml](https://crates.io/crates/toml-cli)
 - [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 - [make](https://www.gnu.org/software/make/)
+- [deno](https://deno.land/#installation)
 
 ## Build enviroment
 Prepare your EmbassyOS build enviroment. In this example we are using Ubuntu 20.04.
