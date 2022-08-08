@@ -1,5 +1,5 @@
-id: synapse2
-title: Synapse2
+id: synapse
+title: Synapse
 version: 1.42.0
 release-notes: "Upgrade to EmbassyOS v0.3.0 and upgrade upstream to 1.42.0"
 license: apache
