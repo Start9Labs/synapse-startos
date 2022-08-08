@@ -51,16 +51,20 @@ jobs:
            
     - name: install package manager stuff
       run: |
-           cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
+           cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git; #TODO probably should make this an action or a variable of some sort.
            cd embassy-os;
            git submodule update --init --recursive
-           cd ../
            cd backend;
            ./install-sdk.sh;
 
+
+#check out service package for synapse
+    - name: Checkout tools repo
+      uses: actions/checkout@v3
+
     - name: build the service package!
       run: |
-           cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
+           cd ~/
            cd synapse-wrapper
            embassy-sdk init
            make
