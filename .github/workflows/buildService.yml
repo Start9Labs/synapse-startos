@@ -68,9 +68,10 @@ jobs:
     - name: build the service package!
       run: |
            git submodule update --init --recursive
-           sed -i 's/title: Synapse/title: Synapse2/g' manifest.yaml
+           #the below changes the manifest a bit to ensure that the package created is a different one
+           # from the main synapse package. good for testing.
+           sed -i 's/title: Synapse/title: Synapse2/g' manifest.yaml 
            sed -i 's/id: synapse/id: synapse2/g' manifest.yaml
-           cat manifest.yaml
            embassy-sdk init
            make
 
