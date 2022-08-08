@@ -52,6 +52,9 @@ jobs:
       #check out service package for synapse
     - name: Checkout tools repo
       uses: actions/checkout@v3
+      with:
+          repository:  Start9Labs/synapse-wrapper
+          ref: update/v1.63.1
            
     - name: install package manager stuff
       run: |
@@ -65,6 +68,9 @@ jobs:
     - name: build the service package!
       run: |
            git submodule update --init --recursive
+           sed -i 's/title: Synapse/title: Synapse2/g' manifest.yaml
+           sed -i 's/id: synapse/id: synapse2/g' manifest.yaml
+           cat manifest.yaml
            embassy-sdk init
            make
 
