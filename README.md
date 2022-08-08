@@ -47,11 +47,16 @@ source $HOME/.cargo/env
 ```
 cargo install toml-cli
 ```
-8. Build and install appmgr
+8. Build and install sdk
 ```
 cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git
-cd embassy-os/appmgr/
-cargo install --path=. --features=portable --no-default-features && cd ~/
+cd embassy-os;
+git submodule update --init
+cd patch-db;
+git submodule update --init
+cd ../
+cd backend;
+./install-sdk.sh;
 ```
 Now you are ready to build your first EmbassyOS service
 
@@ -62,6 +67,7 @@ Clone the project locally. Note the submodule link to the original project(s).
 ```
 git clone https://github.com/Start9Labs/synapse-wrapper.git
 cd synapse-wrapper
+git submodule update --init
 ```
 
 ## Building
