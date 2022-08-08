@@ -59,7 +59,9 @@ jobs:
            cd ../
            cd backend;
            ./install-sdk.sh;
-           
+
+    - name: build the service package!
+      run: |
            cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
            cd synapse-wrapper
            git submodule update --init
