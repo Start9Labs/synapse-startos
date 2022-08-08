@@ -68,6 +68,11 @@ jobs:
            embassy-sdk init
            make
 
+    - uses: actions/upload-artifact@v3
+      with:
+        name: image
+        path: **/synapse.s9pk
+
            
 
 
