@@ -45,6 +45,7 @@ jobs:
            cargo install toml-cli
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git
            pwd;
+           ls;
            #cd embassy-os/appmgr/
            #cargo install --path=. --features=portable --no-default-features && cd ~/
 
