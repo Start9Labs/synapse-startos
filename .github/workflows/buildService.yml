@@ -65,10 +65,6 @@ jobs:
     - name: build the service package!
       run: |
            ls;
-           pwd;
-           cd ~/;
-           ls;
-           cd synapse-wrapper
            embassy-sdk init
            make
 
