@@ -54,13 +54,15 @@ jobs:
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
            cd embassy-os;
            git submodule update --init
-           cd backend;
-           ./install-sdk.sh;
+           ls;
+           ls patch-db/
+           #cd backend;
+           #./install-sdk.sh;
            
-           cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
-           cd synapse-wrapper
-           git submodule update --init
-           make
+           #cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
+           #cd synapse-wrapper
+           #git submodule update --init
+           #make
 
            
 
