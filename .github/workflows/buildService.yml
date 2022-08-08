@@ -50,6 +50,10 @@ jobs:
            
     - name: install package manager stuff
       run: |
+           cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
+           cd embassy-os/backend;
+           ./install-sdk.sh;
+           
            cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
            cd synapse-wrapper
            git submodule update --init
