@@ -62,7 +62,6 @@ jobs:
       run: |
            cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
            cd synapse-wrapper
-           git submodule update --init --recursive
            embassy-sdk init
            make
 
