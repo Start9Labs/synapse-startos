@@ -41,7 +41,7 @@ jobs:
     - name: Install packages and package manager
       run: |
            sudo snap install yq
-           apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
+           sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
            cargo install toml-cli
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git
            cd embassy-os/appmgr/
