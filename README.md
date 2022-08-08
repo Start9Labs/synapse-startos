@@ -70,6 +70,7 @@ git submodule update --init --recursive
 To build the Synapse service, run the following commands:
 
 ```
+embassy-sdk init
 make
 ```
 
