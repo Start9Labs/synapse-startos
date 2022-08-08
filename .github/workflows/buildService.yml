@@ -64,7 +64,7 @@ jobs:
 
     - name: build the service package!
       run: |
-           ls;
+           git submodule update --init --recursive
            embassy-sdk init
            make
 
