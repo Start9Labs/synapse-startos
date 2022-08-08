@@ -8,7 +8,7 @@
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [yq](https://mikefarah.gitbook.io/yq)
 - [toml](https://crates.io/crates/toml-cli)
-- [appmgr](https://github.com/Start9Labs/embassy-os/tree/master/appmgr)
+- [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 - [make](https://www.gnu.org/software/make/)
 
 ## Build enviroment
@@ -49,30 +49,25 @@ cargo install toml-cli
 ```
 8. Build and install sdk
 ```
-cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git
-cd embassy-os;
-git submodule update --init
-cd patch-db;
-git submodule update --init
-cd ../
-cd backend;
-./install-sdk.sh;
+cd ~/ && git clone --recursive https://github.com/Start9Labs/embassy-os.git
+cd embassy-os/backend/
+./install-sdk.sh
 ```
-Now you are ready to build your first EmbassyOS service
+Now you are ready to build Synapse service
 
 ## Cloning
 
-Clone the project locally. Note the submodule link to the original project(s). 
+Clone the Synapse wrapper locally. Note the submodule link to the original project. 
 
 ```
 git clone https://github.com/Start9Labs/synapse-wrapper.git
 cd synapse-wrapper
-git submodule update --init
+git submodule update --init --recursive
 ```
 
 ## Building
 
-To build the project, run the following commands:
+To build the Synapse service, run the following commands:
 
 ```
 make
@@ -85,5 +80,7 @@ SSH into an Embassy device.
 Run the following command to determine successful install:
 
 ```
-sudo appmgr install synapse.s9pk
+embassy-cli auth login
+#Enter your embassy password
+embassy-cli package install synapse.s9pk
 ```
