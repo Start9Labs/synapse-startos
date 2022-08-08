@@ -53,9 +53,7 @@ jobs:
       run: |
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
            cd embassy-os;
-           git submodule update --init
-           cd patch-db;
-           git submodule update --init;
+           git submodule update --init --recursive
            cd ../
            cd backend;
            ./install-sdk.sh;
@@ -64,7 +62,7 @@ jobs:
       run: |
            cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
            cd synapse-wrapper
-           git submodule update --init
+           git submodule update --init --recursive
            embassy-sdk init
            make
 
