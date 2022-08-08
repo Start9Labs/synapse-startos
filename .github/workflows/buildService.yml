@@ -28,22 +28,24 @@ jobs:
         toolchain: stable
         override: true
         
-    #- uses: actions/cache@v3
-    #  with:
-    #    path: |
-    #      ~/.cargo/bin/
-    #      ~/.cargo/registry/index/
-    #      ~/.cargo/registry/cache/
-    #      ~/.cargo/git/db/
-    #      target/
-    #    key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
         
     - name: Install packages
       run: |
            sudo snap install yq
            sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
+           
     - name: do cargo stuff
-      if: steps.cache.outputs.cache-hit != 'true'
+      id: cargo-stuff
+      if: steps.cargo-stuff.outputs.cache-hit != 'true'
       run: cargo install toml-cli
            
     - name: install package manager stuff
