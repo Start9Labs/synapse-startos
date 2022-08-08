@@ -29,6 +29,7 @@ jobs:
         override: true
         
     - uses: actions/cache@v3
+      id: cache
       with:
         path: |
           ~/.cargo/bin/
@@ -45,7 +46,7 @@ jobs:
            
     - name: do cargo stuff
       id: cargo-stuff
-      if: steps.cargo-stuff.outputs.cache-hit != 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       run: cargo install toml-cli
            
     - name: install package manager stuff
