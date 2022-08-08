@@ -48,6 +48,10 @@ jobs:
       id: cargo-stuff
       if: steps.cache.outputs.cache-hit != 'true'
       run: cargo install toml-cli
+      
+      #check out service package for synapse
+    - name: Checkout tools repo
+      uses: actions/checkout@v3
            
     - name: install package manager stuff
       run: |
@@ -57,10 +61,6 @@ jobs:
            cd backend;
            ./install-sdk.sh;
 
-
-#check out service package for synapse
-    - name: Checkout tools repo
-      uses: actions/checkout@v3
 
     - name: build the service package!
       run: |
