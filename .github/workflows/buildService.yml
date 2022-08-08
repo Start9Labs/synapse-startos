@@ -54,7 +54,8 @@ jobs:
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
            cd embassy-os;
            git submodule update --init
-           ls patch-db/patch-db;
+           ls patch-db/json-patch;
+           cat patch-db/json-patch/Cargo.toml;
            cd backend;
            ./install-sdk.sh;
            
