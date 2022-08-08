@@ -49,7 +49,7 @@ jobs:
     - name: install package manager stuff
       run: |
            cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
-           cd synpase-wrapper
+           cd synapse-wrapper
            make
 
            
