@@ -48,11 +48,9 @@ jobs:
            
     - name: install package manager stuff
       run: |
-           cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git
-           pwd;
-           ls;
-           #cd embassy-os/appmgr/
-           #cargo install --path=. --features=portable --no-default-features && cd ~/
+           cd ~/ && git clone https://github.com/Start9Labs/synapse-wrapper.git
+           cd synpase-wrapper
+           make
 
            
 
