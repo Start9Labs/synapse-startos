@@ -1,11 +1,12 @@
 SYNAPSE_SRC := $(shell find ./synapse)
 VERSION := $(shell yq e ".version" manifest.yaml)
+TS_FILES := $(shell find ./ -name \*.ts)
 
 .DELETE_ON_ERROR:
 
 all: verify
 
-install: 
+install:
 	embassy-cli package install synapse.s9pk
 
 clean:
@@ -22,10 +23,9 @@ synapse.s9pk: manifest.yaml instructions.md icon.png LICENSE scripts/embassy.js 
 image.tar: synapse/timeouts.patch Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-all priv-config-forward-onion configurator.py $(shell find ./www)
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/synapse/main:$(VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .
 
-scripts/embassy.js: scripts/**/*.ts
-	deno cache --reload scripts/embassy.ts
+scripts/embassy.js: $(TS_FILES)
 	deno bundle scripts/embassy.ts scripts/embassy.js
-	
+
 # for running on a non-embassy amd64 linux server
 image-x86.tar: patch synapse/docker/Dockerfile $(SYNAPSE_SRC)
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -f synapse/docker/Dockerfile --tag matrixdotorg/synapse:$(VERSION) --platform=linux/amd64 -o type=docker,dest=base-image.tar ./synapse
