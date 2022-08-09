@@ -68,9 +68,7 @@ jobs:
            # from the main synapse package. good for testing.
            sed -i 's/title: Synapse/title: SynapseAlt/g' manifest.yaml 
            sed -i 's/id: synapse/id: synapsealt/g' manifest.yaml
-           ls;
            sed -i 's/synapse\.s9pk/synapsealt.s9pk/' Makefile
-           #sed -i 's/package-id: synapse/package-id: synapsealt/g' assets/compat/config_spec.yaml
            embassy-sdk init
            make
 
