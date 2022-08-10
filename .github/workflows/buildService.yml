@@ -73,6 +73,7 @@ jobs:
            
            sed -i 's/synapse\.s9pk/synapsealt.s9pk/' Makefile
            sed -i 's/--tag matrixdotorg\/synapse/--tag matrixdotorg\/synapsealt/' Makefile
+           sed -i 's/--tag start9\/synapse/--tag start9\/synapsealt/' Makefile
            cat Makefile
            embassy-sdk init
            make
