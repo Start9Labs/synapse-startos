@@ -69,9 +69,10 @@ jobs:
            sed -i 's/title: Synapse/title: SynapseAlt/g' manifest.yaml 
            sed -i 's/id: synapse/id: synapsealt/g' manifest.yaml
            sed -i 's/synapse/synapsealt/g' scripts/services/getConfig.ts
-           cat manifest.yaml;
+           cat scripts/services/getConfig.ts
+           
            sed -i 's/synapse\.s9pk/synapsealt.s9pk/' Makefile
-           cat Makefile;
+           cat Makefile
            embassy-sdk init
            make
 
@@ -79,7 +80,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: image
-        path: ~/**/synapse.s9pk
+        path: ~/**/*.s9pk
 
            
 
