@@ -28,16 +28,16 @@ jobs:
         toolchain: stable
         override: true
         
-    - uses: actions/cache@v3
-      id: cache
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
+    #- uses: actions/cache@v3
+    #  id: cache
+    #  with:
+    #    path: |
+    #      ~/.cargo/bin/
+    #      ~/.cargo/registry/index/
+    #      ~/.cargo/registry/cache/
+    #      ~/.cargo/git/db/
+    ##      target/
+    #    key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
         
     - name: Install packages
       run: |
@@ -64,17 +64,6 @@ jobs:
     - name: build the service package!
       run: |
            git submodule update --init --recursive
-           #the below changes the manifest a bit to ensure that the package created is a different one
-           # from the main synapse package. good for testing.
-           sed -i 's/title: Synapse/title: SynapseAlt/g' manifest.yaml 
-           sed -i 's/id: synapse/id: synapsealt/g' manifest.yaml
-           sed -i 's/synapse/synapsealt/g' scripts/services/getConfig.ts
-           cat scripts/services/getConfig.ts
-           
-           sed -i 's/synapse\.s9pk/synapsealt.s9pk/' Makefile
-           sed -i 's/--tag matrixdotorg\/synapse/--tag matrixdotorg\/synapsealt/' Makefile
-           sed -i 's/--tag start9\/synapse/--tag start9\/synapsealt/' Makefile
-           cat Makefile
            embassy-sdk init
            make
 
