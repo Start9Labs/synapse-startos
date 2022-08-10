@@ -66,13 +66,14 @@ jobs:
            git submodule update --init --recursive
            #the below changes the manifest a bit to ensure that the package created is a different one
            # from the main synapse package. good for testing.
-           #sed -i 's/title: Synapse/title: SynapseAlt/g' manifest.yaml 
-           #sed -i 's/id: synapse/id: synapsealt/g' manifest.yaml
-           #sed -i 's/synapse/synapsealt/g' scripts/services/getConfig.ts
-           #cat scripts/services/getConfig.ts
+           sed -i 's/title: Synapse/title: SynapseAlt/g' manifest.yaml 
+           sed -i 's/id: synapse/id: synapsealt/g' manifest.yaml
+           sed -i 's/synapse/synapsealt/g' scripts/services/getConfig.ts
+           cat scripts/services/getConfig.ts
            
-           #sed -i 's/synapse\.s9pk/synapsealt.s9pk/' Makefile
-           #cat Makefile
+           sed -i 's/synapse\.s9pk/synapsealt.s9pk/' Makefile
+           sed -i 's/--tag matrixdotorg\/synapse/--tag matrixdotorg\/synapsealt/' Makefile
+           cat Makefile
            embassy-sdk init
            make
 
