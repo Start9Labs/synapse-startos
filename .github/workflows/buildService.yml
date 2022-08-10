@@ -66,12 +66,13 @@ jobs:
            git submodule update --init --recursive
            embassy-sdk init
            make
+           mv synapse*s9pk ~/ #move this to home directory for easy reference in the upload step
 
     - name: upload service package
       uses: actions/upload-artifact@v3
       with:
-        name: image
-        path: ~/**/*.s9pk
+        name: synapse
+        path: ~/*.s9pk
 
            
 
