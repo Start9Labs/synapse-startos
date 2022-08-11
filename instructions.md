@@ -30,11 +30,11 @@
     </ol>
   </li>
   <li>
-    <h4>MacOS</h4>
+    <h4>macOS</h4>
     <ol>
-      <li>Configure your MacOS device to run Tor following these <a
+      <li>Configure your macOS device to run Tor following these <a
           href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-mac">instructions</a>.</li>
-      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for MacOS</a>. You can also check out <a href="https://www.schildi.chat/" target="_blank">SchildiChat</a></li>
+      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for macOS</a>. You can also check out <a href="https://www.schildi.chat/" target="_blank">SchildiChat</a></li>
       <p><i>Note: your mac will likely block opening this app for security purposes. You may need to grant special
           permission inside System Preferences --> Security and Privacy. It is perfectly fine to open this app. You
           downloaded it from your own Embassy!</i></p>
