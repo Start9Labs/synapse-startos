@@ -47,7 +47,7 @@ curl https://sh.rustup.rs -sSf | sh
 # Choose nr 1 (default install)
 source $HOME/.cargo/env
 ```
-8. Build and install Embassy SDK
+8. Build and install embassy-sdk
 ```
 cd ~/ && git clone --recursive https://github.com/Start9Labs/embassy-os.git
 cd embassy-os/backend/
