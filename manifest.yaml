@@ -4,6 +4,7 @@ version: 1.63.1
 release-notes: |
   * Upgrade Synapse to 1.63.1
   * Explore rooms in Spaces now work as expected
+  * Updated instructions
   * Switch to using new eOS APIs for faster configuration and properties
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
