@@ -52,6 +52,7 @@ source $HOME/.cargo/env
 cd ~/ && git clone --recursive https://github.com/Start9Labs/embassy-os.git
 cd embassy-os/backend/
 ./install-sdk.sh
+embassy-sdk init
 ```
 Now you are ready to build your Synapse service
 
@@ -75,11 +76,12 @@ make
 
 ## Installing (on Embassy)
 
-Secure copy (`scp`) the `synapse.s9pk` to your Embassy and SSH in.
-Run the following command to determine successful install:
+Run the following commands to determine successful install:
+> :information_source: Change embassy-q1w2e3r.local to your Embassy address
 
 ```
 embassy-cli auth login
 #Enter your embassy password
-embassy-cli package install synapse.s9pk
+embassy-cli --host embassy-q1w2e3r4 package install synapse.s9pk
 ```
+> Tip: You can also install the synapse.s9pk using **Sideload Service** under the **Embassy>SETTINGS** section.

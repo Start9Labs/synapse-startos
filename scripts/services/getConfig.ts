@@ -96,3 +96,4 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
     }
   }
 })
+
