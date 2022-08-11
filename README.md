@@ -49,6 +49,12 @@ source $HOME/.cargo/env
 ```
 8. Build and install Embassy SDK
 ```
+cd ~/ && git clone --recursive https://github.com/Start9Labs/embassy-os.git
+cd embassy-os/backend/
+./install-sdk.sh
+# Generate your developer key
+embassy-sdk init
+```
 Now you are ready to build Synapse service
 
 ## Cloning
