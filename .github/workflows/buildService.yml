@@ -28,16 +28,6 @@ jobs:
         toolchain: stable
         override: true
         
-    #- uses: actions/cache@v3
-    #  id: cache
-    #  with:
-    #    path: |
-    #      ~/.cargo/bin/
-    #      ~/.cargo/registry/index/
-    #      ~/.cargo/registry/cache/
-    #      ~/.cargo/git/db/
-    ##      target/
-    #    key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
         
     - name: Install packages
       run: |
@@ -47,9 +37,6 @@ jobs:
       #check out service package for synapse
     - name: Checkout tools repo
       uses: actions/checkout@v3
-      with:
-          repository:  Start9Labs/synapse-wrapper
-          ref: update/v1.63.1
            
     - name: install package manager stuff
       run: |
