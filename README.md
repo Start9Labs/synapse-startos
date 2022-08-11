@@ -83,6 +83,6 @@ Run the following commands to determine successful install:
 ```
 embassy-cli auth login
 #Enter your embassy password
-embassy-cli --host embassy-q1w2e3r4.local package install synapse.s9pk
+embassy-cli --host https://embassy-q1w2e3r4.local package install synapse.s9pk
 ```
 **Tip:** You can also install the synapse.s9pk using **Sideload Service** under the **Embassy>SETTINGS** section.
