@@ -33,21 +33,21 @@ docker run --privileged --rm linuxkit/binfmt:v0.8
 ```
 sudo snap install yq
 ```
-5. Install essentials build packages
+5. Install deno
+```
+sudo snap install deno
+```
+6. Install essentials build packages
 ```
 sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
 ```
-6. Install Rust
+7. Install Rust
 ```
 curl https://sh.rustup.rs -sSf | sh
 # Choose nr 1 (default install)
 source $HOME/.cargo/env
 ```
-7. Build and install Embassy SDK
-```
-cd ~/ && git clone --recursive https://github.com/Start9Labs/embassy-os.git
-cd embassy-os/backend/
-./install-sdk.sh
+8. Build and install Embassy SDK
 ```
 Now you are ready to build Synapse service
 
