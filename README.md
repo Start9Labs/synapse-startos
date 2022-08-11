@@ -78,12 +78,12 @@ make
 
 ## Installing (on Embassy)
 
-SSH into an Embassy device.
-`scp` the `.s9pk` to any directory from your local machine.
-Run the following command to determine successful install:
+Run the following commands to determine successful install:
+> :information_source: Change embassy-q1w2e3r.local to your Embassy address
 
 ```
 embassy-cli auth login
 #Enter your embassy password
-embassy-cli package install synapse.s9pk
+embassy-cli --host https://embassy-q1w2e3r4.local package install synapse.s9pk
 ```
+**Tip:** You can also install the synapse.s9pk using **Sideload Service** under the **Embassy>SETTINGS** section.

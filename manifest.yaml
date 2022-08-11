@@ -1,14 +1,17 @@
 id: synapse
 title: Synapse
-version: 1.42.0
-release-notes: "Upgrade to EmbassyOS v0.3.0 and upgrade upstream to 1.42.0"
+version: 1.63.1
+release-notes: |
+  * Upgrade Synapse to 1.63.1
+  * Explore rooms in Spaces now work as expected
+  * Switch to using new eOS APIs for faster configuration and properties
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
 support-site: https://github.com/matrix-org/synapse/issues
 marketing-site: https://matrix.org/
 build: ["make"]
-min-os-version: "0.3.0"
+eos-version: "0.3.1"
 description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
@@ -24,13 +27,10 @@ main:
   args: []
   mounts:
     main: /data
-    compat: /mnt/assets
     cert: /mnt/cert
-  io-format: yaml
 health-checks:
   federation:
     name: Federation
-    description: Activates once your homeserver is federating properly
     type: docker
     image: main
     system: false
@@ -41,7 +41,6 @@ health-checks:
     inject: true
   user-signups-off:
     name: User Signups Off
-    description: Indicates whether new user registrations have been disabled. If they are enabled but you're not expecting any new user signups, you should turn the "Enable Registration" toggle off in Config, as anyone who knows your onion URL can create accounts on your server.
     type: docker
     image: main
     system: false
@@ -52,50 +51,14 @@ health-checks:
     inject: true
 config:
   get:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args: 
-      - config
-      - get
-      - /data
-      - /mnt/assets/config_spec.yaml
-    mounts:
-      compat: /mnt/assets
-      main: /data
-    io-format: yaml
+    type: script
   set:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - set
-      - synapse
-      - /data
-      - /mnt/assets/config_rules.yaml
-    mounts:
-      compat: /mnt/assets
-      main: /data
-    io-format: yaml
+    type: script
 properties:
-  type: docker
-  image: compat
-  system: true
-  entrypoint: compat
-  args:
-    - properties
-    - /data
-  mounts:
-    main: /data
-  io-format: yaml
+  type: script
 volumes:
   main:
     type: data
-  compat:
-    type: assets
   cert:
     type: certificate
     interface-id: main
@@ -104,14 +67,13 @@ alerts:
 interfaces:
   main:
     name: Main Interface
-    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser.
+    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser
     tor-config:
       port-mapping:
         80: "80"
         443: "443"
         8448: "8448"
     ui: true
-    ssl: true
     protocols:
       - tcp
       - http
@@ -131,7 +93,6 @@ backup:
     mounts:
       BACKUP: /mnt/backup
       main: /data
-    io-format: yaml
   restore:
     type: docker
     image: compat
@@ -145,7 +106,6 @@ backup:
     mounts:
       BACKUP: /mnt/backup
       main: /data
-    io-format: yaml
 actions:
   reset-first-user:
     name: Reset First User

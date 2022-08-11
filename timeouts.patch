@@ -1,0 +1,77 @@
+From 581b47a5ed8f85f86c0093793605e02db41e765c Mon Sep 17 00:00:00 2001
+From: Chris Guida <chrisguida@gmail.com>
+Date: Tue, 21 Dec 2021 07:21:22 -0600
+Subject: [PATCH] increase all timeouts from 10s to 30s
+
+---
+ synapse/crypto/keyring.py               | 2 +-
+ synapse/federation/federation_client.py | 2 +-
+ synapse/federation/transport/client.py  | 2 +-
+ tests/handlers/test_typing.py           | 4 ++--
+ tests/http/test_fedclient.py            | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/synapse/crypto/keyring.py b/synapse/crypto/keyring.py
+index c88afb298..e2000a552 100644
+--- a/synapse/crypto/keyring.py
++++ b/synapse/crypto/keyring.py
+@@ -871,7 +871,7 @@ class ServerKeyFetcher(BaseV2KeyFetcher):
+                     # (Note that get_json may make 4 attempts, so this can still take
+                     # almost 45 seconds to fetch the headers, plus up to another 60s to
+                     # read the response).
+-                    timeout=10000,
++                    timeout=30000,
+                 )
+             except (NotRetryingDestination, RequestSendFailed) as e:
+                 # these both have str() representations which we can't really improve
+diff --git a/synapse/federation/federation_client.py b/synapse/federation/federation_client.py
+index 6a59cb4b7..07da8f69f 100644
+--- a/synapse/federation/federation_client.py
++++ b/synapse/federation/federation_client.py
+@@ -573,7 +573,7 @@ class FederationClient(FederationBase):
+                     destinations=[pdu_origin],
+                     event_id=pdu.event_id,
+                     room_version=room_version,
+-                    timeout=10000,
++                    timeout=30000,
+                 )
+             except SynapseError:
+                 pass
+diff --git a/synapse/federation/transport/client.py b/synapse/federation/transport/client.py
+index 01dc5ca94..3631aaf98 100644
+--- a/synapse/federation/transport/client.py
++++ b/synapse/federation/transport/client.py
+@@ -268,7 +268,7 @@ class TransportLayerClient:
+             path=path,
+             args=args,
+             retry_on_dns_fail=retry_on_dns_fail,
+-            timeout=10000,
++            timeout=30000,
+             ignore_backoff=ignore_backoff,
+         )
+ 
+diff --git a/tests/handlers/test_typing.py b/tests/handlers/test_typing.py
+index ffd5c4cb9..628ff7cb5 100644
+--- a/tests/handlers/test_typing.py
++++ b/tests/handlers/test_typing.py
+@@ -358,7 +358,7 @@ class TypingNotificationsTestCase(unittest.HomeserverTestCase):
+                 target_user=U_APPLE,
+                 requester=create_requester(U_APPLE),
+                 room_id=ROOM_ID,
+-                timeout=10000,
++                timeout=30000,
+             )
+         )
+ 
+@@ -412,7 +412,7 @@ class TypingNotificationsTestCase(unittest.HomeserverTestCase):
+                 target_user=U_APPLE,
+                 requester=create_requester(U_APPLE),
+                 room_id=ROOM_ID,
+-                timeout=10000,
++                timeout=30000,
+             )
+         )
+ 
+-- 
+2.32.1 (Apple Git-133)
+
