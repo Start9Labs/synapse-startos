@@ -50,7 +50,7 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 }
 EOT
 
-cat /var/www/index.html.template | sed "s/{{TOR_ADDRESS}}/${TOR_ADDRESS}/g" > /var/www/index.html
+cat /var/www/index.html.template > /var/www/index.html
 
 if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
     cp /root/priv-config-forward-all /etc/privoxy/config
