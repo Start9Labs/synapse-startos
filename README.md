@@ -54,7 +54,7 @@ cd embassy-os/backend/
 ./install-sdk.sh
 embassy-sdk init
 ```
-Now you are ready to build Synapse service
+Now you are ready to build your Synapse service
 
 ## Cloning
 
