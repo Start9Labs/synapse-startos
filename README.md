@@ -7,9 +7,9 @@
 - [docker](https://docs.docker.com/get-docker)
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [yq](https://mikefarah.gitbook.io/yq)
-- [toml](https://crates.io/crates/toml-cli)
-- [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
+- [deno](https://deno.land/)
 - [make](https://www.gnu.org/software/make/)
+- [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 
 ## Build enviroment
 Prepare your EmbassyOS build enviroment. In this example we are using Ubuntu 20.04.
@@ -33,25 +33,27 @@ docker run --privileged --rm linuxkit/binfmt:v0.8
 ```
 sudo snap install yq
 ```
-5. Install essentials build packages
+5. Install deno
+```
+sudo snap install deno
+```
+6. Install essentials build packages
 ```
 sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
 ```
-6. Install Rust
+7. Install Rust
 ```
 curl https://sh.rustup.rs -sSf | sh
 # Choose nr 1 (default install)
 source $HOME/.cargo/env
 ```
-7. Install toml
-```
-cargo install toml-cli
-```
-8. Build and install sdk
+8. Build and install Embassy SDK
 ```
 cd ~/ && git clone --recursive https://github.com/Start9Labs/embassy-os.git
 cd embassy-os/backend/
 ./install-sdk.sh
+# Generate your developer key
+embassy-sdk init
 ```
 Now you are ready to build Synapse service
 
@@ -75,12 +77,12 @@ make
 
 ## Installing (on Embassy)
 
-SSH into an Embassy device.
-`scp` the `.s9pk` to any directory from your local machine.
-Run the following command to determine successful install:
+Run the following commands to determine successful install:
+> :information_source: Change embassy-q1w2e3r.local to your Embassy address
 
 ```
 embassy-cli auth login
 #Enter your embassy password
-embassy-cli package install synapse.s9pk
+embassy-cli --host embassy-q1w2e3r4 package install synapse.s9pk
 ```
+> Tip: You can also install the synapse.s9pk using **Sideload Service** under the **Embassy>SETTINGS** section.
