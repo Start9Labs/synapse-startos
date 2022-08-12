@@ -21,16 +21,15 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
     "name": "Email Notifications",
     "description": "Enable this setting to receive email notifications from your Matrix server. Requires inputting SMTP credentials.",
     "tag": {
-      "id": "type",
+      "id": "enabled",
       "name": "Enable SMTP Settings",
       "variant-names": {
-        "false": "False",
         "true": "True",
-      },
+        "false": "False",
+      }
     },
     "default": "false",
-     "variants": {
-     "false": {},
+    "variants": {
      "true": {
         "smtp-settings": {
          "type": "object",
@@ -76,11 +75,12 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
              "name": "Require Transport Security",
              "description": "Require TLS transport security for SMTP. By default, Synapse will connect over plain text, and will then switch to TLS via STARTTLS <strong>if the SMTP server supports it</strong>. If this option is set, Synapse will refuse to connect unless the server supports STARTTLS.",
              "default": false
-           }   
+           },
          }
-        },
-      }
-    }
+        }
+      },
+     "false": {} 
+    },
   },
   "advanced": {
    "type": "object",
@@ -95,5 +95,4 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
       }
     }
   }
-})
-
+});

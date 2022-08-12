@@ -25,7 +25,7 @@
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
         created your account.</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-        <code>http://{{TOR_ADDRESS}}</code></li>
+        <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.</li>
     </ol>
   </li>
@@ -41,7 +41,7 @@
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
         created your account.</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-        <code>http://{{TOR_ADDRESS}}</code></li>
+        <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.</li>
     </ol>
   </li>
@@ -56,7 +56,7 @@
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
         created your account.</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-        <code>http://{{TOR_ADDRESS}}</code></li>
+        <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.</li>
     </ol>
   </li>
@@ -74,7 +74,7 @@
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
         created your account.</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
-        <code>http://{{TOR_ADDRESS}}</code></li>
+        <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.</li>
     </ol>
   </li>
@@ -85,7 +85,7 @@
           href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-android">instructions</a>.</li>
       <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Android</a>.</li>
       <li>Add Element to the list of VPN apps inside Orbot.</li>
-      <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://{{TOR_ADDRESS}}</code></li>
+      <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor.</li>
     </ol>
   </li>
@@ -95,7 +95,7 @@
       <li>Configure your iOS device to run Tor following these <a
           href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-ios">instructions</a>.</li>
       <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for iOS</a>.</li>
-      <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://{{TOR_ADDRESS}}</code></li>
+      <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor.</li>
     </ol>
   </li>

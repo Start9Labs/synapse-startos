@@ -122,3 +122,12 @@ actions:
       mounts:
         main: /data
       io-format: json
+migrations:
+  from:
+    "*":
+      type: script
+      args: ["from"]
+  to:
+    "*":
+      type: script
+      args: ["to"]
