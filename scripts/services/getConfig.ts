@@ -24,14 +24,14 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
       "id": "type",
       "name": "Enable SMTP Settings",
       "variant-names": {
-        "FALSE": "False",
-        "TRUE": "True",
+        "false": "False",
+        "true": "True",
       },
     },
-    "default": "FALSE",
+    "default": "false",
      "variants": {
-     "FALSE": {},
-     "TRUE": {
+     "false": {},
+     "true": {
         "smtp-settings": {
          "type": "object",
          "name": "SMTP Settings",
@@ -87,7 +87,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
    "name": "Advanced",
    "description": "Advanced settings for Synapse",
    "spec": {
-      "tor-only": {
+      "tor-only-mode": {
         "type": "boolean",
         "name": "Tor Only Mode",
         "description": "If enabled, communications with clearnet homeservers will be exclusively routed over Tor using Tor exit nodes instead of encrypted clearnet (https). This is not necessarily more private, and it is slower.",
