@@ -28,7 +28,16 @@ jobs:
         toolchain: stable
         override: true
         
-        
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
+                
     - name: Install packages
       run: |
            sudo snap install yq deno
@@ -39,6 +48,8 @@ jobs:
       uses: actions/checkout@v3
            
     - name: install package manager stuff
+      id: packageManager
+      if: steps.packageManager.outputs.cache-hit != 'true'
       run: |
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git; #TODO probably should make this an action or a variable of some sort.
            cd embassy-os;
