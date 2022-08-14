@@ -34,6 +34,7 @@ jobs:
       
         
     - uses: actions/cache@v3
+      id: packageCache
       with:
         path: |
           ~/.cargo/bin/
@@ -54,7 +55,7 @@ jobs:
            
     - name: install package manager stuff
       id: packageManager
-      if: steps.packageManager.outputs.cache-hit != 'true'
+      if: steps.packageCache.outputs.cache-hit != 'true'
       run: |
            cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git; #TODO probably should make this an action or a variable of some sort.
            cd embassy-os;
