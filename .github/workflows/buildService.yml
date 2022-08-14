@@ -36,7 +36,7 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-cargo-compat-${{ hashFiles('**/system-images/compat/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-compat-${{ git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}' }}
                 
     - name: Install packages
       run: |
