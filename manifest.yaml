@@ -1,18 +1,15 @@
 id: synapse
 title: Synapse
-version: 1.63.1
+version: 1.63.1.2
 release-notes: |
-  * Upgrade Synapse to 1.63.1
-  * Explore rooms in Spaces now work as expected
-  * Updated instructions
-  * Switch to using new eOS APIs for faster configuration and properties
+  * added support for x86_64 architecture
+  * fix for Reset First User action
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
 support-site: https://github.com/matrix-org/synapse/issues
 marketing-site: https://matrix.org/
 build: ["make"]
-eos-version: "0.3.1"
 description:
   short: Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.
   long: Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).
@@ -20,7 +17,6 @@ assets:
   license: LICENSE
   icon: icon.png
   instructions: instructions.md
-  docker-images: image.tar
 main:
   type: docker
   image: main
