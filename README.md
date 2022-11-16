@@ -12,7 +12,7 @@
 - [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 
 ## Build enviroment
-Prepare your EmbassyOS build enviroment. In this example we are using Ubuntu 20.04.
+Prepare your embassyOS build enviroment. In this example we are using Ubuntu 20.04.
 
 1. Install docker
 ```
