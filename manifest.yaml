@@ -1,8 +1,9 @@
 id: synapse
 title: Synapse
-version: 1.63.1.2
+version: 1.63.1.1
 release-notes: |
-  * added support for x86_64 architecture
+  This one is Universal Package aka Fattie
+  * added support for x86_64 and aarch64 architecture
   * fix for Reset First User action
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
@@ -17,6 +18,7 @@ assets:
   license: LICENSE
   icon: icon.png
   instructions: instructions.md
+#  docker-images: image.tar
 main:
   type: docker
   image: main
