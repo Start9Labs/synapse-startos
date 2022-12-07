@@ -11,8 +11,8 @@
 - [make](https://www.gnu.org/software/make/)
 - [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 
-## Build enviroment
-Prepare your EmbassyOS build enviroment. In this example we are using Ubuntu 20.04.
+## Build environment
+Prepare your embassyOS build environment. In this example we are using Ubuntu 20.04.
 
 1. Install docker
 ```
@@ -77,11 +77,16 @@ make
 ## Installing (on Embassy)
 
 Run the following commands to determine successful install:
-> :information_source: Change embassy-q1w2e3r.local to your Embassy address
+> :information_source: Change embassy-server-name.local to your Embassy address
 
 ```
 embassy-cli auth login
 #Enter your embassy password
-embassy-cli --host https://embassy-q1w2e3r4.local package install synapse.s9pk
+embassy-cli --host https://embassy-server-name.local package install synapse.s9pk
 ```
-**Tip:** You can also install the synapse.s9pk using **Sideload Service** under the **Embassy>SETTINGS** section.
+**Tip:** You can also install the ghost.s9pk using **Sideload Service** under the **System > MANAGE** section.
+## Verify Install
+
+Go to your Embassy Services page, select **Synapse**, configure and start the service.
+
+**Done!** 

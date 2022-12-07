@@ -44,22 +44,13 @@ RUN \
 
 # We install poetry in its own build stage to avoid its dependencies conflicting with
 # synapse's dependencies.
-# We use a specific commit from poetry's master branch instead of our usual 1.1.12,
-# to incorporate fixes to some bugs in `poetry export`. This commit corresponds to
-#    https://github.com/python-poetry/poetry/pull/5156 and
-#    https://github.com/python-poetry/poetry/issues/5141 ;
-# without it, we generate a requirements.txt with incorrect environment markers,
-# which causes necessary packages to be omitted when we `pip install`.
-#
-# NB: In poetry 1.2 `poetry export` will be moved into a plugin; we'll need to also
-# pip install poetry-plugin-export (https://github.com/python-poetry/poetry-plugin-export).
 RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install --user "poetry-core==1.1.0a7" git+https://github.com/python-poetry/poetry.git@fb13b3a676f476177f7937ffa480ee5cff9a90a5
+  pip install --user "poetry==1.2.0"
 
 WORKDIR /synapse
 
 # Copy just what we need to run `poetry export`...
-COPY synapse/pyproject.toml synapse/poetry.lock synapse/README.rst /synapse/
+COPY synapse/pyproject.toml synapse/poetry.lock /synapse/
 
 # If specified, we won't verify the hashes of dependencies.
 # This is only needed if the hashes of dependencies cannot be checked for some
@@ -168,7 +159,8 @@ RUN apt-get update \
     wget \
     sqlite3
 
-RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_arm \
+ARG PLATFORM
+RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_${PLATFORM} \
     && chmod a+x /usr/local/bin/yq
 RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 

@@ -1,11 +1,10 @@
 id: synapse
 title: Synapse
-version: 1.63.1
+version: 1.63.1.1
 release-notes: |
-  * Upgrade Synapse to 1.63.1
-  * Explore rooms in Spaces now work as expected
-  * Updated instructions
-  * Switch to using new eOS APIs for faster configuration and properties
+  This one is Universal Package aka Fattie
+  * added support for x86_64 and aarch64 architecture
+  * fix for Reset First User action
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
@@ -19,7 +18,7 @@ assets:
   license: LICENSE
   icon: icon.png
   instructions: instructions.md
-  docker-images: image.tar
+#  docker-images: image.tar
 main:
   type: docker
   image: main
