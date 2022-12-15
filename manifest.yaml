@@ -1,10 +1,9 @@
 id: synapse
 title: Synapse
-version: 1.63.1.1
+version: 1.73.0
 release-notes: |
-  This one is Universal Package aka Fattie
-  * added support for x86_64 and aarch64 architecture
-  * fix for Reset First User action
+  * Update to latest upstream version
+  * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.63.1...v1.73.0)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
