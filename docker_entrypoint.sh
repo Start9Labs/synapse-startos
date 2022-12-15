@@ -4,6 +4,7 @@ set -e
 
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 export TOR_ADDRESS=$(yq e '.tor-address' /data/start9/config.yaml)
+export TIMEOUT=20000
 echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then
@@ -83,6 +84,9 @@ python /configurator.py
 #Fixes and last minute config changes
 echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
 echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
+sed -i 's#timeout=10000#timeout='$TIMEOUT'#g' /usr/local/lib/python3*/site-packages/synapse/crypto/keyring.py
+sed -i 's#timeout=10000#timeout='$TIMEOUT'#g' /usr/local/lib/python3*/site-packages/synapse/federation/transport/client.py
+sed -i 's#timeout=10000#timeout='$TIMEOUT'#g' /usr/local/lib/python3*/site-packages/synapse/federation/federation_client.py
 nginx
 privoxy /etc/privoxy/config
 export https_proxy="127.0.0.1:8118"
