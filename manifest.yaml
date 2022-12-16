@@ -3,6 +3,7 @@ title: Synapse
 version: 1.73.0
 release-notes: |
   * Update to latest upstream version
+  * Adjusted timeout
   * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.63.1...v1.73.0)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
@@ -17,7 +18,6 @@ assets:
   license: LICENSE
   icon: icon.png
   instructions: instructions.md
-#  docker-images: image.tar
 main:
   type: docker
   image: main
