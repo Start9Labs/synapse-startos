@@ -2,10 +2,7 @@
 synapse.s9pk
 image.tar
 base-image.tar
-homeserver.yaml
 .vscode/
-config.yaml
-homeserver1.yaml
 .DS_Store
 scripts/*.js
 docker-images
