@@ -38,7 +38,7 @@ EOT
 echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     root /var/www;
-    location ~* ^(\/_matrix|\/_synapse\/client) {
+    location ~* ^(\/_matrix|\/_synapse) {
         proxy_pass http://127.0.0.1:8008;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
