@@ -1,4 +1,4 @@
-FROM matrixdotorg/synapse:v1.74.0
+FROM matrixdotorg/synapse:v1.75.0
 
 ARG PLATFORM
 ENV YQ_VER v4.3.2

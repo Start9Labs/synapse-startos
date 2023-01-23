@@ -1,11 +1,10 @@
 id: synapse
 title: Synapse
-version: 1.74.0
+version: 1.75.0
 release-notes: |
   * Update to latest upstream version
-  * Faster remote room joins [more info](https://github.com/matrix-org/synapse/pull/14473)
-  * Adjusted timeout
-  * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.63.1...v1.74.0)
+  * Update backups to use new eOS APIs
+  * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.74.0...v1.75.0)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
@@ -80,31 +79,9 @@ interfaces:
 dependencies: {}
 backup:
   create:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - create
-      - /mnt/backup
-      - /data
-    mounts:
-      BACKUP: /mnt/backup
-      main: /data
+    type: script
   restore:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - restore
-      - /mnt/backup
-      - /data
-    mounts:
-      BACKUP: /mnt/backup
-      main: /data
+    type: script
 actions:
   reset-first-user:
     name: Reset First User
