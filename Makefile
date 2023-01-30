@@ -50,3 +50,7 @@ endif
 
 scripts/embassy.js: $(TS_FILES)
 	deno bundle scripts/embassy.ts scripts/embassy.js
+
+vps: Dockerfile.vps
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --build-arg PLATFORM=amd64 -f Dockerfile --tag matrixdotorg/synapse:v$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=synapse-vps.tar .
+	

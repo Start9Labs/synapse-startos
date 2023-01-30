@@ -39,11 +39,13 @@ ADD ./user-signups-off.sh /usr/local/bin/user-signups-off.sh
 RUN chmod a+x /usr/local/bin/user-signups-off.sh
 ADD ./configurator.py /configurator.py
 RUN chmod a+x /configurator.py
+RUN sed -i 's#timeout=10000#timeout=20000#g' /usr/local/lib/python3*/site-packages/synapse/crypto/keyring.py
+RUN sed -i 's#timeout=10000#timeout=20000#g' /usr/local/lib/python3*/site-packages/synapse/federation/transport/client.py
+RUN sed -i 's#timeout=10000#timeout=20000#g' /usr/local/lib/python3*/site-packages/synapse/federation/federation_client.py
+
 
 WORKDIR /data
 
 RUN mkdir /run/nginx
 
 EXPOSE 8448 443 80
-
-ENTRYPOINT ["/usr/local/bin/docker_entrypoint.sh"]
