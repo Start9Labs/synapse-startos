@@ -2,6 +2,7 @@ id: synapse
 title: Synapse
 version: 1.75.0
 release-notes: |
+  * Introducing Synapse-Admin as default UI for the service
   * Update to latest upstream version
   * Update backups to use new eOS APIs
   * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.74.0...v1.75.0)
@@ -60,8 +61,8 @@ volumes:
   cert:
     type: certificate
     interface-id: main
-alerts: 
-  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
+alerts: {}
+#  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
   main:
     name: Main Interface
@@ -71,7 +72,7 @@ interfaces:
         80: "80"
         443: "443"
         8448: "8448"
-    ui: false
+    ui: true
     protocols:
       - tcp
       - http

@@ -12,9 +12,9 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
   },
   "enable-registration": {
     "name": "Enable Registration",
-    "description": "Allow users to sign up on this homeserver. It is recommended that you disable this after creating your first user.",
+    "description": "Allow users to sign up on this homeserver. It is recommended that you disable this feature the moment user confirms successful registration.",
     "type": "boolean",
-    "default": true,
+    "default": false,
   },
   "email-notifications": {
     "type": "union",

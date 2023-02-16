@@ -37,7 +37,7 @@ EOT
 echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     root /var/www;
-    location ~* ^(\/_matrix|\/_synapse\/client) {
+    location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
         proxy_pass http://127.0.0.1:8008;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -50,7 +50,7 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 }
 EOT
 
-cat /var/www/index.html.template > /var/www/index.html
+#cat /var/www/index.html.template > /var/www/index.html
 
 if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
     cp /root/priv-config-forward-all /etc/privoxy/config
@@ -58,6 +58,16 @@ else
     cp /root/priv-config-forward-onion /etc/privoxy/config
 fi
 
+if [ "$(sqlite3 /data/homeserver.db "SELECT COUNT(*) FROM users WHERE name LIKE '@admin:%';" | awk '{print $1}')" -eq 0 ]; then
+    echo
+    echo "Synapse-admin user not found. Creating ..."
+    echo
+    admin_password=$(cat /dev/urandom | base64 | head -c 16)
+    timeout 10s synapse_homeserver -c /data/homeserver.yaml &
+    sleep 3
+    register_new_matrix_user --config /data/homeserver.yaml --user admin --password $admin_password --admin
+    yq e '.admin_password = "'$admin_password'"' -i /data/start9/config.yaml
+fi
 
 if [ "$1" = "reset-first-user" ]; then
     query() {
@@ -65,7 +75,8 @@ if [ "$1" = "reset-first-user" ]; then
     }
     password=$(cat /dev/urandom | base64 | head -c 16)
     hashed_password=$(hash_password -p "$password" -c "/data/homeserver.yaml")
-    first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
+    first_user_name=$(query "SELECT name FROM users WHERE creation_ts = (SELECT MIN(creation_ts) FROM users) AND name NOT LIKE '@admin:%' LIMIT 1;")
+#    first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
     query "update users set password_hash=\"$hashed_password\" where name=\"$first_user_name\""
     cat << EOF
 {
@@ -83,6 +94,7 @@ python /configurator.py
 #Fixes and last minute config changes
 echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
 echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
+sed -i 's#synapse.onion#'$TOR_ADDRESS'#g' /var/www/static/js/main.*.js
 nginx
 privoxy /etc/privoxy/config
 export https_proxy="127.0.0.1:8118"

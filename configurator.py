@@ -49,6 +49,30 @@ def main():
         stats = {
             "version": 2,
             "data": {
+                "Synapse-Admin password": {
+                    "type": "string",
+                    "value": os.popen("yq e '.admin_password' /data/start9/config.yaml").read().strip(),
+                    "description": "Password for Synapse-Admin.",
+                    "copyable": True,
+                    "qr": False,
+                    "masked": True,
+                },
+                "Synapse-Admin username": {
+                    "type": "string",
+                    "value": "admin",
+                    "description": "Default username for Synapse-Admin.",
+                    "copyable": True,
+                    "qr": False,
+                    "masked": False,
+                },
+#                "Synapse-Admin URL": {
+#                    "type": "string",
+#                    "value": "http://" + os.getenv("TOR_ADDRESS") + "/synapse-admin",
+#                    "description": "URL address for Synapse-Admin.",
+#                    "copyable": True,
+#                    "qr": False,
+#                    "masked": False,
+#                },
                 "SSL Cert SHA256 Fingerprint": {
                     "type": "string",
                     "value": os.popen(
@@ -61,7 +85,7 @@ def main():
                     "copyable": True,
                     "qr": False,
                     "masked": False,
-                }
+                },
             },
         }
         yaml.dump(stats, s)
