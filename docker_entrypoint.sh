@@ -4,6 +4,7 @@ set -e
 
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 export TOR_ADDRESS=$(yq e '.tor-address' /data/start9/config.yaml)
+FEDERATION=$(yq e '.federation' /data/start9/config.yaml)
 echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then
@@ -22,6 +23,12 @@ EOF
     SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=no /start.py generate
     yq e -i ".federation_certificate_verification_whitelist[0] = \"*.onion\"" /data/homeserver.yaml
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
+    if [ $FEDERATION == "true" ]; then
+        yq e -i ".listeners[0].resources.names = [client, keys, media, metrics, health, federation]" /data/homeserver.yaml
+    else
+        yq e -i ".listeners[0].resources.names = [client, keys, media, metrics, health]" /data/homeserver.yaml
+        yq e -i ".federation_domain_whitelist = []" /data/homeserver.yaml
+    fi
 fi
 
 echo "" > /etc/nginx/conf.d/default.conf
@@ -50,12 +57,14 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 }
 EOT
 
-#cat /var/www/index.html.template > /var/www/index.html
-
-if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
-    cp /root/priv-config-forward-all /etc/privoxy/config
-else
-    cp /root/priv-config-forward-onion /etc/privoxy/config
+if [ $FEDERATION == "false" ]; then
+echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
+cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+    location /_matrix/federation {
+        deny all;
+        return 403;
+    }
+EOT
 fi
 
 if [ "$(sqlite3 /data/homeserver.db "SELECT COUNT(*) FROM users WHERE name LIKE '@admin:%';" | awk '{print $1}')" -eq 0 ]; then

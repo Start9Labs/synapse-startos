@@ -22,14 +22,14 @@ def main():
         s9.close()
 
     homeserver_cfg["public_baseurl"] = "http://" + os.getenv("TOR_ADDRESS")
-    if s9_cfg.get("enable-registration"):
+    if s9_cfg.get("advanced").get("enable-registration"):
         homeserver_cfg["enable_registration"] = True
     else:
         homeserver_cfg["enable_registration"] = False
 
     homeserver_email_cfg = None
     if s9_cfg.get("email-notifications").get("enabled") == "true":
-        s9_email_cfg = s9_cfg.get("email-notifications").get("smtp-settings")
+        s9_email_cfg = s9_cfg.get("email-notifications")
         homeserver_email_cfg = {
             "enable_notifs": True,
             "notif_from": s9_email_cfg["from-name"]
