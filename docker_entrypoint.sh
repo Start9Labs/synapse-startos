@@ -23,7 +23,7 @@ EOF
     SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=no /start.py generate
     yq e -i ".federation_certificate_verification_whitelist[0] = \"*.onion\"" /data/homeserver.yaml
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
-    if [ $FEDERATION == "true" ]; then
+    if [ $FEDERATION = "true" ]; then
         yq e -i ".listeners[0].resources.names = [client, keys, media, metrics, health, federation]" /data/homeserver.yaml
     else
         yq e -i ".listeners[0].resources.names = [client, keys, media, metrics, health]" /data/homeserver.yaml
@@ -57,7 +57,7 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
 }
 EOT
 
-if [ $FEDERATION == "false" ]; then
+if [ $FEDERATION = "false" ]; then
 echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     location /_matrix/federation {

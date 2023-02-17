@@ -2,7 +2,7 @@
 
 FEDERATION=$(yq e '.federation' /data/start9/config.yaml)
 
-if [$FEDERATION == 'false']; then
+if [$FEDERATION = 'false']; then
     exit 59
 fi
 
