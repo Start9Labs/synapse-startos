@@ -105,6 +105,6 @@ echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
 echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
 sed -i 's#synapse.onion#'$TOR_ADDRESS'#g' /var/www/static/js/main.*.js
 nginx
-privoxy /etc/privoxy/config
+privoxy /root/priv-config-forward-onion
 export https_proxy="127.0.0.1:8118"
 exec tini /start.py

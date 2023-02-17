@@ -43,6 +43,7 @@ RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/
 ADD ./www /var/www
 COPY --from=builder /src/build /var/www
 ADD ./cert.conf /etc/ssl/cert.conf
+ADD ./priv-config-forward-onion /root
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
 ADD ./check-federation.sh /usr/local/bin/check-federation.sh
