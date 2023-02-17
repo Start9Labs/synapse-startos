@@ -72,10 +72,10 @@ if [ "$(sqlite3 /data/homeserver.db "SELECT COUNT(*) FROM users WHERE name LIKE 
     echo "Synapse-admin user not found. Creating ..."
     echo
     admin_password=$(cat /dev/urandom | base64 | head -c 16)
-    timeout 10s synapse_homeserver -c /data/homeserver.yaml &
-    sleep 3
+    timeout 15s synapse_homeserver -c /data/homeserver.yaml &
+    sleep 5
     register_new_matrix_user --config /data/homeserver.yaml --user admin --password $admin_password --admin
-    yq e '.admin_password = "'$admin_password'"' -i /data/start9/config.yaml
+    echo $admin_password > /data/start9/adm.key
 fi
 
 if [ "$1" = "reset-first-user" ]; then

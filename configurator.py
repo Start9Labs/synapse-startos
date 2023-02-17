@@ -51,7 +51,7 @@ def main():
             "data": {
                 "Synapse-Admin password": {
                     "type": "string",
-                    "value": os.popen("yq e '.admin_password' /data/start9/config.yaml").read().strip(),
+                    "value": os.popen("cat /data/start9/adm.key").read().strip(),
                     "description": "Password for Synapse-Admin.",
                     "copyable": True,
                     "qr": False,
