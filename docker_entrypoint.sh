@@ -54,16 +54,18 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
         # Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
         client_max_body_size 50M;
     }
-}
 EOT
-
 if [ $FEDERATION = "false" ]; then
-echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
 cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     location /_matrix/federation {
         deny all;
         return 403;
     }
+}
+EOT
+else
+cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+}
 EOT
 fi
 
