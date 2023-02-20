@@ -31,18 +31,21 @@ EOF
     fi
 fi
 
-echo "" > /etc/nginx/conf.d/default.conf
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+cat > /etc/nginx/conf.d/default.conf <<"EOT"
 server_names_hash_bucket_size 128;
 server {
     listen 80;
     listen 443 ssl;
+EOT
+if [ $FEDERATION = "true" ]; then
+cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     listen 8448 ssl;
+EOT
+fi
+cat >> /etc/nginx/conf.d/default.conf <<"EOT"
     ssl_certificate /mnt/cert/main.cert.pem;
     ssl_certificate_key /mnt/cert/main.key.pem;
-EOT
-echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+    server_name $TOR_ADDRESS;
     root /var/www;
     location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
         proxy_pass http://127.0.0.1:8008;
@@ -54,20 +57,8 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
         # Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
         client_max_body_size 50M;
     }
-EOT
-if [ $FEDERATION = "false" ]; then
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
-    location /_matrix/federation {
-        deny all;
-        return 403;
-    }
 }
 EOT
-else
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
-}
-EOT
-fi
 
 if [ "$(sqlite3 /data/homeserver.db "SELECT COUNT(*) FROM users WHERE name LIKE '@admin:%';" | awk '{print $1}')" -eq 0 ]; then
     echo
