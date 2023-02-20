@@ -65,18 +65,33 @@ alerts: {}
 #  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
   main:
-    name: Main Interface
-    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser
+    name: Synapse Interface
+    description: Listens for Matrix clients and peers to federate with.
     tor-config:
       port-mapping:
         80: "80"
         443: "443"
         8448: "8448"
-    ui: true
+    ui: false
     protocols:
       - tcp
       - http
       - matrix
+  admin:
+    name: Synapse Admin Interface
+    description: Admin interface for synapse homeserver.
+    tor-config:
+      port-mapping:
+        80: "80"
+        443: "443"
+    lan-config:
+      443:
+        ssl: true
+        internal: 443
+    ui: true
+    protocols:
+      - tcp
+      - http
 dependencies: {}
 backup:
   create:
