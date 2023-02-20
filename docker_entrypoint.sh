@@ -31,18 +31,18 @@ EOF
     fi
 fi
 
-cat > /etc/nginx/conf.d/default.conf <<"EOT"
+cat << EOT > /etc/nginx/conf.d/default.conf
 server_names_hash_bucket_size 128;
 server {
     listen 80;
     listen 443 ssl;
 EOT
 if [ $FEDERATION = "true" ]; then
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+cat << EOT >> /etc/nginx/conf.d/default.conf
     listen 8448 ssl;
 EOT
 fi
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+cat << EOT >> /etc/nginx/conf.d/default.conf
     ssl_certificate /mnt/cert/main.cert.pem;
     ssl_certificate_key /mnt/cert/main.key.pem;
     server_name $TOR_ADDRESS;
