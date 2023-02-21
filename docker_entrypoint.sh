@@ -105,11 +105,11 @@ python /configurator.py
 #Fixes and last minute config changes
 if [ $FEDERATION = "true" ]; then
 echo "Federation enabled"
-    yq e -i '.listeners[0].resources[0].names |= ["client", "keys", "media", "metrics", "federation"]' /data/homeserver.yaml
+    yq e -i '.listeners[0].resources[0].names |= ["client", "federation"]' /data/homeserver.yaml
     yq e -i 'del(.federation_domain_whitelist)' /data/homeserver.yaml
 else
 echo "Federation disabled"
-    yq e -i '.listeners[0].resources[0].names |= ["client", "keys", "media", "metrics"]' /data/homeserver.yaml
+    yq e -i '.listeners[0].resources[0].names |= ["client"]' /data/homeserver.yaml
     yq e -i ".federation_domain_whitelist = []" /data/homeserver.yaml
 fi
 yq e -i ".enable_registration_without_verification = true" /data/homeserver.yaml
