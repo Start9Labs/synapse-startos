@@ -42,12 +42,12 @@ cat << EOT >> /etc/nginx/conf.d/default.conf
     listen 8448 ssl;
 EOT
 fi
-cat << EOT >> /etc/nginx/conf.d/default.conf
+cat << "EOT" >> /etc/nginx/conf.d/default.conf
     ssl_certificate /mnt/cert/main.cert.pem;
     ssl_certificate_key /mnt/cert/main.key.pem;
-    server_name $TOR_ADDRESS;
-    root /var/www;
-    location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
+    server_name TOR_ADDRESS;
+    root /var/www/synapse;
+    location ~* ^(\/_matrix|\/_synapse\/client) {
         proxy_pass http://127.0.0.1:8008;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -58,7 +58,22 @@ cat << EOT >> /etc/nginx/conf.d/default.conf
         client_max_body_size 50M;
     }
 }
+server {
+    listen 8080;
+    listen 4433 ssl;
+    ssl_certificate /mnt/cert/admin.cert.pem;
+    ssl_certificate_key /mnt/cert/admin.key.pem;
+    server_name synapse-admin;
+    root /var/www/admin;
+    location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
+        proxy_pass http://127.0.0.1:8008;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+    }
+}
 EOT
+sed -i 's#TOR_ADDRESS#'$TOR_ADDRESS'#g' /etc/nginx/conf.d/default.conf
 
 if [ "$(sqlite3 /data/homeserver.db "SELECT COUNT(*) FROM users WHERE name LIKE '@admin:%';" | awk '{print $1}')" -eq 0 ]; then
     echo
@@ -96,7 +111,6 @@ python /configurator.py
 #Fixes and last minute config changes
 echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
 echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
-sed -i 's#synapse.onion#'$TOR_ADDRESS'#g' /var/www/static/js/main.*.js
 nginx
 privoxy /root/priv-config-forward-onion
 export https_proxy="127.0.0.1:8118"

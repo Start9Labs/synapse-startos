@@ -1,15 +1,4 @@
-#FROM awesometechnologies/synapse-admin:0.8.7 as synapse-admin
-FROM node:lts-alpine as builder
-
-ARG REACT_APP_SERVER
-RUN apk add --no-cache wget
-RUN wget https://github.com/Awesome-Technologies/synapse-admin/archive/refs/tags/0.8.7.tar.gz \
-    && tar -xzvf 0.8.7.tar.gz \
-    && mv synapse-admin-0.8.7 /src
-WORKDIR /src
-
-RUN yarn --network-timeout=300000 install
-RUN REACT_APP_SERVER=http://synapse.onion yarn build
+FROM awesometechnologies/synapse-admin:0.8.7 as synapse-admin
 
 FROM matrixdotorg/synapse:v1.75.0
 
@@ -41,7 +30,7 @@ RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/
     && chmod a+x /usr/local/bin/yq
 
 ADD ./www /var/www
-COPY --from=builder /src/build /var/www
+COPY --from=synapse-admin /app /var/www/admin
 ADD ./cert.conf /etc/ssl/cert.conf
 ADD ./priv-config-forward-onion /root
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh

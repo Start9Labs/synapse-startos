@@ -82,12 +82,12 @@ interfaces:
     description: Admin interface for synapse homeserver.
     tor-config:
       port-mapping:
-        80: "80"
-        443: "443"
+        80: "8080"
+        443: "4433"
     lan-config:
       443:
         ssl: true
-        internal: 443
+        internal: 8080
     ui: true
     protocols:
       - tcp
