@@ -46,30 +46,22 @@ def main():
         stats = {
             "version": 2,
             "data": {
-                "Synapse-Admin password": {
-                    "type": "string",
-                    "value": os.popen("cat /data/start9/adm.key").read().strip(),
-                    "description": "Password for Synapse-Admin.",
-                    "copyable": True,
-                    "qr": False,
-                    "masked": True,
-                },
-                "Synapse-Admin username": {
+                "Admin Username": {
                     "type": "string",
                     "value": "admin",
-                    "description": "Default username for Synapse-Admin.",
+                    "description": "Username for your Admin Portal",
                     "copyable": True,
                     "qr": False,
                     "masked": False,
                 },
-#                "Synapse-Admin URL": {
-#                    "type": "string",
-#                    "value": "http://" + os.getenv("TOR_ADDRESS") + "/synapse-admin",
-#                    "description": "URL address for Synapse-Admin.",
-#                    "copyable": True,
-#                    "qr": False,
-#                    "masked": False,
-#                },
+                "Admin Password": {
+                    "type": "string",
+                    "value": os.popen("cat /data/start9/adm.key").read().strip(),
+                    "description": "Password for your Admin Portal",
+                    "copyable": True,
+                    "qr": False,
+                    "masked": True,
+                },
                 "SSL Cert SHA256 Fingerprint": {
                     "type": "string",
                     "value": os.popen(
