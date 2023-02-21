@@ -23,12 +23,6 @@ EOF
     SYNAPSE_SERVER_NAME=$TOR_ADDRESS SYNAPSE_REPORT_STATS=no /start.py generate
     yq e -i ".federation_certificate_verification_whitelist[0] = \"*.onion\"" /data/homeserver.yaml
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
-    if [ $FEDERATION = "true" ]; then
-        yq e -i ".listeners[0].resources.names = [client, keys, media, metrics, health, federation]" /data/homeserver.yaml
-    else
-        yq e -i ".listeners[0].resources.names = [client, keys, media, metrics, health]" /data/homeserver.yaml
-        yq e -i ".federation_domain_whitelist = []" /data/homeserver.yaml
-    fi
 fi
 
 cat << EOT > /etc/nginx/conf.d/default.conf
@@ -109,8 +103,17 @@ fi
 
 python /configurator.py
 #Fixes and last minute config changes
-echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
-echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
+if [ $FEDERATION = "true" ]; then
+echo "Federation enabled"
+    yq e -i '.listeners[0].resources[0].names |= ["client", "keys", "media", "metrics", "federation"]' /data/homeserver.yaml
+    yq e -i 'del(.federation_domain_whitelist)' /data/homeserver.yaml
+else
+echo "Federation disabled"
+    yq e -i '.listeners[0].resources[0].names |= ["client", "keys", "media", "metrics"]' /data/homeserver.yaml
+    yq e -i ".federation_domain_whitelist = []" /data/homeserver.yaml
+fi
+yq e -i ".enable_registration_without_verification = true" /data/homeserver.yaml
+yq e -i ".suppress_key_server_warning = true" /data/homeserver.yaml
 nginx
 privoxy /root/priv-config-forward-onion
 export https_proxy="127.0.0.1:8118"
