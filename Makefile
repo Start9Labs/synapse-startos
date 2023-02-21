@@ -18,7 +18,7 @@ clean:
 	rm -f $(PKG_ID).s9pk
 	rm -f scripts/*.js
 	rm -rf docker-images
-	rm -r synapse-vps.tar
+	rm -f synapse-vps.tar
 
 verify: $(PKG_ID).s9pk
 	@embassy-sdk verify s9pk $(PKG_ID).s9pk
