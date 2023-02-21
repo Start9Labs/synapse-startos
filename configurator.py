@@ -33,9 +33,6 @@ def main():
         homeserver_email_cfg = {
             "enable_notifs": True,
             "notif_from": s9_email_cfg["from-name"]
-            + "<"
-            + s9_email_cfg["smtp-user"]
-            + ">",
         }
         for s9_key in EMAIL_CFG_KEYS:
             if s9_email_cfg.get(s9_key):

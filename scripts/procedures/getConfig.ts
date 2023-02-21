@@ -50,11 +50,10 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
         },
         "from-name": {
           "type": "string",
-          "name": "From Name",
-          "description": "Name to display in the from field when receiving emails from your Synapse server.",
-          "placeholder": "e.g. Synapse, Matrix",
+          "name": "From Address",
+          "description": "Name/Address to display in the from field when receiving emails from your Synapse server.",
+          "placeholder": "e.g. Synapse<synapse@mydomain.com>",
           "nullable": false,
-          "default": "Synapse",
           "masked": false
         },
         "smtp-user": {
