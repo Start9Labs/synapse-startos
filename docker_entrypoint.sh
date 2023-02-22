@@ -69,17 +69,6 @@ server {
 EOT
 sed -i 's#TOR_ADDRESS#'$TOR_ADDRESS'#g' /etc/nginx/conf.d/default.conf
 
-if [ "$(sqlite3 /data/homeserver.db "SELECT COUNT(*) FROM users WHERE name LIKE '@admin:%';" | awk '{print $1}')" -eq 0 ]; then
-    echo
-    echo "Synapse-admin user not found. Creating ..."
-    echo
-    admin_password=$(cat /dev/urandom | base64 | head -c 16)
-    timeout 15s synapse_homeserver -c /data/homeserver.yaml &
-    sleep 5
-    register_new_matrix_user --config /data/homeserver.yaml --user admin --password $admin_password --admin
-    echo $admin_password > /data/start9/adm.key
-fi
-
 if [ "$1" = "reset-first-user" ]; then
     query() {
         sqlite3 /data/homeserver.db "$*"
@@ -103,6 +92,21 @@ fi
 
 python /configurator.py
 #Fixes and last minute config changes
+
+if [ -e /data/start9/adm.key ]; then
+    echo "Synapse-admin user found! Continuing ..."
+else
+    echo
+    echo "Synapse-admin user not found. Creating ..."
+    echo
+    admin_password=$(cat /dev/urandom | base64 | head -c 16)
+    timeout 25s /start.py &
+    sleep 20
+    register_new_matrix_user --config /data/homeserver.yaml --user admin --password $admin_password --admin
+    echo $admin_password > /data/start9/adm.key
+    python /configurator.py
+fi
+
 if [ $FEDERATION = "true" ]; then
 echo "Federation enabled"
     yq e -i '.listeners[0].resources[0].names |= ["client", "federation"]' /data/homeserver.yaml
