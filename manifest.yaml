@@ -70,7 +70,7 @@ interfaces:
         80: "80"
         443: "443"
         8448: "8448"
-    ui: true
+    ui: false
     protocols:
       - tcp
       - http
