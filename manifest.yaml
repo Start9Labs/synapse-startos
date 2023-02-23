@@ -3,7 +3,9 @@ title: Synapse
 version: 1.75.0
 release-notes: |
   * Introducing Synapse-Admin as default UI for the service
-  * Update to latest upstream version
+  * Added option to disable federation
+  * Removed tor-only option
+  * Better config options rearrangement
   * Update backups to use new eOS APIs
   * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.74.0...v1.75.0)
 license: apache
@@ -65,18 +67,33 @@ alerts: {}
 #  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
   main:
-    name: Main Interface
-    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser
+    name: Homeserver Address
+    description: Used by clients and other servers to connect with your homeserver
     tor-config:
       port-mapping:
         80: "80"
         443: "443"
         8448: "8448"
-    ui: true
+    ui: false
     protocols:
       - tcp
       - http
       - matrix
+  admin:
+    name: Admin Portal
+    description: A web application for administering your Synapse server
+    tor-config:
+      port-mapping:
+        80: "8080"
+        443: "4433"
+    lan-config:
+      443:
+        ssl: true
+        internal: 8080
+    ui: true
+    protocols:
+      - tcp
+      - http
 dependencies: {}
 backup:
   create:
