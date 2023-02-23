@@ -1,11 +1,13 @@
 id: synapse
 title: Synapse
-version: 1.74.0
+version: 1.75.0
 release-notes: |
-  * Update to latest upstream version
-  * Faster remote room joins [more info](https://github.com/matrix-org/synapse/pull/14473)
-  * Adjusted timeout
-  * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.63.1...v1.74.0)
+  * Introducing Synapse-Admin as default UI for the service
+  * Added option to disable federation
+  * Removed tor-only option
+  * Better config options rearrangement
+  * Update backups to use new eOS APIs
+  * Detailed changelog available [here](https://github.com/matrix-org/synapse/compare/v1.74.0...v1.75.0)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/Start9Labs/synapse
@@ -61,12 +63,12 @@ volumes:
   cert:
     type: certificate
     interface-id: main
-alerts: 
-  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
+alerts: {}
+#  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
   main:
-    name: Main Interface
-    description: Listens for Matrix clients and peers to federate with. Also displays instructions when visited in a browser
+    name: Homeserver Address
+    description: Used by clients and other servers to connect with your homeserver
     tor-config:
       port-mapping:
         80: "80"
@@ -77,34 +79,27 @@ interfaces:
       - tcp
       - http
       - matrix
+  admin:
+    name: Admin Portal
+    description: A web application for administering your Synapse server
+    tor-config:
+      port-mapping:
+        80: "8080"
+        443: "4433"
+    lan-config:
+      443:
+        ssl: true
+        internal: 8080
+    ui: true
+    protocols:
+      - tcp
+      - http
 dependencies: {}
 backup:
   create:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - create
-      - /mnt/backup
-      - /data
-    mounts:
-      BACKUP: /mnt/backup
-      main: /data
+    type: script
   restore:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - restore
-      - /mnt/backup
-      - /data
-    mounts:
-      BACKUP: /mnt/backup
-      main: /data
+    type: script
 actions:
   reset-first-user:
     name: Reset First User

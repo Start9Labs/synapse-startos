@@ -4,7 +4,7 @@ set -e
 
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 export TOR_ADDRESS=$(yq e '.tor-address' /data/start9/config.yaml)
-export TIMEOUT=20000
+FEDERATION=$(yq e '.federation' /data/start9/config.yaml)
 echo "$HOST_IP   tor" >> /etc/hosts
 
 if ! [ -f /data/homeserver.yaml ]; then
@@ -25,19 +25,22 @@ EOF
     yq e -i ".listeners[0].bind_addresses = [\"127.0.0.1\"]" /data/homeserver.yaml
 fi
 
-echo "" > /etc/nginx/conf.d/default.conf
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
+cat << EOT > /etc/nginx/conf.d/default.conf
 server_names_hash_bucket_size 128;
 server {
     listen 80;
     listen 443 ssl;
+EOT
+if [ $FEDERATION = "true" ]; then
+cat << EOT >> /etc/nginx/conf.d/default.conf
     listen 8448 ssl;
+EOT
+fi
+cat << "EOT" >> /etc/nginx/conf.d/default.conf
     ssl_certificate /mnt/cert/main.cert.pem;
     ssl_certificate_key /mnt/cert/main.key.pem;
-EOT
-echo "    server_name ${TOR_ADDRESS};" >> /etc/nginx/conf.d/default.conf
-cat >> /etc/nginx/conf.d/default.conf <<"EOT"
-    root /var/www;
+    server_name TOR_ADDRESS;
+    root /var/www/synapse;
     location ~* ^(\/_matrix|\/_synapse\/client) {
         proxy_pass http://127.0.0.1:8008;
         proxy_set_header X-Forwarded-For $remote_addr;
@@ -49,16 +52,22 @@ cat >> /etc/nginx/conf.d/default.conf <<"EOT"
         client_max_body_size 50M;
     }
 }
+server {
+    listen 8080;
+    listen 4433 ssl;
+    ssl_certificate /mnt/cert/admin.cert.pem;
+    ssl_certificate_key /mnt/cert/admin.key.pem;
+    server_name synapse-admin;
+    root /var/www/admin;
+    location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
+        proxy_pass http://127.0.0.1:8008;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+    }
+}
 EOT
-
-cat /var/www/index.html.template > /var/www/index.html
-
-if [ "$(yq e ".advanced.tor-only-mode" /data/start9/config.yaml)" = "true" ]; then
-    cp /root/priv-config-forward-all /etc/privoxy/config
-else
-    cp /root/priv-config-forward-onion /etc/privoxy/config
-fi
-
+sed -i 's#TOR_ADDRESS#'$TOR_ADDRESS'#g' /etc/nginx/conf.d/default.conf
 
 if [ "$1" = "reset-first-user" ]; then
     query() {
@@ -66,7 +75,8 @@ if [ "$1" = "reset-first-user" ]; then
     }
     password=$(cat /dev/urandom | base64 | head -c 16)
     hashed_password=$(hash_password -p "$password" -c "/data/homeserver.yaml")
-    first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
+    first_user_name=$(query "SELECT name FROM users WHERE creation_ts = (SELECT MIN(creation_ts) FROM users) AND name NOT LIKE '@admin:%' LIMIT 1;")
+#    first_user_name=$(query "select name from users where creation_ts = (select min(creation_ts) from users) limit 1;")
     query "update users set password_hash=\"$hashed_password\" where name=\"$first_user_name\""
     cat << EOF
 {
@@ -82,12 +92,33 @@ fi
 
 python /configurator.py
 #Fixes and last minute config changes
-echo "enable_registration_without_verification: true" >> /data/homeserver.yaml
-echo "suppress_key_server_warning: true" >> /data/homeserver.yaml
-sed -i 's#timeout=10000#timeout='$TIMEOUT'#g' /usr/local/lib/python3*/site-packages/synapse/crypto/keyring.py
-sed -i 's#timeout=10000#timeout='$TIMEOUT'#g' /usr/local/lib/python3*/site-packages/synapse/federation/transport/client.py
-sed -i 's#timeout=10000#timeout='$TIMEOUT'#g' /usr/local/lib/python3*/site-packages/synapse/federation/federation_client.py
+
+if [ -e /data/start9/adm.key ]; then
+    echo "Synapse-admin user found! Continuing ..."
+else
+    echo
+    echo "Synapse-admin user not found. Creating ..."
+    echo
+    admin_password=$(cat /dev/urandom | base64 | head -c 16)
+    timeout 25s /start.py &
+    sleep 20
+    register_new_matrix_user --config /data/homeserver.yaml --user admin --password $admin_password --admin
+    echo $admin_password > /data/start9/adm.key
+    python /configurator.py
+fi
+
+if [ $FEDERATION = "true" ]; then
+echo "Federation enabled"
+    yq e -i '.listeners[0].resources[0].names |= ["client", "federation"]' /data/homeserver.yaml
+    yq e -i 'del(.federation_domain_whitelist)' /data/homeserver.yaml
+else
+echo "Federation disabled"
+    yq e -i '.listeners[0].resources[0].names |= ["client"]' /data/homeserver.yaml
+    yq e -i ".federation_domain_whitelist = []" /data/homeserver.yaml
+fi
+yq e -i ".enable_registration_without_verification = true" /data/homeserver.yaml
+yq e -i ".suppress_key_server_warning = true" /data/homeserver.yaml
 nginx
-privoxy /etc/privoxy/config
+privoxy /root/priv-config-forward-onion
 export https_proxy="127.0.0.1:8118"
 exec tini /start.py

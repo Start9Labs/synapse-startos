@@ -9,94 +9,130 @@
 <br />
 <h2><u>Instructions</u></h2>
 
-<h3>Step 1: Connecting to Your Synapse Server</h3>
-<p>In order to use your new Synapse server, you will need to select a client app. Currently, the only client we
-  recommend is
-  <a href="https://element.io" target="_blank">Element</a>, which offers native apps for various platforms.
+<h3>Step 1: Initial Config</h3>
+<ol>
+  <li>
+    <b>Federation</b>: Enabling Federation allows you to discover and join rooms on other Tor-enabled servers and vice versa. If you want a totally private chat server, you should disable Federation. Either way, you will <i>not</i> be able to interact with rooms and people on clearnet servers, such as matrix.org.
+  </li>
+  <li>
+    <b>Email Notifications</b>: If you wish to receive email notification from your Synapse server, you must provide your own SMTP credentials.
+  </li>
+  <li>
+    <b>Advanced - Enable Registration</b>: If you enable registration, anyone will be able to create an account on your Synapse server. It is <i>highly</i> recommended that you disable registrations whenever possible. The only time we recommend turning it on is if you quickly want multiple people to create accounts on your server, then you should turn it back off.
+  </li>
+</ol>
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h3>Step 2: Creating Your First Account</h3>
+<p>
+  With registrations disabled, the only way to create an account on your Server is through the Admin Portal.
+</p>
+<ol>
+  <li>In your Synapse dashboard, click "Launch UI"</li>
+  <li>
+    Log in with your Admin Username and Password (located in Properties). For "Homeserver URL", do <i>not</i> enter your Homeserver address. Instead, enter your Admin Portal URL. Hint: this is the URL currently showing in your browser URL bar, minus the path. e.g. https://exampleaddress.local or http://exampleaddress.onion.
+  </li>
+  <li>In the "Users" tab, you will notice the admin user already created.</li>
+  <li>In the "Users" tab, click "+ Create"</li>
+  <li>
+    Choose a User-ID, Displayname, and Password for your account. Optionally enter an email address under the 3PIDs section. It is not recommended to make this user a Server Administrator, as it is best to limit admin access.
+  </li>
+</ol>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h3>Step 3: Using Your Server</h3>
+<p>In order to use your new Synapse server, you will need to select a client app. We recommend:
+  <ul>
+    <li><a href="https://element.io" target="_blank" noreferrer>Element</a></li>
+    <li><a href="https://schildi.chat" target="_blank" noreferrer>SchildiChat</a></li>
+  </ul>
+  These instructions are written for Element, but they are identical for SchildiChat.
 </p>
 <ul>
   <li>
     <h4>Web</h4>
     <ol>
       <p><i>Note: Element Web is <b>not</b> mobile responsive, meaning it does not adapt well to smaller screen sizes.
-          You should only use it from desktop/laptop browsers, not from your mobile device.</i></p>
+          You should only use it from desktop/laptop browsers, not from your mobile device</i></p>
       <li>Visit <a href="https://app.element.io" target="_blank">https://app.element.io</a> <i>from a Tor-enabled
-          browser</i> (Tor Browser or Firefox, but <b>not</b> Brave).</li>
+          browser</i> (Tor Browser or Firefox, but <b>not</b> Brave)</li>
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
-        created your account.</li>
+        created your account</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
         <code>http://your_synapse_address_from_interfaces.onion</code></li>
-      <li>Complete sign in or account creation.</li>
+      <li>Complete sign in or account creation</li>
     </ol>
   </li>
   <li>
     <h4>macOS</h4>
     <ol>
       <li>Configure your macOS device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-mac">instructions</a>.</li>
-      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for macOS</a>. You can also check out <a href="https://www.schildi.chat/" target="_blank">SchildiChat</a></li>
-      <p><i>Note: your mac will likely block opening this app for security purposes. You may need to grant special
-          permission inside System Preferences --> Security and Privacy. It is perfectly fine to open this app. You
-          downloaded it from your own Embassy!</i></p>
+          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-mac">instructions</a></li>
+      <li>Download Element for macOS</li>
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
-        created your account.</li>
+        created your account</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
         <code>http://your_synapse_address_from_interfaces.onion</code></li>
-      <li>Complete sign in or account creation.</li>
+      <li>Complete sign in or account creation</li>
     </ol>
   </li>
   <li>
     <h4>Linux</h4>
     <ol>
       <li>Configure your Linux device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-linux">instructions</a>.</li>
-      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Linux</a>.</li>
-      <li>Because the Element app is not Tor-enabled by default, you must launch it from the command line using the
+          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-linux">instructions</a></li>
+      <li>Download Element for Linux</li>
+      <li>Because Element app is not Tor-enabled by default, you must launch it from the command line using the
         following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
-        created your account.</li>
+        created your account</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
         <code>http://your_synapse_address_from_interfaces.onion</code></li>
-      <li>Complete sign in or account creation.</li>
+      <li>Complete sign in or account creation</li>
     </ol>
   </li>
   <li>
     <h4>Windows</h4>
     <ol>
       <li>Configure your Windows device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-windows">instructions</a>.</li>
-      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Windows</a>.</li>
-      <li>Right click on the Element app or app shortcut.</li>
-      <li>Click "Properties".</li>
+          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-windows">instructions</a></li>
+      <li>Download Element for Windows</li>
+      <li>Right click on Element app icon</li>
+      <li>Click "Properties"</li>
       <li>On the "Shortcut" tab, add <code>--proxy-server=socks5://127.0.0.1:9050</code> to the end of the "Target"
         field. Please note, there must be a space between <code>...Element.exe</code> and <code>--proxy...</code>
       </li>
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
-        created your account.</li>
+        created your account</li>
       <li>Beneath "Host Account On" (following Create Account), or "Homeserver" (following Sign In), click <code>Edit</code> and change "matrix.org" to
         <code>http://your_synapse_address_from_interfaces.onion</code></li>
-      <li>Complete sign in or account creation.</li>
+      <li>Complete sign in or account creation</li>
     </ol>
   </li>
   <li>
     <h4>Android</h4>
     <ol>
       <li>Configure your Android device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-android">instructions</a>.</li>
-      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for Android</a>.</li>
-      <li>Add Element to the list of VPN apps inside Orbot.</li>
+          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-android">instructions</a></li>
+      <li>Download Element for Android</li>
+      <li>Add Element to the list of VPN apps inside Orbot</li>
       <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
-      <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor.</li>
+      <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor</li>
     </ol>
   </li>
   <li>
     <h4>iOS</h4>
     <ol>
       <li>Configure your iOS device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-ios">instructions</a>.</li>
-      <li>Download the <a href="https://element.io/get-started" target="_blank">Element app for iOS</a>.</li>
+          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-ios">instructions</a></li>
+      <li>Download Element app for iOS</li>
       <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
-      <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor.</li>
+      <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor</li>
     </ol>
   </li>
 </ul>
@@ -105,12 +141,12 @@
 <hr style="border: 1px dashed #bbb;" />
 <br />
 
-<h3>Step 2: Enable Cross Signing</h3>
+<h3>Step 4: Enable Cross Signing</h3>
 <ol>
-  <li>Go to Settings --> Security & Privacy --> Cross-signing.</li>
-  <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go.</li>
+  <li>Go to Settings --> Security & Privacy --> Cross-signing</li>
+  <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go</li>
   <li>If you see <code>Cross-signing has not been set up</code>, then click <code>Set Up</code>, then follow the
-    instructions to complete setup.</li>
+    instructions to complete setup</li>
   <li>Alternatively, if you see <code>Cross-signing is ready but keys are not backed up</code>, follow the backup instructions in Step 4</li>
 </ol>
 <p>Explanation: The Matrix protocol uses advanced cryptography to ensure that you are, in fact, communicating with the
@@ -126,23 +162,23 @@
 <hr style="border: 1px dashed #bbb;" />
 <br />
 
-<h3>Step 3: Joining a Room</h3>
+<h3>Step 5: Joining a Room</h3>
 <ol>
-  <li>On the main dashboard, select <code>Explore Public Rooms</code>.</li>
+  <li>On the main dashboard, select <code>Explore Public Rooms</code></li>
   <li>In the search field, paste in the alias of the room you want to join. Room aliases start with #. For example,
     Start9's Tor Party room
     is <a href="https://matrix.to/#/#tor-party:matrix.privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion"
       target="_blank">#tor-party:matrix.privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion</a>, then click
-    <code>&#8626; Join</code>.</li>
+    <code>&#8626; Join</code></li>
   <li>Joining a room can take a while, depending on how many users are currently in the room. If it fails, simply try
-    again.</li>
+    again</li>
 </ol>
 
 <br />
 <hr style="border: 1px dashed #bbb;" />
 <br />
 
-<h3>Step 4: Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
+<h3>Step 6: Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
 <p><u>Encryption Keys</u>: Matrix uses end-to-end (E2E) encryption, meaning all encryption/decryption is performed
   locally on your phone/computer using keys stored on the device. To further complicate things, these keys are
   frequently changed to ensure maximum security. And to even further complicate things, when you log out of

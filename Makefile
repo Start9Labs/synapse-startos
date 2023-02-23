@@ -7,7 +7,7 @@ TS_FILES := $(shell find ./ -name \*.ts)
 all: verify
 
 install:
-ifeq (,$(wildcard ~/.embassy/config.yaml1))
+ifeq (,$(wildcard ~/.embassy/config.yaml))
 	@echo; echo "You must define \"host: http://embassy-server-name.local\" in ~/.embassy/config.yaml config file first"; echo
 else
 	embassy-cli package install $(PKG_ID).s9pk
@@ -18,6 +18,7 @@ clean:
 	rm -f $(PKG_ID).s9pk
 	rm -f scripts/*.js
 	rm -rf docker-images
+	rm -f synapse-vps.tar
 
 verify: $(PKG_ID).s9pk
 	@embassy-sdk verify s9pk $(PKG_ID).s9pk
@@ -34,14 +35,14 @@ else
 endif
 	@embassy-sdk pack
 
-docker-images/aarch64.tar: Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-all priv-config-forward-onion configurator.py $(shell find ./www)
+docker-images/aarch64.tar: Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-onion configurator.py $(shell find ./www)
 ifeq ($(ARCH),x86_64)
 else
 	mkdir -p docker-images
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --build-arg PLATFORM=arm64 --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/arm64 -o type=docker,dest=docker-images/aarch64.tar .
 endif
 
-docker-images/x86_64.tar: Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-all priv-config-forward-onion configurator.py $(shell find ./www)
+docker-images/x86_64.tar: Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-onion configurator.py $(shell find ./www)
 ifeq ($(ARCH),aarch64)
 else
 	mkdir -p docker-images
@@ -50,3 +51,7 @@ endif
 
 scripts/embassy.js: $(TS_FILES)
 	deno bundle scripts/embassy.ts scripts/embassy.js
+
+vps: Dockerfile.vps
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --build-arg PLATFORM=amd64 -f Dockerfile --tag matrixdotorg/synapse:v$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=synapse-vps.tar .
+	

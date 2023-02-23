@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$(yq e ".enable-registration" /data/start9/config.yaml)" = "false" ]; then
+if [ "$(yq e ".advanced.enable-registration" /data/start9/config.yaml)" = "false" ]; then
     exit 0
 else
     echo "User signups should be disabled when not in use" >&2
