@@ -58,6 +58,7 @@ jobs:
            cd embassy-os;
            git submodule update --init --recursive
            cd backend;
+           export RUSTFLAGS="";
            ./install-sdk.sh;
 
 
