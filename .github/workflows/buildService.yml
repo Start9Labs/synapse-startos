@@ -1,88 +1,63 @@
-# This is a basic workflow that is manually triggered
-
 name: Build Service
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
   workflow_dispatch:
   pull_request:
-    paths-ignore:
-    - '*.md'
-    branches:
-    - master
-    - next
+    paths-ignore: ['*.md']
+    branches: ['master', 'next']
   push:
-    paths-ignore:
-    - '*.md'
-    branches:
-    - master
-    - next
+    paths-ignore: ['*.md']
+    branches: ['master', 'next']
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "greet"
   BuildPackage:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-        
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-           
-    - uses: actions-rust-lang/setup-rust-toolchain@v1
-      with:
-        toolchain: stable
-        
-    - name: Get EmbassyOS Hash
-      run:  echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
-
-    - uses: actions/cache@v3
-      id: packageCache
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-synapse-${{ env.EMBASSYHASH }}
-                
-    - name: Install packages
-      run: |
-           sudo snap install yq deno
-           sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
-      
-      #check out service package for synapse
-    - name: Checkout tools repo
-      uses: actions/checkout@v3
-           
-    - name: install package manager stuff
-      id: packageManager
-      if: steps.packageCache.outputs.cache-hit != 'true'
-      run: |
-           cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git; #TODO probably should make this an action or a variable of some sort.
-           cd embassy-os;
-           git submodule update --init --recursive
-           cd backend;
-           export RUSTFLAGS="";
-           ./install-sdk.sh;
-
-
-    - name: build the service package!
-      run: |
-           git submodule update --init --recursive
-           embassy-sdk init
-           make
-           mv synapse*s9pk ~/ #move this to home directory for easy reference in the upload step
-
-    - name: upload service package
-      uses: actions/upload-artifact@v3
-      with:
-        name: synapse.s9pk
-        path: ~/*.s9pk
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Set up Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - name: Get EmbassyOS Hash
+        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
+      - name: Cache Packages
+        uses: actions/cache@v2
+        id: packageCache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-synapse-${{ env.EMBASSYHASH }}
+      - name: Install Dependencies
+        run: |
+          sudo snap install yq deno
+          sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
+      - name: Checkout services repository
+        uses: actions/checkout@v3
+      - name: Install Package Manager
+        id: packageManager
+        if: steps.packageCache.outputs.cache-hit != 'true'
+        run: |
+          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
+          cd embassy-os;
+          git submodule update --init --recursive
+          cd backend;
+          export RUSTFLAGS="";
+          ./install-sdk.sh;
+      - name: Build the service package
+        run: |
+          git submodule update --init --recursive
+          embassy-sdk init
+          make
+          mv synapse*s9pk ~/
+      - name: Upload .s9pk
+        uses: actions/upload-artifact@v2
+        with:
+          name: synapse.s9pk
+          path: ~/*.s9pk
