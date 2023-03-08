@@ -1,6 +1,6 @@
 id: synapse
 title: Synapse
-version: 1.75.0
+version: 1.75.0.1
 release-notes: |
   * Introducing Synapse-Admin as default UI for the service
   * Added option to disable federation
@@ -97,9 +97,31 @@ interfaces:
 dependencies: {}
 backup:
   create:
-    type: script
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - create
+      - /mnt/backup
+      - /data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /data
   restore:
-    type: script
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - restore
+      - /mnt/backup
+      - /data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /data
 actions:
   reset-first-user:
     name: Reset First User
