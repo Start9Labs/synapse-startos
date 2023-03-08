@@ -55,18 +55,18 @@ jobs:
       - name: Generate sha256 checksum
         run: |
           sha256sum synapse.s9pk > synapse.s9pk.sha256
-      - name: Read release notes from manifest
-        run: |
-          RELEASE_NOTES=$(yq e '.release-notes' manifest.yaml)
-          echo "RELEASE_NOTES=${RELEASE_NOTES}" >> $GITHUB_ENV
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NOTES: $(yq e '.release-notes' manifest.yaml)
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
-          body: Automated release ${{ github.ref }}${{ env.RELEASE_NOTES }}
+          body: |
+            ## What's Changed
+            ${{ env.RELEASE_NOTES }}
+            Automated release ${{ github.ref }}
           files: |
             synapse.s9pk
             synapse.s9pk.sha256
