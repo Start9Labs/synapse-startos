@@ -59,7 +59,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_NOTES: $(yq e '.release-notes' manifest.yaml)
+          RELEASE_NOTES: |
+            $(yq e '.release-notes' manifest.yaml | awk '{printf "* %s\n", $0}')
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
