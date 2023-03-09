@@ -21,7 +21,7 @@ jobs:
       - name: Get EmbassyOS Hash
         run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
       - name: Cache Packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: packageCache
         with:
           path: |
@@ -55,19 +55,18 @@ jobs:
       - name: Generate sha256 checksum
         run: |
           sha256sum synapse.s9pk > synapse.s9pk.sha256
+      - name: Generate changelog
+        run: |
+          echo "## What's Changed" > change-log.txt
+          yq e '.release-notes' manifest.yaml >> change-log.txt
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_NOTES: |
-            $(yq e '.release-notes' manifest.yaml | awk '{printf "* %s\n", $0}')
         with:
           tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
-          body: |
-            ## What's Changed
-            ${{ env.RELEASE_NOTES }}
-            Automated release ${{ github.ref }}
+          name: Synapse ${{ github.ref }}
+          body_path: change-log.txt
           files: |
             synapse.s9pk
             synapse.s9pk.sha256

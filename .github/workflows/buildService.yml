@@ -24,7 +24,7 @@ jobs:
       - name: Get EmbassyOS Hash
         run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
       - name: Cache Packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: packageCache
         with:
           path: |
@@ -57,7 +57,7 @@ jobs:
           make
           mv synapse*s9pk ~/
       - name: Upload .s9pk
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: synapse.s9pk
           path: ~/*.s9pk
