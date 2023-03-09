@@ -3,9 +3,10 @@ title: Synapse
 version: 1.75.0.1
 release-notes: |
   * Backup fix for x86_64 build
+  * Package upstream info update
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
-upstream-repo: https://github.com/Start9Labs/synapse
+upstream-repo: https://github.com/matrix-org/synapse
 support-site: https://github.com/matrix-org/synapse/issues
 marketing-site: https://matrix.org/
 build: ["make"]
