@@ -19,7 +19,7 @@ jobs:
         with:
           toolchain: stable
       - name: Get EmbassyOS Hash
-        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
+        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os --branch latest | awk '{ print $1}')" >> $GITHUB_ENV
       - name: Cache Packages
         uses: actions/cache@v3
         id: packageCache
@@ -41,7 +41,7 @@ jobs:
         id: packageManager
         if: steps.packageCache.outputs.cache-hit != 'true'
         run: |
-          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
+          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git --branch latest;
           cd embassy-os;
           git submodule update --init --recursive
           cd backend;
