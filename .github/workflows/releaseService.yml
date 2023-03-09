@@ -64,8 +64,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          name: Synapse ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
+          name: Synapse ${{ github.ref_name }}
           body_path: change-log.txt
           files: |
             synapse.s9pk
