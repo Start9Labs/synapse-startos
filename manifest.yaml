@@ -59,6 +59,9 @@ volumes:
   cert:
     type: certificate
     interface-id: main
+  admin-cert:
+    type: certificate
+    interface-id: admin
 alerts: {}
 #  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
 interfaces:
