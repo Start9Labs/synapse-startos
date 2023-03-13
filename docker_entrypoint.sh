@@ -37,8 +37,8 @@ cat << EOT >> /etc/nginx/conf.d/default.conf
 EOT
 fi
 cat << "EOT" >> /etc/nginx/conf.d/default.conf
-    ssl_certificate /mnt/cert/main.cert.pem;
-    ssl_certificate_key /mnt/cert/main.key.pem;
+    ssl_certificate /mnt/cert/main/main.cert.pem;
+    ssl_certificate_key /mnt/cert/main/main.key.pem;
     server_name TOR_ADDRESS;
     root /var/www/synapse;
     location ~* ^(\/_matrix|\/_synapse\/client) {
@@ -55,8 +55,8 @@ cat << "EOT" >> /etc/nginx/conf.d/default.conf
 server {
     listen 8080;
     listen 4433 ssl;
-    ssl_certificate /mnt/cert/admin.cert.pem;
-    ssl_certificate_key /mnt/cert/admin.key.pem;
+    ssl_certificate /mnt/cert/admin/admin.cert.pem;
+    ssl_certificate_key /mnt/cert/admin/admin.key.pem;
     server_name synapse-admin;
     root /var/www/admin;
     location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
