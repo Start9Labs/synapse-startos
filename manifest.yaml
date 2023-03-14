@@ -25,6 +25,7 @@ main:
   mounts:
     main: /data
     cert: /mnt/cert
+    admin-cert: /mnt/admin-cert
 health-checks:
   federation:
     name: Federation
