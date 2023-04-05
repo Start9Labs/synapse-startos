@@ -33,11 +33,18 @@
   <li>In your Synapse dashboard, click "Launch UI"</li>
   <li>
     Log in with your Admin Username and Password (located in Properties). For "Homeserver URL", do <i>not</i> enter your Homeserver address. Instead, enter your Admin Portal URL. Hint: this is the URL currently showing in your browser URL bar, minus the path. e.g. https://exampleaddress.local or http://exampleaddress.onion.
+    <br />
+    ![](./docs/images/synapse-admin-1.jpg)
   </li>
   <li>In the "Users" tab, you will notice the admin user already created.</li>
-  <li>In the "Users" tab, click "+ Create"</li>
+  <li>In the "Users" tab, click "+ Create"
+      <br />
+      ![](./docs/images/synapse-admin-2.jpg)
+  </li>
   <li>
     Choose a User-ID, Displayname, and Password for your account. Optionally enter an email address under the 3PIDs section. It is not recommended to make this user a Server Administrator, as it is best to limit admin access.
+    <br />
+    ![](./docs/images/synapse-admin-3.jpg)
   </li>
 </ol>
 
