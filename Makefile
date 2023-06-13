@@ -8,7 +8,7 @@ all: verify
 
 install:
 ifeq (,$(wildcard ~/.embassy/config.yaml))
-	@echo; echo "You must define \"host: http://embassy-server-name.local\" in ~/.embassy/config.yaml config file first"; echo
+	@echo; echo "You must define \"host: http://server-name.local\" in ~/.embassy/config.yaml config file first"; echo
 else
 	embassy-cli package install $(PKG_ID).s9pk
 endif
@@ -19,6 +19,14 @@ clean:
 	rm -f scripts/*.js
 	rm -rf docker-images
 	rm -f synapse-vps.tar
+
+arm:
+	@rm -f docker-images/x86_64.tar
+	@ARCH=aarch64 $(MAKE)
+
+x86:
+	@rm -f docker-images/aarch64.tar
+	@ARCH=x86_64 $(MAKE)
 
 verify: $(PKG_ID).s9pk
 	@embassy-sdk verify s9pk $(PKG_ID).s9pk

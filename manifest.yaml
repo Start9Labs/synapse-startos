@@ -1,6 +1,6 @@
 id: synapse
 title: Synapse
-version: 1.75.0.2
+version: 1.85.2
 release-notes: |
   * Backup fix for x86_64 build
   * Package upstream info update
