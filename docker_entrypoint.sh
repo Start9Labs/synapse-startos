@@ -124,4 +124,5 @@ yq e -i ".federation_verify_certificates = false" /data/homeserver.yaml
 nginx
 privoxy /root/priv-config-forward-onion
 export https_proxy="127.0.0.1:8118"
+export matrix_proxy="127.0.0.1:8118"
 exec tini /start.py
