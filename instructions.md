@@ -72,7 +72,7 @@
     <h4>macOS</h4>
     <ol>
       <li>Configure your macOS device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-mac">instructions</a></li>
+          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-mac">instructions</a></li>
       <li>Download Element for macOS</li>
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
         created your account</li>
@@ -85,7 +85,7 @@
     <h4>Linux</h4>
     <ol>
       <li>Configure your Linux device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-linux">instructions</a></li>
+          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-linux">instructions</a></li>
       <li>Download Element for Linux</li>
       <li>Because Element app is not Tor-enabled by default, you must launch it from the command line using the
         following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
@@ -100,7 +100,7 @@
     <h4>Windows</h4>
     <ol>
       <li>Configure your Windows device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-windows">instructions</a></li>
+          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-windows">instructions</a></li>
       <li>Download Element for Windows</li>
       <li>Right click on Element app icon</li>
       <li>Click "Properties"</li>
@@ -118,7 +118,7 @@
     <h4>Android</h4>
     <ol>
       <li>Configure your Android device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-android">instructions</a></li>
+          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-android">instructions</a></li>
       <li>Download Element for Android</li>
       <li>Add Element to the list of VPN apps inside Orbot</li>
       <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
@@ -129,7 +129,7 @@
     <h4>iOS</h4>
     <ol>
       <li>Configure your iOS device to run Tor following these <a
-          href="https://start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-ios">instructions</a></li>
+          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-ios">instructions</a></li>
       <li>Download Element app for iOS</li>
       <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor</li>
@@ -185,8 +185,8 @@
   Element, these keys are purged from memory. Meaning, if you log out of all your Element client apps, you will
   lose your keys and be unable to decrypt your own message history!</p>
 <p><u>Message History</u>: Additionally, your entire (encrypted) message history is stored on your personal
-  Synapse server, which is running on your physical Embassy device. So there are two, separate types of backups
-  that are needed: (1) the encryption keys on your device and (2) the message history on your Embassy.</p>
+  Synapse server, which is running on your physical Start9 server. So there are two, separate types of backups
+  that are needed: (1) the encryption keys on your device and (2) the message history on your Start9 server.</p>
 <ul>
   <li>
     <h4>Backing up encryption keys</h4>
@@ -213,7 +213,7 @@
       </li>
       <li>
         <h5>Automatic</h5>
-        <p>This option will <i>automatically</i> store encrypted backups of your keys on your Embassy whenever they
+        <p>This option will <i>automatically</i> store encrypted backups of your keys on your Start9 server whenever they
           are rotated
           and is the recommended way of doing key backup</p>
         <ol>
@@ -228,7 +228,7 @@
             for you to store on your own.
             If you select <code>Enter a Security Phrase</code>, Element will encrypt the Security Key with your
             Security Phrase,
-            then store it on your Embassy. In the former case, you will need to keep and protect a private key.
+            then store it on your Start9 server. In the former case, you will need to keep and protect a private key.
             In the latter case, you will need to keep and protect a chosen passphrase. Either way, you will need to
             store something.
             The reason it is recommended to select <code>Generate a Security Key</code> is because, if someone gets
@@ -246,7 +246,6 @@
   </li>
   <li>
     <h4>Backing up message history</h4>
-    <p>All your (encrypted) messages are stored on your physical Embassy device. Therefore, it is critical to
-      create frequent backups of Synapse on your Embassy.</p>
+    <p>All of your (encrypted) messages are securely stored on your dedicated Start9 server. Given the importance of preserving your data, it is crucial to regularly create backups of Synapse on StartOS to ensure its protection and availability.</p>
   </li>
 </ul>

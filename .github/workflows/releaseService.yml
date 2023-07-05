@@ -46,6 +46,7 @@ jobs:
           git submodule update --init --recursive
           cd backend;
           export RUSTFLAGS="";
+          export OS_ARCH=$(uname -m);
           ./install-sdk.sh;
       - name: Build the service package
         run: |

@@ -14,7 +14,6 @@ else
 endif
 
 clean:
-	rm -f image.tar
 	rm -f $(PKG_ID).s9pk
 	rm -f scripts/*.js
 	rm -rf docker-images

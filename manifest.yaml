@@ -1,11 +1,10 @@
 id: synapse
 title: Synapse
-version: 1.85.2
+version: 1.87.0
 release-notes: |
-  * Backup fix for x86_64 build
-  * Package upstream info update
-  * Better federation health check
-license: apache
+  * Upgrade to version [1.87.0](https://github.com/matrix-org/synapse/releases/tag/v1.87.0)
+
+license: Apache-2.0
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/matrix-org/synapse
 support-site: https://github.com/matrix-org/synapse/issues
