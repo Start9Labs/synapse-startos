@@ -1,6 +1,6 @@
 FROM awesometechnologies/synapse-admin:0.8.7 as synapse-admin
 
-FROM matrixdotorg/synapse:v1.75.0
+FROM matrixdotorg/synapse:v1.87.0
 
 ARG PLATFORM
 ENV YQ_VER v4.3.2
@@ -8,7 +8,7 @@ ENV YQ_VER v4.3.2
 RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     tini \
     ca-certificates \
     nginx \

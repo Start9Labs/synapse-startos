@@ -1,10 +1,11 @@
 id: synapse
 title: Synapse
-version: 1.75.0.2
+version: 1.87.0
 release-notes: |
-  * Backup fix for x86_64 build
-  * Package upstream info update
-  * Better federation health check
+  * Upgrade to version [1.87.0](https://github.com/matrix-org/synapse/releases/tag/v1.87.0)
+  * Instructions update
+  * Minor code changes and improvements
+  * 21% smaller package size
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/matrix-org/synapse
@@ -64,8 +65,8 @@ volumes:
   admin-cert:
     type: certificate
     interface-id: admin
-alerts: {}
-#  start: "Important! After registering your first user, we highly recommend disabling user registrations. This can be done inside Config. If you do not disable registrations, anyone who knows your onion address can attack your embassy by spamming it with data through users they create."
+alerts:
+  start: "After your first run, Synapse needs a little time to establish a stable TOR connection over federation. We kindly ask for your patience during this process. Remember, great things take time! 🕒"
 interfaces:
   main:
     name: Homeserver Address
