@@ -1,11 +1,10 @@
 id: synapse
 title: Synapse
-version: 1.87.0
+version: 1.93.0
 release-notes: |
-  * Upgrade to version [1.87.0](https://github.com/matrix-org/synapse/releases/tag/v1.87.0)
-  * Instructions update
   * Minor code changes and improvements
-  * 21% smaller package size
+  * Readme update
+  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.93.0)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/matrix-org/synapse
