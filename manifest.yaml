@@ -3,6 +3,7 @@ title: Synapse
 version: 1.93.0
 release-notes: |
   * Minor code changes and improvements
+  * Standardized and optimized icon
   * Readme update
   * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.93.0)
 license: apache
