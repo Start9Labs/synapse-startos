@@ -3,11 +3,11 @@ name: Build Service
 on:
   workflow_dispatch:
   pull_request:
-    paths-ignore: ['*.md']
-    branches: ['master', 'next']
+    paths-ignore: ["*.md"]
+    branches: ["master", "next"]
   push:
-    paths-ignore: ['*.md']
-    branches: ['master', 'next']
+    paths-ignore: ["*.md"]
+    branches: ["master", "next"]
 
 jobs:
   BuildPackage:
@@ -21,10 +21,10 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-      - name: Get EmbassyOS Hash
-        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
+      - name: Get StartOS Hash
+        run: echo "STARTOSHASH=$(git ls-remote https://github.com/Start9Labs/start-os --branch sdk | awk '{ print $1}')" >> $GITHUB_ENV
       - name: Cache Packages
-        uses: actions/cache@v3
+        uses: buildjet/cache@v3
         id: packageCache
         with:
           path: |
@@ -33,7 +33,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-synapse-${{ env.EMBASSYHASH }}
+          key: ${{ runner.os }}-synapse-${{ env.STARTOSHASH }}
       - name: Install Dependencies
         run: |
           sudo snap install yq deno
@@ -44,8 +44,8 @@ jobs:
         id: packageManager
         if: steps.packageCache.outputs.cache-hit != 'true'
         run: |
-          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
-          cd embassy-os;
+          cd ~/ && git clone https://github.com/Start9Labs/start-os.git --branch sdk;
+          cd start-os;
           git submodule update --init --recursive
           cd backend;
           export RUSTFLAGS="";
@@ -54,7 +54,7 @@ jobs:
       - name: Build the service package
         run: |
           git submodule update --init --recursive
-          embassy-sdk init
+          start-sdk init
           make
           mv synapse*s9pk ~/
       - name: Upload .s9pk

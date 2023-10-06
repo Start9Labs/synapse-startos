@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*.*'
+      - "v*.*"
 
 jobs:
   ReleasePackage:
@@ -18,10 +18,10 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-      - name: Get EmbassyOS Hash
-        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os --branch latest | awk '{ print $1}')" >> $GITHUB_ENV
+      - name: Get StartOS Hash
+        run: echo "STARTOSHASH=$(git ls-remote https://github.com/Start9Labs/start-os --branch sdk | awk '{ print $1}')" >> $GITHUB_ENV
       - name: Cache Packages
-        uses: actions/cache@v3
+        uses: buildjet/cache@v3
         id: packageCache
         with:
           path: |
@@ -30,7 +30,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-synapse-${{ env.EMBASSYHASH }}
+          key: ${{ runner.os }}-synapse-${{ env.STARTOSHASH }}
       - name: Install Dependencies
         run: |
           sudo snap install yq deno
@@ -41,8 +41,8 @@ jobs:
         id: packageManager
         if: steps.packageCache.outputs.cache-hit != 'true'
         run: |
-          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git --branch latest;
-          cd embassy-os;
+          cd ~/ && git clone https://github.com/Start9Labs/start-os.git --branch sdk;
+          cd start-os;
           git submodule update --init --recursive
           cd backend;
           export RUSTFLAGS="";
@@ -51,7 +51,7 @@ jobs:
       - name: Build the service package
         run: |
           git submodule update --init --recursive
-          embassy-sdk init
+          start-sdk init
           make
       - name: Generate sha256 checksum
         run: |
@@ -60,6 +60,10 @@ jobs:
         run: |
           echo "## What's Changed" > change-log.txt
           yq e '.release-notes' manifest.yaml >> change-log.txt
+          echo "## SHA256 Hash" >> change-log.txt
+          echo '```' >> change-log.txt
+          sha256sum synapse.s9pk >> change-log.txt
+          echo '```' >> change-log.txt
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:
@@ -67,6 +71,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Synapse ${{ github.ref_name }}
+          prerelease: true
           body_path: change-log.txt
           files: |
             synapse.s9pk
