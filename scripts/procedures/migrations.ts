@@ -32,4 +32,4 @@ export const migration: T.ExpectedExports.migration = compat.migrations
                 { version: "1.75.0", type: "down" },
             ),
       },
-    }, "1.93.0" );
+    }, "1.94.0" );
