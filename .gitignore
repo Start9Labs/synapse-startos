@@ -1,6 +1,5 @@
 .env/
-synapse.s9pk
-image.tar
+*.s9pk
 synapse-vps.tar
 .vscode/
 .DS_Store

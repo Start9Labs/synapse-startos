@@ -100,8 +100,8 @@ else
     echo "Synapse-admin user not found. Creating ..."
     echo
     admin_password=$(cat /dev/urandom | base64 | head -c 16)
-    timeout 25s /start.py &
-    sleep 20
+    timeout 210s /start.py &
+    sleep 205
     register_new_matrix_user --config /data/homeserver.yaml --user admin --password $admin_password --admin
     echo $admin_password > /data/start9/adm.key
     python /configurator.py
