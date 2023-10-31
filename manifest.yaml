@@ -1,12 +1,12 @@
 id: synapse
 title: Synapse
-version: 1.94.0
+version: 1.95.0
 release-notes: |
   * Minor code changes and performace improvements
   * Standardized and optimized icon
   * Use bookworm as the package base
   * Readme update
-  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.94.0)
+  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.95.0)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/matrix-org/synapse
