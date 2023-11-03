@@ -1,6 +1,6 @@
 FROM awesometechnologies/synapse-admin:0.8.7 as synapse-admin
 
-FROM matrixdotorg/synapse:v1.94.0
+FROM matrixdotorg/synapse:v1.95.1
 
 ARG PLATFORM
 ENV YQ_VER v4.3.2
@@ -13,11 +13,9 @@ RUN apt-get update && \
     ca-certificates \
     nginx \
     curl \
-    jq \
     openssl \
     privoxy \
     iproute2 \
-    wget \
     sqlite3; \
     apt clean; \
     rm -rf \
@@ -26,7 +24,7 @@ RUN apt-get update && \
     /var/lib/apt/lists/* \
     /var/tmp/*
 
-RUN wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/${YQ_VER}/yq_linux_${PLATFORM} \
+RUN curl -skLo /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/${YQ_VER}/yq_linux_${PLATFORM} \
     && chmod a+x /usr/local/bin/yq
 
 ADD ./www /var/www
@@ -37,6 +35,8 @@ ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
 ADD ./check-federation.sh /usr/local/bin/check-federation.sh
 RUN chmod a+x /usr/local/bin/check-federation.sh
+ADD ./check-ui.sh /usr/local/bin/check-ui.sh
+RUN chmod a+x /usr/local/bin/check-ui.sh
 ADD ./user-signups-off.sh /usr/local/bin/user-signups-off.sh
 RUN chmod a+x /usr/local/bin/user-signups-off.sh
 ADD ./configurator.py /configurator.py
