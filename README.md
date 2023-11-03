@@ -2,7 +2,7 @@
   <img src="icon.png" alt="Project Logo" width="21%">
 </p>
 
-# Wrapper for Synapse
+# Synapse for StartOS
 
 [Synapse](https://github.com/matrix-org/synapse) is a homeserver software for the Matrix protocol, enabling decentralized and federated communication across different Matrix servers to send messages and interact with each other seamlessly.
 
@@ -19,7 +19,7 @@ Prior to building the `synapse` package, it's essential to configure your build 
 
 ## Cloning
 
-Clone the Synapse wrapper locally.
+Clone the Synapse package repository locally.
 
 ```
 git clone https://github.com/Start9Labs/synapse-wrapper.git
