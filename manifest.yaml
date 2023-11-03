@@ -3,8 +3,8 @@ title: Synapse
 version: 1.95.1
 release-notes: |
   * Security [fix](https://github.com/matrix-org/synapse/security/advisories/GHSA-mp92-3jfm-3575)
-  * Added Synapse Admin healthcheck
-  * Minor code changes and performace improvements
+  * Added Synapse Admin health check
+  * Minor code changes and performance improvements
   * Standardized and optimized icon
   * Use bookworm as the package base
   * Readme update
