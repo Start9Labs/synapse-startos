@@ -1,12 +1,13 @@
 id: synapse
 title: Synapse
-version: 1.95.0
+version: 1.95.1
 release-notes: |
+  * Security [fix](https://github.com/matrix-org/synapse/security/advisories/GHSA-mp92-3jfm-3575)
   * Minor code changes and performace improvements
   * Standardized and optimized icon
   * Use bookworm as the package base
   * Readme update
-  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.95.0)
+  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.95.1)
 license: apache
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/matrix-org/synapse
@@ -39,6 +40,17 @@ health-checks:
     args: []
     mounts: {}
     io-format: json
+    inject: true
+  synapse-admin:
+    name: Admin interface
+    success-message: Synapse Admin is ready to be visited in a web browser.
+    type: docker
+    image: main
+    system: false
+    entrypoint: check-ui.sh
+    args: []
+    mounts: {}
+    io-format: yaml
     inject: true
   user-signups-off:
     name: User Signups Off
