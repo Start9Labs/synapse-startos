@@ -22,8 +22,8 @@ Prior to building the `synapse` package, it's essential to configure your build 
 Clone the Synapse package repository locally.
 
 ```
-git clone https://github.com/Start9Labs/synapse-wrapper.git
-cd synapse-wrapper
+git clone https://github.com/Start9Labs/synapse-startos.git
+cd synapse-startos
 ```
 
 ## Building
