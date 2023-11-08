@@ -4,7 +4,7 @@
 
 # Synapse for StartOS
 
-[Synapse](https://github.com/matrix-org/synapse) is a homeserver software for the Matrix protocol, enabling decentralized and federated communication across different Matrix servers to send messages and interact with each other seamlessly.
+[Synapse](https://github.com/matrix-org/synapse) is a homeserver software for the Matrix protocol, enabling decentralized and federated communication across different Matrix servers to send messages and interact with each other seamlessly. This repository creates the `s9pk` package that is installed to run `Synapse` on [StartOS](https://github.com/Start9Labs/start-os/).
 
 ## Dependencies
 
