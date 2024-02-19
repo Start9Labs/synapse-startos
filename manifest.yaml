@@ -1,6 +1,6 @@
 id: synapse
 title: Synapse
-version: 1.95.1
+version: 1.101.0
 release-notes: |
   * Security [fix](https://github.com/matrix-org/synapse/security/advisories/GHSA-mp92-3jfm-3575)
   * Added Synapse Admin health check
@@ -8,7 +8,7 @@ release-notes: |
   * Standardized and optimized icon
   * Use bookworm as the package base
   * Readme update
-  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.95.1)
+  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.87.0...v1.101.0)
 license: Apache-2.0 
 wrapper-repo: https://github.com/Start9Labs/synapse-wrapper
 upstream-repo: https://github.com/matrix-org/synapse
