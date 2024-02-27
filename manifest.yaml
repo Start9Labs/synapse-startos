@@ -4,12 +4,12 @@ version: 1.101.0
 release-notes: |
   * Upstream code update
   * Synapse Admin updated to the latest version - ([full changelog](https://github.com/Awesome-Technologies/synapse-admin/compare/0.8.7...0.9.1))
-  * Updated package repository links
-  * Full list of upstream changes available [here](https://github.com/matrix-org/synapse/compare/v1.95.1...v1.101.0)
+  * Updated package and upstream repositories links
+  * Full list of upstream changes available [here](https://github.com/element-hq/synapse/compare/v1.95.1...v1.101.0)
 license: Apache-2.0 
 wrapper-repo: https://github.com/Start9Labs/synapse-startos
-upstream-repo: https://github.com/matrix-org/synapse
-support-site: https://github.com/matrix-org/synapse/issues
+upstream-repo: https://github.com/element-hq/synapse
+support-site: https://github.com/element-hq/synapse/issues
 marketing-site: https://matrix.org/
 build: ["make"]
 description:
