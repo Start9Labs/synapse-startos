@@ -4,7 +4,7 @@
 
 # Synapse for StartOS
 
-[Synapse](https://github.com/matrix-org/synapse) is a homeserver software for the Matrix protocol, enabling decentralized and federated communication across different Matrix servers to send messages and interact with each other seamlessly. This repository creates the `s9pk` package that is installed to run `Synapse` on [StartOS](https://github.com/Start9Labs/start-os/).
+[Synapse](https://github.com/matrix-org/synapse) is a homeserver software for the Matrix protocol, enabling decentralized and federated communication across different Matrix servers to send messages and interact with each other seamlessly. This repository creates the `s9pk` package that is installed to run `Synapse` with integrated [`Admin UI`](https://github.com/Awesome-Technologies/synapse-admin) on [StartOS](https://github.com/Start9Labs/start-os/).
 
 ## Dependencies
 
@@ -14,7 +14,7 @@ Prior to building the `synapse` package, it's essential to configure your build 
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [deno](https://deno.land/)
 - [make](https://www.gnu.org/software/make/)
-- [start-sdk](https://github.com/Start9Labs/start-os/tree/sdk/backend)
+- [start-sdk](https://github.com/Start9Labs/start-os/tree/sdk/core)
 - [yq](https://mikefarah.gitbook.io/yq)
 
 ## Cloning

@@ -1,6 +1,6 @@
-FROM awesometechnologies/synapse-admin:0.8.7 as synapse-admin
+FROM awesometechnologies/synapse-admin:0.9.1 as synapse-admin
 
-FROM matrixdotorg/synapse:v1.95.1
+FROM matrixdotorg/synapse:v1.98.0
 
 ARG PLATFORM
 ENV YQ_VER v4.3.2

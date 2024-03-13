@@ -162,16 +162,12 @@
 <hr style="border: 1px dashed #bbb;" />
 <br />
 
-<h3>Step 5: Joining a Room</h3>
+<h3>Step 5: Joining a Remote Room</h3>
 <ol>
-  <li>On the main dashboard, select <code>Explore Public Rooms</code></li>
-  <li>In the search field, paste in the alias of the room you want to join. Room aliases start with #. For example,
-    Start9's Tor Party room
-    is <a href="https://matrix.to/#/#tor-party:matrix.privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion"
-      target="_blank">#tor-party:matrix.privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion</a>, then click
-    <code>&#8626; Join</code></li>
-  <li>Joining a room can take a while, depending on how many users are currently in the room. If it fails, simply try
-    again</li>
+  <li>On the main dashboard, select <code>Explore Public Rooms</code>.</li>
+  <li>In the search field, paste in the alias of the room you want to join. Room aliases start with #. For example, if you want to join a room on a friend's server, you would need their .onion address and the room name. It would look something like this: <code>#room-name:yxtgpdjhafirrf3jskstue3bcs5wrrj47u4ljbmcgrubq46uxwpz7fad.onion</code>. Then click <code>&#8626; Join</code>.</li>
+  <li>Joining a room can take a while, depending on how many users are currently in the room. If it fails, simply try again.</li>
+  <li>Please note that to join a room on a remote server over federation, you need to know the .onion address of that server. This is like sharing secrets between each other, but the secret is one party's V3 .onion homeserver address with the room name.</li>
 </ol>
 
 <br />
