@@ -1,4 +1,4 @@
-FROM awesometechnologies/synapse-admin:0.9.1 as synapse-admin
+FROM ghcr.io/etkecc/synapse-admin:v0.10.3-etke35 as synapse-admin
 
 FROM matrixdotorg/synapse:v1.121.1
 
