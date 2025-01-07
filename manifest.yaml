@@ -28,6 +28,10 @@ main:
     main: /data
     cert: /mnt/cert
     admin-cert: /mnt/admin-cert
+hardware-requirements:
+  arch:
+    - x86_64
+    - aarch64
 health-checks:
   federation:
     name: Federation
