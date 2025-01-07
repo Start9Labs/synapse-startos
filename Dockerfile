@@ -1,9 +1,9 @@
-FROM ghcr.io/etkecc/synapse-admin:v0.10.3-etke35 as synapse-admin
+FROM ghcr.io/etkecc/synapse-admin:v0.10.3-etke35 AS synapse-admin
 
 FROM matrixdotorg/synapse:v1.121.1
 
 ARG PLATFORM
-ENV YQ_VER v4.3.2
+ENV YQ_VER=v4.3.2
 
 RUN pip install --prefix="/install" --no-warn-script-location pyyaml
 
