@@ -1,6 +1,6 @@
 id: synapse
 title: Synapse
-version: 1.98.0
+version: 1.121.1
 release-notes: |
   * Upstream code update
   * Synapse Admin updated to the latest version - ([full changelog](https://github.com/Awesome-Technologies/synapse-admin/compare/0.8.7...0.9.1))
