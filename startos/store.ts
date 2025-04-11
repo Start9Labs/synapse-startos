@@ -3,17 +3,13 @@ import { sdk } from './sdk'
 
 export type Store = {
   adminUserCreated: boolean
-  host: string | null
-  federationEnabled: boolean
-  registrationEnabled: boolean
+  serverStarted: boolean
   smtp: typeof sdk.inputSpecConstants.smtpInputSpec._TYPE
 }
 
 export const initStore: Store = {
   adminUserCreated: false,
-  host: null,
-  federationEnabled: false,
-  registrationEnabled: false,
+  serverStarted: false,
   smtp: { selection: 'disabled', value: {} },
 }
 

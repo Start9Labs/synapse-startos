@@ -9,9 +9,6 @@ export const v_1_128_0_0 = VersionInfo.of({
   migrations: {
     up: async ({ effects }) => {
       const {
-        'tor-address': torAddress,
-        federation,
-        'enable-registration': registrationEnabled,
         'email-notifications': emailNotifications,
         'smtp-host': smtpHost,
         'smtp-port': smtpPort,
@@ -19,9 +16,6 @@ export const v_1_128_0_0 = VersionInfo.of({
         'smtp-user': smtpUser,
         'smtp-pass': smtpPass,
       } = load(await readFile('/root/start9/config.yaml', 'utf-8')) as {
-        'tor-address': string
-        federation: boolean
-        'enable-registration': boolean
         'email-notifications': boolean
         'smtp-host': string
         'smtp-port': number
@@ -32,9 +26,7 @@ export const v_1_128_0_0 = VersionInfo.of({
 
       await sdk.store.setOwn(effects, sdk.StorePath, {
         adminUserCreated: true,
-        host: torAddress,
-        federationEnabled: federation,
-        registrationEnabled,
+        serverStarted: true,
         smtp: emailNotifications
           ? {
               selection: 'custom',

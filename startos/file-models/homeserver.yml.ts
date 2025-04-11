@@ -43,7 +43,7 @@ const shape = object({
     enable_registration_without_verification,
   ),
   federation_certificate_verification_whitelist: arrayOf(string),
-  federation_domain_whitelist: arrayOf(string),
+  federation_domain_whitelist: arrayOf(string).optional(),
   listeners: array(
     object({
       bind_addresses: arrayOf(string).onMismatch(bind_addresses), // @TODO enforce contents
@@ -76,6 +76,8 @@ const shape = object({
   macaroon_secret_key: string,
   registration_shared_secret: string,
 })
+
+export type HomeserverYaml = typeof shape._TYPE
 
 export const homeserverYaml = FileHelper.yaml(
   '/media/startos/volumes/main/homeserver.yaml',

@@ -2,6 +2,7 @@ import { sdk } from './sdk'
 import { homeserverPort, adminPort } from './utils'
 
 export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
+  // ** homeserver **
   const homeserverMulti = sdk.MultiHost.of(effects, 'homeserver-multi')
   const homeserverMultiOrigin = await homeserverMulti.bindPort(homeserverPort, {
     protocol: 'http',
@@ -20,6 +21,7 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
   })
   const homeserverReceipt = await homeserverMultiOrigin.export([homeserver])
 
+  // ** admin UI **
   const adminMulti = sdk.MultiHost.of(effects, 'admin-multi')
   const adminMultiOrigin = await adminMulti.bindPort(adminPort, {
     protocol: 'http',

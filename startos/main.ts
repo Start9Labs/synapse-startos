@@ -1,6 +1,6 @@
 import { sdk } from './sdk'
 import { T } from '@start9labs/start-sdk'
-import { uiPort } from './utils'
+import { homeserverPort, adminPort } from './utils'
 
 export const main = sdk.setupMain(async ({ effects, started }) => {
   /**
@@ -24,21 +24,34 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    *
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
-  return sdk.Daemons.of(effects, started, additionalChecks).addDaemon(
-    'primary',
-    {
-      subcontainer: { imageId: 'hello-world' },
-      command: ['hello-world'],
+  return sdk.Daemons.of(effects, started, additionalChecks)
+    .addDaemon('synapse', {
+      subcontainer: { imageId: 'synapse' },
+      command: ['/start.py'],
       mounts: sdk.Mounts.of().addVolume('main', null, '/data', false),
       ready: {
-        display: 'Web Interface',
+        display: 'Homeserver',
         fn: () =>
-          sdk.healthCheck.checkPortListening(effects, uiPort, {
-            successMessage: 'The web interface is ready',
-            errorMessage: 'The web interface is not ready',
+          sdk.healthCheck.checkPortListening(effects, homeserverPort, {
+            successMessage: 'Your Synapse homeserver is ready',
+            errorMessage: 'Your Synapse homeserver cannot be reached',
           }),
       },
       requires: [],
-    },
-  )
+    })
+    .addDaemon('synapse-admin', {
+      subcontainer: { imageId: 'synapse-admin' },
+      // @TODO how to start the admin UI?
+      command: [''],
+      mounts: sdk.Mounts.of().addVolume('main', null, '/data', false),
+      ready: {
+        display: 'Admin UI',
+        fn: () =>
+          sdk.healthCheck.checkPortListening(effects, adminPort, {
+            successMessage: 'Your Synapse admin UI is ready',
+            errorMessage: 'Your Synapse admin UI cannot be reached',
+          }),
+      },
+      requires: [],
+    })
 })

@@ -1,5 +1,9 @@
+import { sdk } from './sdk'
+
 export const homeserverPort = 8008
 export const adminPort = 8080
+
+export const mount = sdk.Mounts.of().addVolume('main', null, '/data', false)
 
 export type Config = {
   database: {
@@ -20,7 +24,7 @@ export type Config = {
   enable_registration: boolean
   enable_registration_without_verification: boolean
   federation_certificate_verification_whitelist: string[]
-  federation_domain_whitelist: string[]
+  federation_domain_whitelist?: string[]
   listeners: [
     {
       bind_addresses: ['::1', '127.0.0.1']
