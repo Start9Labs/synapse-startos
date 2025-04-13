@@ -32,7 +32,7 @@ const shape = object({
     notif_from: string,
     require_transport_security: literal(true),
     smtp_host: string,
-    smtp_pass: string,
+    smtp_pass: string.optional(),
     smtp_port: natural,
     smtp_user: string,
   })

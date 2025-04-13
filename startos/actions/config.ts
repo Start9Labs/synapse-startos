@@ -4,10 +4,14 @@ import { sdk } from '../sdk'
 const { InputSpec, Value, Variants, List } = sdk
 
 export const inputSpec = InputSpec.of({
-  enable_registration: Value.toggle({
-    name: 'Enable Registration',
+  registration: Value.select({
+    name: 'Registration',
     description: `Allow outsiders to create their own accounts on your homeserver. This is not recommended, as it leaves your server vulnerable to attack. It is preferable for you to create accounts on their behalf using your server's admin portal.`,
-    default: false,
+    default: 'disabled',
+    values: {
+      disabled: 'Disabled',
+      enabled: 'Enabled',
+    },
   }),
   federation: Value.union(
     {
@@ -38,6 +42,7 @@ export const inputSpec = InputSpec.of({
       },
     }),
   ),
+  smtp: sdk.inputSpecConstants.smtpInputSpec,
 })
 
 export const config = sdk.Action.withInput(
@@ -59,17 +64,23 @@ export const config = sdk.Action.withInput(
 
   // optionally pre-fill the input form
   async ({ effects }) => {
-    const { enable_registration, listeners, federation_domain_whitelist } =
-      (await homeserverYaml.read.const(effects))!
+    const yaml = await homeserverYaml.read.const(effects)
+    if (!yaml) {
+      return {}
+    }
+    const { enable_registration, listeners, federation_domain_whitelist } = yaml
 
     return {
-      enable_registration,
+      registration: enable_registration
+        ? ('enabled' as const)
+        : ('disabled' as const),
       federation: listeners[0].resources[0].names.includes('federation')
         ? {
             selection: 'enabled' as const,
             value: { federation_domain_whitelist },
           }
         : { selection: 'disabled' as const, value: {} },
+      smtp: await sdk.store.getOwn(effects, sdk.StorePath.smtp).const(),
     }
   },
 
@@ -83,8 +94,9 @@ export const config = sdk.Action.withInput(
         ? ['client']
         : ['client', 'federation']
 
+    // We don't need to set email/smtp attrs because that is done automatically in setupMain(). Updating homeserver.yaml here will force a service restart.
     await homeserverYaml.merge(effects, {
-      enable_registration: input.enable_registration,
+      enable_registration: input.registration === 'enabled',
       listeners,
       federation_domain_whitelist:
         input.federation.selection === 'disabled'
