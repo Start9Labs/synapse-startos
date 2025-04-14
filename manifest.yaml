@@ -1,9 +1,9 @@
 id: synapse
 title: Synapse
-version: 1.121.1
+version: 1.128.0
 release-notes: |
-  * Upstream Synapse updated to v1.121.1 ([changelog](https://github.com/element-hq/synapse/compare/v1.98.0...v1.121.1))
-  * Switched to etke fork of Synapse Admin v0.10.3-etke35 ([changelog](https://github.com/etkecc/synapse-admin/releases/tag/v0.10.3-etke35))
+  * Upstream Synapse updated to v1.128.0 ([changelog](https://github.com/element-hq/synapse/compare/v1.98.0...v1.128.0))
+  * Switched to etke fork of Synapse Admin v0.10.3-etke38 ([changelog](https://github.com/etkecc/synapse-admin/releases/tag/v0.10.3-etke38))
   * Updated bundling process to use Deno emit module
   * Changed license from Apache License v2 to AGPL-3.0 to match upstream
 license: AGPL-3.0 

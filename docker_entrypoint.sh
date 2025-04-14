@@ -122,6 +122,7 @@ echo "Federation disabled"
 fi
 yq e -i ".enable_registration_without_verification = true" /data/homeserver.yaml
 yq e -i ".suppress_key_server_warning = true" /data/homeserver.yaml
+yq e -i ".enable_authenticated_media = false" /data/homeserver.yaml
 nginx
 privoxy /root/priv-config-forward-onion
 export https_proxy="127.0.0.1:8118"
