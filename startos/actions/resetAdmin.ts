@@ -26,6 +26,7 @@ export const resetAdmin = sdk.Action.withoutInput(
 
   // the execution function
   async ({ effects }) => {
+    const username = 'admin'
     const password = utils.getDefaultString(randomPassword)
 
     const adminUserCreated = await sdk.store
@@ -49,7 +50,7 @@ export const resetAdmin = sdk.Action.withoutInput(
         [
           'sqlite3',
           '/data/homeserver.db',
-          `UPDATE users SET password_hash='${passwordHash}' WHERE name='admin')`,
+          `UPDATE users SET password_hash='${passwordHash}' WHERE name='${username}')`,
         ],
         { mounts: mount },
         'update-admin-pass',
@@ -63,7 +64,7 @@ export const resetAdmin = sdk.Action.withoutInput(
           '--config',
           '/data/homeserver.yaml',
           '--user',
-          'admin',
+          username,
           '--password',
           password,
           '--admin',
@@ -85,7 +86,7 @@ export const resetAdmin = sdk.Action.withoutInput(
             type: 'single',
             name: 'Username',
             description: null,
-            value: password,
+            value: username,
             masked: true,
             copyable: true,
             qr: false,

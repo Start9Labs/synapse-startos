@@ -1,6 +1,6 @@
 import { sdk } from './sdk'
 import { T } from '@start9labs/start-sdk'
-import { homeserverPort, adminPort } from './utils'
+import { homeserverPort } from './utils'
 import { homeserverYaml } from './file-models/homeserver.yml'
 
 export const main = sdk.setupMain(async ({ effects, started }) => {
@@ -36,6 +36,10 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
         smtp_pass: password || undefined,
       },
     })
+  } else {
+    await homeserverYaml.merge(effects, {
+      email: null,
+    })
   }
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
@@ -55,10 +59,11 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    *
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
-  return sdk.Daemons.of(effects, started, additionalChecks)
-    .addDaemon('synapse', {
+  return sdk.Daemons.of(effects, started, additionalChecks).addDaemon(
+    'synapse',
+    {
       subcontainer: { imageId: 'synapse' },
-      command: ['/start.py'],
+      command: ['start.py'],
       mounts: sdk.Mounts.of().addVolume('main', null, '/data', false),
       ready: {
         display: 'Homeserver',
@@ -69,20 +74,6 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
           }),
       },
       requires: [],
-    })
-    .addDaemon('synapse-admin', {
-      subcontainer: { imageId: 'synapse-admin' },
-      // @TODO how to start the admin UI?
-      command: [''],
-      mounts: sdk.Mounts.of().addVolume('main', null, '/data', false),
-      ready: {
-        display: 'Admin UI',
-        fn: () =>
-          sdk.healthCheck.checkPortListening(effects, adminPort, {
-            successMessage: 'Your Synapse admin UI is ready',
-            errorMessage: 'Your Synapse admin UI cannot be reached',
-          }),
-      },
-      requires: [],
-    })
+    },
+  )
 })

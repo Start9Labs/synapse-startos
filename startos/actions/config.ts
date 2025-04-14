@@ -31,7 +31,7 @@ export const inputSpec = InputSpec.of({
                 name: 'Domain Whitelist (optional)',
                 default: [],
                 description:
-                  'If you only want your server to federate with specific homeservers and reject all others, enter the server names here. If no domains are provided, your server will be capable of federating with all public Matrix servers',
+                  'If you only want your server to federate with specific homeservers and reject all others, enter the server addresses/domains here. If no domains are provided, your server will be capable of federating with all public Matrix servers',
               },
               {
                 placeholder: 'matrix.start9labs.com',

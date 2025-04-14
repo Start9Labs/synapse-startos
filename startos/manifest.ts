@@ -18,12 +18,12 @@ export const manifest = setupManifest({
   images: {
     synapse: {
       source: {
-        dockerTag: 'matrixdotorg/synapse:v1.121.1',
+        dockerTag: 'matrixdotorg/synapse:v1.128.0',
       },
     },
     'synapse-admin': {
       source: {
-        dockerTag: 'ghcr.io/etkecc/synapse-admin:v0.10.3-etke35',
+        dockerTag: 'ghcr.io/etkecc/synapse-admin:v0.10.3-etke38',
       },
     },
   },

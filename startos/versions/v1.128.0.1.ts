@@ -3,8 +3,8 @@ import { load } from 'js-yaml'
 import { readFile } from 'fs/promises'
 import { sdk } from '../sdk'
 
-export const v_1_128_0_0 = VersionInfo.of({
-  version: '1.128.0:0',
+export const v_1_128_0_1 = VersionInfo.of({
+  version: '1.128.0:1',
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
