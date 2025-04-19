@@ -9,7 +9,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    *
    * In this section, we fetch any resources or run any desired preliminary commands.
    */
-  console.info('Starting Hello World!')
+  console.info('Starting Synapse!')
 
   // Merge to homeserver.yaml to enforce file model protections
   await homeserverYaml.merge(effects, {})
@@ -62,9 +62,13 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   return sdk.Daemons.of(effects, started, additionalChecks).addDaemon(
     'synapse',
     {
-      subcontainer: { imageId: 'synapse' },
+      subcontainer: await sdk.SubContainer.of(
+        effects,
+        { imageId: 'synapse' },
+        sdk.Mounts.of().addVolume('main', null, '/data', false),
+        'synapse-sub',
+      ),
       command: ['start.py'],
-      mounts: sdk.Mounts.of().addVolume('main', null, '/data', false),
       ready: {
         display: 'Homeserver',
         fn: () =>
