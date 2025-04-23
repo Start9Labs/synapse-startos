@@ -1,6 +1,6 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
 import { load } from 'js-yaml'
-import { readFile } from 'fs/promises'
+import { readFile, rmdir } from 'fs/promises'
 import { sdk } from '../sdk'
 
 export const v_1_128_0_1 = VersionInfo.of({
@@ -40,6 +40,9 @@ export const v_1_128_0_1 = VersionInfo.of({
             }
           : { selection: 'disabled', value: {} },
       })
+
+      // remove old start9 dir
+      await rmdir('/root/start9')
     },
     down: IMPOSSIBLE,
   },
