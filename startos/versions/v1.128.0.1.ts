@@ -1,5 +1,5 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
-import { load } from 'js-yaml'
+import { yaml } from '@start9labs/start-sdk'
 import { readFile, rmdir } from 'fs/promises'
 import { sdk } from '../sdk'
 
@@ -15,7 +15,7 @@ export const v_1_128_0_1 = VersionInfo.of({
         'from-name': smtpFrom,
         'smtp-user': smtpUser,
         'smtp-pass': smtpPass,
-      } = load(await readFile('/root/start9/config.yaml', 'utf-8')) as {
+      } = yaml.parse(await readFile('/root/start9/config.yaml', 'utf-8')) as {
         'email-notifications': boolean
         'smtp-host': string
         'smtp-port': number

@@ -18,15 +18,15 @@ const {
 const { bind_addresses, port, resources, tls, type, x_forwarded } = listeners[0]
 const resource = resources[0]
 
+const databaseArgs = object({
+  database: literal('/data/homeserver.db').onMismatch('/data/homeserver.db'),
+})
+const database = object({
+  args: databaseArgs.withMismatch((_) => databaseArgs.unsafeCast({})),
+  name: literal('sqlite3').onMismatch('sqlite3'),
+})
 const shape = object({
-  database: object({
-    args: object({
-      database: literal('/data/homeserver.db').onMismatch(
-        '/data/homeserver.db',
-      ),
-    }),
-    name: literal('sqlite3').onMismatch('sqlite3'),
-  }),
+  database: database.withMismatch((_) => database.unsafeCast({})),
   email: object({
     enable_notifs: literal(true),
     notif_from: string,
@@ -67,19 +67,19 @@ const shape = object({
   report_stats: boolean.onMismatch(report_stats),
   signing_key_path: string,
   suppress_key_server_warning: boolean.onMismatch(suppress_key_server_warning),
-  trusted_key_servers: arrayOf(object({ server_name: string })),
+  trusted_key_servers: arrayOf(object({ server_name: string })).onMismatch([]),
   // below need to be set manually
   server_name: string,
   public_baseurl: string,
   // below are set automatically
-  form_secret: string,
-  macaroon_secret_key: string,
-  registration_shared_secret: string,
+  form_secret: string.optional(),
+  macaroon_secret_key: string.optional(),
+  registration_shared_secret: string.optional(),
 })
 
 export type HomeserverYaml = typeof shape._TYPE
 
 export const homeserverYaml = FileHelper.yaml(
   '/media/startos/volumes/main/homeserver.yaml',
-  shape,
+  shape.withMismatch((_) => shape.unsafeCast({})),
 )

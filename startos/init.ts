@@ -8,26 +8,25 @@ import { homeserverYaml } from './file-models/homeserver.yml'
 import { configDefaults, mount } from './utils'
 import { setServerName } from './actions/setServerName'
 import { resetAdmin } from './actions/resetAdmin'
+import * as fs from 'node:fs/promises'
 
 // **** Pre Install ****
 const preInstall = sdk.setupPreInstall(async ({ effects }) => {
-  await sdk.runCommand(
+  await sdk.SubContainer.withTemp(
     effects,
     { imageId: 'synapse' },
-    [
-      'SYNAPSE_SERVER_NAME=placeholder.com',
-      'SYNAPSE_REPORT_STATS=no',
-      '/start.py',
-      'generate',
-    ],
-    { mounts: mount },
+    mount,
     'gen-config',
+    (subc) =>
+      subc.execFail(['/start.py', 'generate'], {
+        env: {
+          SYNAPSE_SERVER_NAME: 'placeholder.com',
+          SYNAPSE_REPORT_STATS: 'no',
+        },
+      }),
   )
 
-  // @TODO Aiden should this be necessary?
-  await new Promise((resolve) => setTimeout(resolve, 69))
-
-  await homeserverYaml.write(effects, configDefaults)
+  await homeserverYaml.merge(effects, configDefaults)
 })
 
 // **** Post Install ****
@@ -36,7 +35,7 @@ const postInstall = sdk.setupPostInstall(async ({ effects }) => {
     sdk.action.requestOwn(effects, setServerName, 'critical', {
       reason: 'Choose the permanent address/URL of your Synapse Matrix server',
     }),
-    sdk.action.requestOwn(effects, resetAdmin, 'critical', {
+    sdk.action.requestOwn(effects, resetAdmin, 'important', {
       reason: 'Create a root admin user for your Synapse Matrix homeserver',
     }),
   ])

@@ -1,6 +1,7 @@
 import { sdk } from './sdk'
 
 export const homeserverPort = 8008
+export const nginxPort = 80
 export const adminPort = 8080
 
 export const mount = sdk.Mounts.of().addVolume('main', null, '/data', false)
@@ -28,7 +29,7 @@ export type Config = {
   listeners: [
     {
       bind_addresses: ['::1', '127.0.0.1']
-      port: 8008
+      port: typeof homeserverPort
       resources: [{ compress: false; names: Array<'client' | 'federation'> }]
       tls: false
       type: 'http'
@@ -48,9 +49,9 @@ export type Config = {
   server_name: string
   public_baseurl: string
   // below are set automatically
-  form_secret: string
-  macaroon_secret_key: string
-  registration_shared_secret: string
+  form_secret?: string
+  macaroon_secret_key?: string
+  registration_shared_secret?: string
 }
 
 export const configDefaults: Config = {
@@ -68,7 +69,7 @@ export const configDefaults: Config = {
   listeners: [
     {
       bind_addresses: ['::1', '127.0.0.1'],
-      port: 8008,
+      port: homeserverPort,
       resources: [{ compress: false, names: ['client'] }],
       tls: false,
       type: 'http',
@@ -85,8 +86,4 @@ export const configDefaults: Config = {
   // below need to be set manually
   server_name: '',
   public_baseurl: '',
-  // below are set automatically
-  form_secret: '',
-  macaroon_secret_key: '',
-  registration_shared_secret: '',
 }

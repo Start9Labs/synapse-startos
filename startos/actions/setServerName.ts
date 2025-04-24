@@ -89,25 +89,32 @@ export async function getSynapseInterfaceUrls(
   default: string
   values: Record<string, string>
 }> {
-  const iface = await sdk.serviceInterface.getOwn(effects, 'synapse').once()
-  const urls =
-    type === 'tor'
-      ? iface?.host?.onions || []
-      : iface?.addressInfo?.publicUrls.map((u) =>
-          u.replace(/^https?:\/\//, ''),
-        ) || []
+  const iface = await sdk.serviceInterface.getOwn(effects, 'homeserver').once()
+  const hostnames =
+    iface?.addressInfo
+      ?.filter(
+        {
+          visibility: 'public',
+          ...(type === 'tor'
+            ? { kind: 'onion' }
+            : { exclude: { kind: 'onion' } }),
+        },
+        'url',
+      )
+      .map((u) => u.hostname) || []
+  // TODO: handle server port?
 
   return {
     name,
     description,
     warning: type === 'tor' ? warning : null,
-    values: urls.reduce(
-      (obj, url) => ({
+    values: hostnames.reduce(
+      (obj, hostname) => ({
         ...obj,
-        [url]: url,
+        [hostname]: hostname,
       }),
       {} as Record<string, string>,
     ),
-    default: urls[0] || '',
+    default: hostnames[0] || '',
   }
 }

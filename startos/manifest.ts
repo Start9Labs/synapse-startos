@@ -21,9 +21,9 @@ export const manifest = setupManifest({
         dockerTag: 'matrixdotorg/synapse:v1.128.0',
       },
     },
-    'synapse-admin': {
+    nginx: {
       source: {
-        dockerTag: 'ghcr.io/etkecc/synapse-admin:v0.10.3-etke38',
+        dockerTag: 'nginx:stable-alpine',
       },
     },
   },

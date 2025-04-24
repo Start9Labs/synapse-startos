@@ -18,7 +18,7 @@ export const resetAdmin = sdk.Action.withoutInput(
         ? 'Reset your admin user password'
         : 'Create your admin user and password',
       warning: null,
-      allowedStatuses: 'any',
+      allowedStatuses: adminUserCreated ? 'only-stopped' : 'only-running',
       group: null,
       visibility: 'enabled',
     }
@@ -34,43 +34,45 @@ export const resetAdmin = sdk.Action.withoutInput(
       .const()
 
     if (adminUserCreated) {
-      const passwordHash = (
-        await sdk.runCommand(
-          effects,
-          { imageId: 'synapse' },
-          ['hash_password', '-p', password, '-c', '/data/homeserver.yaml'],
-          { mounts: sdk.Mounts.of() },
-          'update-admin-pass',
-        )
-      ).stdout
-
-      await sdk.runCommand(
+      await sdk.SubContainer.withTemp(
         effects,
         { imageId: 'synapse' },
-        [
-          'sqlite3',
-          '/data/homeserver.db',
-          `UPDATE users SET password_hash='${passwordHash}' WHERE name='${username}')`,
-        ],
-        { mounts: mount },
+        mount,
         'update-admin-pass',
+        async (subc) => {
+          const passwordHash = (
+            await subc.execFail([
+              'hash_password',
+              '-p',
+              password,
+              '-c',
+              '/data/homeserver.yaml',
+            ])
+          ).stdout
+          await subc.execFail([
+            'sqlite3',
+            '/data/homeserver.db',
+            `UPDATE users SET password_hash='${passwordHash}' WHERE name='${username}')`,
+          ])
+        },
       )
     } else {
-      await sdk.runCommand(
+      await sdk.SubContainer.withTemp(
         effects,
         { imageId: 'synapse' },
-        [
-          'register_new_matrix_user',
-          '--config',
-          '/data/homeserver.yaml',
-          '--user',
-          username,
-          '--password',
-          password,
-          '--admin',
-        ],
-        { mounts: mount },
+        mount,
         'set-admin-pass',
+        (subc) =>
+          subc.execFail([
+            'register_new_matrix_user',
+            '--config',
+            '/data/homeserver.yaml',
+            '--user',
+            username,
+            '--password',
+            password,
+            '--admin',
+          ]),
       )
       await sdk.store.setOwn(effects, sdk.StorePath.adminUserCreated, true)
     }

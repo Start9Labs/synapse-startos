@@ -1,12 +1,12 @@
 import { sdk } from './sdk'
-import { homeserverPort, adminPort } from './utils'
+import { nginxPort, adminPort } from './utils'
 
 export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
   // ** homeserver **
   const homeserverMulti = sdk.MultiHost.of(effects, 'homeserver-multi')
-  const homeserverMultiOrigin = await homeserverMulti.bindPort(homeserverPort, {
+  const homeserverMultiOrigin = await homeserverMulti.bindPort(nginxPort, {
     protocol: 'http',
-    addSsl: { preferredExternalPort: 8448 }, // @TODO Aiden does this actually work?
+    // addSsl: { preferredExternalPort: 8448 }, // @TODO Aiden does this actually work?
   })
   const homeserver = sdk.createInterface(effects, {
     name: 'Homeserver',
