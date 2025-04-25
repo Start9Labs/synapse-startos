@@ -1,7 +1,7 @@
 PACKAGE_ID := $(shell grep -o "id: '[^']*'" startos/manifest.ts | sed "s/id: '\([^']*\)'/\1/")
 INGREDIENTS := $(shell start-cli s9pk list-ingredients 2> /dev/null) assets/synapse-admin
-SYNAPSE_ADMIN_VERSION = 0.10.3
-SYNAPSE_ADMIN_CHECKSUM = 0998ee4e2d9e55d72c2d160fa70734a3484ebcf5b6f380204e19bc376f2d500d
+SYNAPSE_ADMIN_VERSION = v0.10.3-etke39
+SYNAPSE_ADMIN_CHECKSUM = 1ba65304586d8359a3960c2eff87d793a50753f0eabc39218ec7331a7467a611
 
 .PHONY: all clean install check-deps check-init ingredients
 
@@ -35,15 +35,14 @@ javascript/index.js: $(shell git ls-files startos) tsconfig.json node_modules pa
 assets:
 	mkdir -p assets
 
-assets/synapse-admin: assets tmp/synapse-admin-$(SYNAPSE_ADMIN_VERSION).tar.gz
+assets/synapse-admin: assets tmp/synapse-admin.tar.gz
 	rm -rf assets/synapse-admin
-	tar -xzvf tmp/synapse-admin-0.10.3.tar.gz -C assets
-	mv assets/synapse-admin-$(SYNAPSE_ADMIN_VERSION) assets/synapse-admin
+	tar -xzvf tmp/synapse-admin.tar.gz -C assets
 
-tmp/synapse-admin-$(SYNAPSE_ADMIN_VERSION).tar.gz:
+tmp/synapse-admin.tar.gz:
 	mkdir -p tmp
-	(cd tmp && wget https://github.com/Awesome-Technologies/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin-$(SYNAPSE_ADMIN_VERSION).tar.gz)
-	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin-$(SYNAPSE_ADMIN_VERSION).tar.gz" | shasum -a 256 -c -
+	(cd tmp && wget https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
+	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
 
 node_modules: package-lock.json
 	npm ci
