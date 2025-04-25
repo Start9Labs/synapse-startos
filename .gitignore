@@ -7,3 +7,4 @@ docker-images
 javascript
 ncc-cache
 tmp/
+assets/synapse-admin

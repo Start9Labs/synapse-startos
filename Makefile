@@ -41,7 +41,7 @@ assets/synapse-admin: assets tmp/synapse-admin.tar.gz
 
 tmp/synapse-admin.tar.gz:
 	mkdir -p tmp
-	(cd tmp && wget https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
+	(cd tmp && curl --progress-bar -OL https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
 	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
 
 node_modules: package-lock.json
@@ -54,6 +54,7 @@ clean:
 	rm -rf ${PACKAGE_ID}.s9pk
 	rm -rf javascript
 	rm -rf node_modules
+	rm -rf assets/synapse-admin
 
 install: | check-deps check-init
 	@if [ ! -f ~/.startos/config.yaml ]; then echo "You must define \"host: http://server-name.local\" in ~/.startos/config.yaml config file first."; exit 1; fi

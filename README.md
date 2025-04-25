@@ -8,7 +8,7 @@
 
 ## Dependencies
 
-Prior to building the `synapse` package, it's essential to configure your build environment for StartOS services. You can find instructions on how to set up the appropriate build environment in the [Developer Docs](https://docs.start9.com/latest/developer-docs/packaging).
+Prior to building the `synapse.s9pk` package, it's essential to configure your build environment for StartOS services. You can find instructions on how to set up the appropriate build environment in the [Packaging Guide](https://staging.docs.start9.com/packaging-guide/).
 
 - [docker](https://docs.docker.com/get-docker)
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
@@ -42,7 +42,7 @@ Before installation, define `host: https://server-name.local` in your `~/.starto
 make install
 ```
 
-**Tip:** You can also install the synapse.s9pk by sideloading it under the **StartOS > System > Sideload a Service** section.
+**Tip:** You can also install the `synapse.s9pk` by using the **Sideload** tab available in the top menu of the StartOS UI.
 
 ## Verify Install
 
