@@ -9,6 +9,7 @@ import { configDefaults, mount } from './utils'
 import { setServerName } from './actions/setServerName'
 import { resetAdmin } from './actions/resetAdmin'
 import * as fs from 'node:fs/promises'
+import { T } from '@start9labs/start-sdk'
 
 // **** Pre Install ****
 const preInstall = sdk.setupPreInstall(async ({ effects }) => {
