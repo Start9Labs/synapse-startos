@@ -16,6 +16,10 @@ check-deps:
 		echo "Error: start-cli not found. Please install it first."; \
 		exit 1; \
 	fi
+	@if ! command -v npm > /dev/null; then \
+		echo "Error: npm (Node Package Manager) not found. Please install Node.js and npm."; \
+		exit 1; \
+	fi
 
 check-init:
 	@if [ ! -f ~/.startos/developer.key.pem ]; then \
