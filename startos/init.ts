@@ -1,5 +1,4 @@
 import { sdk } from './sdk'
-import { exposedStore, initStore } from './store'
 import { setDependencies } from './dependencies'
 import { setInterfaces } from './interfaces'
 import { versions } from './versions'
@@ -8,8 +7,6 @@ import { homeserverYaml } from './file-models/homeserver.yml'
 import { configDefaults, mount } from './utils'
 import { setServerName } from './actions/setServerName'
 import { resetAdmin } from './actions/resetAdmin'
-import * as fs from 'node:fs/promises'
-import { T } from '@start9labs/start-sdk'
 
 // **** Pre Install ****
 const preInstall = sdk.setupPreInstall(async ({ effects }) => {
@@ -56,6 +53,4 @@ export const { packageInit, packageUninit, containerInit } = sdk.setupInit(
   setInterfaces,
   setDependencies,
   actions,
-  initStore,
-  exposedStore,
 )

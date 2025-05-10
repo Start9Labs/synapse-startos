@@ -1,11 +1,15 @@
-import { T } from '@start9labs/start-sdk'
 import { sdk } from './sdk'
 
 export const homeserverPort = 8008
 export const nginxPort = 80
 export const adminPort = 8080
 
-export const mount = sdk.Mounts.of().addVolume('main', null, '/data', false)
+export const mount = sdk.Mounts.of().mountVolume({
+  volumeId: 'main',
+  subpath: null,
+  mountpoint: '/data',
+  readonly: false,
+})
 
 export const configDefaults = {
   database: {

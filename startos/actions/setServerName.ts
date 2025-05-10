@@ -1,6 +1,7 @@
 import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
 import { sdk } from '../sdk'
 import { homeserverYaml } from '../file-models/homeserver.yml'
+import { store } from '../file-models/store.json'
 
 const { InputSpec, Value, Variants } = sdk
 
@@ -51,9 +52,7 @@ export const setServerName = sdk.Action.withInput(
       warning: null,
       allowedStatuses: 'only-stopped',
       group: null,
-      visibility: (await sdk.store
-        .getOwn(effects, sdk.StorePath.serverStarted)
-        .const())
+      visibility: (await store.read((s) => s.serverStarted).const(effects))
         ? 'hidden'
         : 'enabled',
     }

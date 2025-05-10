@@ -4,6 +4,7 @@ import { adminPort, homeserverPort, nginxPort } from './utils'
 import { homeserverYaml } from './file-models/homeserver.yml'
 import { homeserverLogConfig } from './file-models/homeserver.log.config'
 import * as fs from 'node:fs/promises'
+import { store } from './file-models/store.json'
 
 export const main = sdk.setupMain(async ({ effects, started }) => {
   /**
@@ -19,14 +20,19 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   const subcontainer = await sdk.SubContainer.of(
     effects,
     { imageId: 'synapse' },
-    sdk.Mounts.of().addVolume('main', null, '/data', false),
+    sdk.Mounts.of().mountVolume({
+      volumeId: 'main',
+      subpath: null,
+      mountpoint: '/data',
+      readonly: false,
+    }),
     'synapse',
   )
   await subcontainer
     .exec(['chown', '-R', '991:991', '/data'])
     .then((a) => a.throw())
 
-  const smtp = await sdk.store.getOwn(effects, sdk.StorePath.smtp).const()
+  const smtp = (await store.read((s) => s.smtp).const(effects))!
   const creds =
     smtp.selection === 'disabled'
       ? null
@@ -55,13 +61,16 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   }
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
-  const config = await homeserverYaml.read.const(effects)
+  const config = await homeserverYaml.read().const(effects)
 
   // create and configure nginx container
   const nginxContainer = await sdk.SubContainer.of(
     effects,
     { imageId: 'nginx' },
-    sdk.Mounts.of().addAssets('synapse-admin', '/var/www/html'),
+    sdk.Mounts.of().mountAssets({
+      subpath: 'synapse-admin',
+      mountpoint: '/var/www/html',
+    }),
     'nginx',
   )
   fs.writeFile(

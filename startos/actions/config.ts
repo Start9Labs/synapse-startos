@@ -1,4 +1,5 @@
 import { homeserverYaml } from '../file-models/homeserver.yml'
+import { store } from '../file-models/store.json'
 import { sdk } from '../sdk'
 
 const { InputSpec, Value, Variants, List } = sdk
@@ -64,7 +65,7 @@ export const config = sdk.Action.withInput(
 
   // optionally pre-fill the input form
   async ({ effects }) => {
-    const yaml = await homeserverYaml.read.const(effects)
+    const yaml = await homeserverYaml.read().const(effects)
     if (!yaml) {
       return {}
     }
@@ -80,13 +81,15 @@ export const config = sdk.Action.withInput(
             value: { federation_domain_whitelist },
           }
         : { selection: 'disabled' as const, value: {} },
-      smtp: await sdk.store.getOwn(effects, sdk.StorePath.smtp).const(),
+      smtp: (await store.read((s) => s.smtp).const(effects)) || undefined,
     }
   },
 
   // the execution function
   async ({ effects, input }) => {
-    const listeners = (await homeserverYaml.read.const(effects))?.listeners
+    const listeners = await homeserverYaml
+      .read((h) => h.listeners)
+      .const(effects)
     if (!listeners) throw 'Listeners missing from homeserver.yaml'
 
     listeners[0].resources[0].names =
