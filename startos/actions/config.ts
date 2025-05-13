@@ -90,14 +90,17 @@ export const config = sdk.Action.withInput(
     const listeners = await homeserverYaml
       .read((h) => h.listeners)
       .const(effects)
-    if (!listeners) throw 'Listeners missing from homeserver.yaml'
+    if (!listeners) {
+      throw 'Listeners missing from homeserver.yaml'
+    }
 
     listeners[0].resources[0].names =
       input.federation.selection === 'disabled'
         ? ['client']
         : ['client', 'federation']
 
-    // We don't need to set email/smtp attrs because that is done automatically in setupMain(). Updating homeserver.yaml here will force a service restart.
+    await store.merge(effects, { smtp: input.smtp })
+
     await homeserverYaml.merge(effects, {
       enable_registration: input.registration === 'enabled',
       listeners,
