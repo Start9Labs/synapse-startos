@@ -80,6 +80,9 @@ const shape = object({
 export type HomeserverYaml = typeof shape._TYPE
 
 export const homeserverYaml = FileHelper.yaml(
-  '/media/startos/volumes/main/homeserver.yaml',
+  {
+    volumeId: 'main',
+    subpath: 'homeserver.yaml',
+  },
   shape.withMismatch((_) => shape.unsafeCast({})),
 )

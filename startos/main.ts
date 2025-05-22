@@ -1,10 +1,10 @@
 import { sdk } from './sdk'
 import { T } from '@start9labs/start-sdk'
 import { adminPort, homeserverPort, nginxPort } from './utils'
-import { homeserverYaml } from './file-models/homeserver.yml'
-import { homeserverLogConfig } from './file-models/homeserver.log.config'
+import { homeserverYaml } from './fileModels/homeserver.yml'
+import { homeserverLogConfig } from './fileModels/homeserver.log.config'
 import * as fs from 'node:fs/promises'
-import { store } from './file-models/store.json'
+import { store } from './fileModels/store.json'
 
 export const main = sdk.setupMain(async ({ effects, started }) => {
   /**

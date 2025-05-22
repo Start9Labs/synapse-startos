@@ -1,5 +1,5 @@
-import { homeserverYaml } from '../file-models/homeserver.yml'
-import { store } from '../file-models/store.json'
+import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { store } from '../fileModels/store.json'
 import { sdk } from '../sdk'
 
 const { InputSpec, Value, Variants, List } = sdk

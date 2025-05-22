@@ -1,7 +1,7 @@
 import { sdk } from '../sdk'
 import { utils } from '@start9labs/start-sdk'
 import { mount } from '../utils'
-import { store } from '../file-models/store.json'
+import { store } from '../fileModels/store.json'
 
 export const resetAdmin = sdk.Action.withoutInput(
   // id

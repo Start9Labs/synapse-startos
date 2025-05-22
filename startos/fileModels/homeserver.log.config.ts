@@ -47,6 +47,9 @@ const shape = literal(staticConfig).onMismatch(staticConfig)
 export type HomeserverLogConfig = typeof shape._TYPE
 
 export const homeserverLogConfig = FileHelper.yaml(
-  '/media/startos/volumes/main/homeserver.log.config',
+  {
+    volumeId: 'main',
+    subpath: '/homeserver.log.config',
+  },
   shape.withMismatch((_) => shape.unsafeCast({})),
 )

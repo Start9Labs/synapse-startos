@@ -1,7 +1,7 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
 import { yaml } from '@start9labs/start-sdk'
-import { readFile, rmdir } from 'fs/promises'
-import { store } from '../file-models/store.json'
+import { readFile, rm } from 'fs/promises'
+import { store } from '../../fileModels/store.json'
 
 export const v_1_128_0_1 = VersionInfo.of({
   version: '1.128.0:1',
@@ -42,7 +42,7 @@ export const v_1_128_0_1 = VersionInfo.of({
       })
 
       // remove old start9 dir
-      await rmdir('/root/start9')
+      await rm('/root/start9', { recursive: true }).catch(console.error)
     },
     down: IMPOSSIBLE,
   },

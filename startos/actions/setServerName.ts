@@ -1,7 +1,7 @@
 import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
 import { sdk } from '../sdk'
-import { homeserverYaml } from '../file-models/homeserver.yml'
-import { store } from '../file-models/store.json'
+import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { store } from '../fileModels/store.json'
 
 const { InputSpec, Value, Variants } = sdk
 
