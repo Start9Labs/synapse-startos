@@ -15,7 +15,9 @@ export const v_1_128_0_1 = VersionInfo.of({
         'from-name': smtpFrom,
         'smtp-user': smtpUser,
         'smtp-pass': smtpPass,
-      } = yaml.parse(await readFile('/root/start9/config.yaml', 'utf-8')) as {
+      } = yaml.parse(
+        await readFile('/media/startos/volumes/start9/config.yaml', 'utf-8'),
+      ) as {
         'email-notifications': boolean
         'smtp-host': string
         'smtp-port': number
@@ -42,7 +44,9 @@ export const v_1_128_0_1 = VersionInfo.of({
       })
 
       // remove old start9 dir
-      await rm('/root/start9', { recursive: true }).catch(console.error)
+      await rm('/media/startos/volumes/start9', { recursive: true }).catch(
+        console.error,
+      )
     },
     down: IMPOSSIBLE,
   },

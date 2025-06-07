@@ -139,7 +139,7 @@ server {
   return sdk.Daemons.of(effects, started, additionalChecks)
     .addDaemon('synapse', {
       subcontainer,
-      command: ['/start.py'],
+      exec: { command: ['/start.py'] },
       ready: {
         display: 'Homeserver',
         gracePeriod: 10000,
@@ -157,7 +157,7 @@ server {
     })
     .addDaemon('nginx', {
       subcontainer: nginxContainer,
-      command: sdk.useEntrypoint(),
+      exec: { command: sdk.useEntrypoint() },
       ready: {
         display: 'Web Server',
         fn: () =>
