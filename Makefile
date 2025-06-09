@@ -1,5 +1,7 @@
 PACKAGE_ID := $(shell grep -o "id: '[^']*'" startos/manifest.ts | sed "s/id: '\([^']*\)'/\1/")
-INGREDIENTS := $(shell start-cli s9pk list-ingredients 2> /dev/null)
+INGREDIENTS := $(shell start-cli s9pk list-ingredients 2> /dev/null) assets/synapse-admin
+SYNAPSE_ADMIN_VERSION = v0.11.1-etke43
+SYNAPSE_ADMIN_CHECKSUM = daa909e3441e997bbfa6c834d21696804e87c76bada37fa34e63769635fbab2c
 
 .PHONY: all clean install check-deps check-init ingredients
 
@@ -37,6 +39,15 @@ javascript/index.js: $(shell git ls-files startos) tsconfig.json node_modules pa
 assets:
 	mkdir -p assets
 
+assets/synapse-admin: assets tmp/synapse-admin.tar.gz
+	rm -rf assets/synapse-admin
+	tar -xzvf tmp/synapse-admin.tar.gz -C assets
+
+tmp/synapse-admin.tar.gz:
+	mkdir -p tmp
+	(cd tmp && curl --progress-bar -OL https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
+	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
+
 node_modules: package-lock.json
 	npm ci
 
@@ -44,9 +55,12 @@ package-lock.json: package.json
 	npm i
 
 clean:
-	rm -rf ${PACKAGE_ID}.s9pk
-	rm -rf javascript
-	rm -rf node_modules
+	rm -rf \
+	${PACKAGE_ID}.s9pk \
+	javascript \
+	node_modules \
+	assets/synapse-admin \
+	tmp
 
 install: | check-deps check-init
 	@if [ ! -f ~/.startos/config.yaml ]; then echo "You must define \"host: http://server-name.local\" in ~/.startos/config.yaml config file first."; exit 1; fi
