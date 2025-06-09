@@ -44,9 +44,10 @@ export const v_1_128_0_1 = VersionInfo.of({
       })
 
       // remove old start9 dir
-      await rm('/media/startos/volumes/start9', { recursive: true }).catch(
-        console.error,
-      )
+      await rm('/media/startos/volumes/start9', {
+        recursive: true,
+        force: true,
+      })
     },
     down: IMPOSSIBLE,
   },
