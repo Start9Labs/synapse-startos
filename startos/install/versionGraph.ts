@@ -18,6 +18,7 @@ export const versionGraph = VersionGraph.of({
           env: {
             SYNAPSE_SERVER_NAME: 'placeholder.com',
             SYNAPSE_REPORT_STATS: 'no',
+            SYNAPSE_CONFIG_DIR: '/data',
           },
         }),
     )

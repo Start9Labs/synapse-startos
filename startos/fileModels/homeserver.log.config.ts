@@ -49,7 +49,7 @@ export type HomeserverLogConfig = typeof shape._TYPE
 export const homeserverLogConfig = FileHelper.yaml(
   {
     volumeId: 'main',
-    subpath: '/homeserver.log.config',
+    subpath: 'homeserver.log.config',
   },
   shape.withMismatch((_) => shape.unsafeCast({})),
 )
