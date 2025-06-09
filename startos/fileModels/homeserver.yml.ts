@@ -42,7 +42,7 @@ const shape = object({
   enable_registration_without_verification: boolean.onMismatch(
     enable_registration_without_verification,
   ),
-  federation_certificate_verification_whitelist: arrayOf(string),
+  federation_certificate_verification_whitelist: arrayOf(string).onMismatch([]),
   federation_domain_whitelist: arrayOf(string).optional(),
   listeners: array(
     object({
