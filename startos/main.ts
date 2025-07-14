@@ -162,4 +162,20 @@ server {
       },
       requires: ['synapse'],
     })
+    .addHealthCheck('admin-interface', {
+      ready: {
+        display: 'Admin Dashboard',
+        fn: () => {
+          return sdk.healthCheck.checkWebUrl(
+            effects,
+            `http://localhost:${adminPort}`,
+            {
+              successMessage: `Running`,
+              errorMessage: `Unreachable`,
+            },
+          )
+        },
+      },
+      requires: ['nginx'],
+    })
 })
