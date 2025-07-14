@@ -22,7 +22,7 @@ export const configDefaults = {
   enable_registration: false,
   enable_registration_without_verification: true,
   // federation_certificate_verification_whitelist: [],
-  // federation_domain_whitelist: [],
+  federation_domain_whitelist: [],
   listeners: [
     {
       bind_addresses: ['::1', '127.0.0.1'],

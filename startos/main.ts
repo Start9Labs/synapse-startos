@@ -31,32 +31,30 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
     .exec(['chown', '-R', '991:991', '/data'])
     .then((a) => a.throw())
 
-  const smtp = (await store.read((s) => s.smtp).const(effects))!
-  const creds =
-    smtp.selection === 'disabled'
-      ? null
-      : smtp.selection === 'custom'
-        ? smtp.value
-        : await sdk.getSystemSmtp(effects).const()
+  const smtp = await store.read((s) => s.smtp).const(effects)
+  if (smtp) {
+    const creds =
+      smtp.selection === 'disabled'
+        ? null
+        : smtp.selection === 'custom'
+          ? smtp.value
+          : await sdk.getSystemSmtp(effects).const()
 
-  if (creds) {
-    const { server, port, from, login, password } = creds
-    await homeserverYaml.merge(effects, {
-      email: {
-        enable_notifs: true,
-        require_transport_security: true,
-        notif_from:
-          (smtp.selection === 'system' && smtp.value.customFrom) || from,
-        smtp_host: server,
-        smtp_port: port,
-        smtp_user: login,
-        smtp_pass: password || undefined,
-      },
-    })
-  } else {
-    await homeserverYaml.merge(effects, {
-      email: null,
-    })
+    if (creds) {
+      const { server, port, from, login, password } = creds
+      await homeserverYaml.merge(effects, {
+        email: {
+          enable_notifs: true,
+          require_transport_security: true,
+          notif_from:
+            (smtp.selection === 'system' && smtp.value.customFrom) || from,
+          smtp_host: server,
+          smtp_port: port,
+          smtp_user: login,
+          smtp_pass: password || undefined,
+        },
+      })
+    }
   }
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
@@ -76,13 +74,17 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
     `${nginxContainer.rootfs}/etc/nginx/conf.d/default.conf`,
     `
 server {
-    listen       ${nginxPort};
-    listen       [::]:${nginxPort};
+    listen ${nginxPort} default_server;
+    listen [::]:${nginxPort} default_server;
     server_name  _;
 
     location = /.well-known/matrix/server {
         default_type application/json;
         return 200 '{ "m.server": "${config?.server_name}:443" }';
+    }
+
+    location / {
+      proxy_pass http://localhost:8008;
     }
 
     location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
@@ -151,9 +153,9 @@ server {
       subcontainer: nginxContainer,
       exec: { command: sdk.useEntrypoint() },
       ready: {
-        display: 'Web Server',
+        display: null,
         fn: () =>
-          sdk.healthCheck.checkPortListening(effects, 80, {
+          sdk.healthCheck.checkPortListening(effects, nginxPort, {
             errorMessage: 'Web Server is not running',
             successMessage: 'Web Server is running',
           }),
