@@ -12,13 +12,11 @@ const warning =
   'Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.'
 
 export const inputSpec = InputSpec.of({
-  network: Value.union(
-    {
-      name: 'Network',
-      default: 'clearnet',
-      description: `Choose whether your server will be hosted on clearnet (recommended) or Tor. IMPORTANT: ${warning}`,
-    },
-    Variants.of({
+  network: Value.union({
+    name: 'Network',
+    default: 'clearnet',
+    description: `Choose whether your server will be hosted on clearnet (recommended) or Tor. IMPORTANT: ${warning}`,
+    variants: Variants.of({
       clearnet: {
         name: 'Clearnet',
         spec: InputSpec.of({
@@ -36,7 +34,7 @@ export const inputSpec = InputSpec.of({
         }),
       },
     }),
-  ),
+  }),
 })
 
 export const setServerName = sdk.Action.withInput(

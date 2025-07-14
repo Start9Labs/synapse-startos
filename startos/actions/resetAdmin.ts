@@ -3,6 +3,11 @@ import { utils } from '@start9labs/start-sdk'
 import { mount } from '../utils'
 import { store } from '../fileModels/store.json'
 
+const randomPassword = {
+  charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
+  len: 22,
+}
+
 export const resetAdmin = sdk.Action.withoutInput(
   // id
   'reset-admin',
@@ -51,7 +56,7 @@ export const resetAdmin = sdk.Action.withoutInput(
           await subc.execFail([
             'sqlite3',
             '/data/homeserver.db',
-            `UPDATE users SET password_hash='${passwordHash}' WHERE name='${username}')`,
+            `UPDATE users SET password_hash='${passwordHash}' WHERE name='${username}'`,
           ])
         },
       )
@@ -106,8 +111,3 @@ export const resetAdmin = sdk.Action.withoutInput(
     }
   },
 )
-
-const randomPassword = {
-  charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
-  len: 22,
-}

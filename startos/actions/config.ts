@@ -14,14 +14,12 @@ export const inputSpec = InputSpec.of({
       enabled: 'Enabled',
     },
   }),
-  federation: Value.union(
-    {
-      name: 'Federation',
-      default: 'disabled',
-      description:
-        'If enabled, users on your homeserver will be able to join rooms on other homeservers and vica versa. If disabled, users on your homeserver will only be able to interact with other users and rooms on your homeserver.',
-    },
-    Variants.of({
+  federation: Value.union({
+    name: 'Federation',
+    default: 'disabled',
+    description:
+      'If enabled, users on your homeserver will be able to join rooms on other homeservers and vica versa. If disabled, users on your homeserver will only be able to interact with other users and rooms on your homeserver.',
+    variants: Variants.of({
       disabled: { name: 'Disabled', spec: InputSpec.of({}) },
       enabled: {
         name: 'Enabled',
@@ -42,7 +40,7 @@ export const inputSpec = InputSpec.of({
         }),
       },
     }),
-  ),
+  }),
   smtp: sdk.inputSpecConstants.smtpInputSpec,
 })
 

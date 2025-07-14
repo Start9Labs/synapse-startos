@@ -9,6 +9,8 @@ export const manifest = setupManifest({
   supportSite: 'https://github.com/element-hq/synapse/issues',
   marketingSite: 'https://matrix.org/',
   donationUrl: null,
+  docsUrl:
+    'https://github.com/Start9Labs/synapse-startos/blob/master/instructions.md',
   description: {
     short:
       'Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.',

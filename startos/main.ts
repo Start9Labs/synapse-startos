@@ -11,7 +11,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    *
    * In this section, we fetch any resources or run any desired preliminary commands.
    */
-  console.info('Starting Synapse!')
+  console.info('[i] Starting Synapse!')
 
   // Merge to homeserver.yaml to enforce file model protections
   await homeserverYaml.merge(effects, {})
