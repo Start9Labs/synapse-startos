@@ -21,7 +21,7 @@ export const configDefaults = {
   email: null,
   enable_registration: false,
   enable_registration_without_verification: true,
-  // federation_certificate_verification_whitelist: [],
+  federation_certificate_verification_whitelist: [],
   federation_domain_whitelist: [],
   listeners: [
     {
