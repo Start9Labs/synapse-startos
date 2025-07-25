@@ -72,7 +72,7 @@
     <h4>macOS</h4>
     <ol>
       <li>Configure your macOS device to run Tor following these <a
-          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-mac">instructions</a></li>
+          href="https://docs.start9.com/0.3.5.x/device-guides/mac/tor-mac#tor-mac">instructions</a></li>
       <li>Download Element for macOS</li>
       <li>Click <code>Sign In</code> or <code>Create Account</code>, depending on whether or not you have already
         created your account</li>
@@ -85,7 +85,7 @@
     <h4>Linux</h4>
     <ol>
       <li>Configure your Linux device to run Tor following these <a
-          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-linux">instructions</a></li>
+          href="https://docs.start9.com/0.3.5.x/device-guides/linux/tor-linux#tor-linux">instructions</a></li>
       <li>Download Element for Linux</li>
       <li>Because Element app is not Tor-enabled by default, you must launch it from the command line using the
         following command: <code>element-desktop --proxy-server=socks5://127.0.0.1:9050</code></li>
@@ -100,7 +100,7 @@
     <h4>Windows</h4>
     <ol>
       <li>Configure your Windows device to run Tor following these <a
-          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-windows">instructions</a></li>
+          href="https://docs.start9.com/0.3.5.x/device-guides/windows/tor-windows#tor-windows">instructions</a></li>
       <li>Download Element for Windows</li>
       <li>Right click on Element app icon</li>
       <li>Click "Properties"</li>
@@ -118,7 +118,7 @@
     <h4>Android</h4>
     <ol>
       <li>Configure your Android device to run Tor following these <a
-          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-android">instructions</a></li>
+          href="https://docs.start9.com/0.3.5.x/device-guides/android/tor-android#tor-android">instructions</a></li>
       <li>Download Element for Android</li>
       <li>Add Element to the list of VPN apps inside Orbot</li>
       <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
@@ -129,7 +129,7 @@
     <h4>iOS</h4>
     <ol>
       <li>Configure your iOS device to run Tor following these <a
-          href="https://docs.start9.com/latest/user-manual/connecting/connecting-tor/tor-os/tor-ios">instructions</a></li>
+          href="https://docs.start9.com/0.3.5.x/device-guides/ios/tor-ios#tor-ios">instructions</a></li>
       <li>Download Element app for iOS</li>
       <li>In the Element app, you will be asked to "Select a Server."  Choose "Other," and enter <code>http://your_synapse_address_from_interfaces.onion</code></li>
       <li>Complete sign in or account creation.  If you are asked to 'Trust' a certificate, go ahead and do so.  This is safe to do as you are the server operator and traffic is already over Tor</li>
