@@ -131,42 +131,94 @@ jobs:
           
           printf "\n ARM SHA256: $(sha256sum ${ARCH_PACKAGE}) \n"
 
-      # UNIVERSAL: Export Docker artifacts (works for both strategies)
-      - name: Export Docker images for cache
+      # SMART: Export Docker images based on S9PK manifest
+      - name: Export Docker images (manifest-driven + intelligent fallback)
         run: |
-          echo "📦 Exporting Docker images for cache..."
-          echo "   Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
+          echo "📦 Exporting Docker images with intelligent detection..."
           mkdir -p docker-cache-arm
           
-          if [ "${{ steps.check-dockerfile.outputs.has_dockerfile }}" = "true" ]; then
-            echo "   Strategy: Custom build - exporting built + pulled images"
-            # For custom builds: export both built and pulled images
-            for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|${{ github.repository_owner }}|nginx|postgres|redis|mongo)" | head -15); do
-              if [[ "$image" != "<none>:<none>" ]]; then
-                safe_name=$(echo $image | sed 's#[:/.]#_#g')
-                echo "   Exporting: $image"
-                docker save "$image" -o "docker-cache-arm/${safe_name}.tar" || echo "   Failed: $image"
+          # Step 1: Try to get images from S9PK manifest
+          ARCH_PACKAGE=$(ls *_aarch64.s9pk 2>/dev/null | head -n1)
+          MANIFEST_IMAGES=""
+          
+          if [ -n "$ARCH_PACKAGE" ]; then
+            echo "📋 Reading manifest from: $ARCH_PACKAGE"
+            MANIFEST_IMAGES=$(start-cli s9pk inspect "$ARCH_PACKAGE" manifest 2>/dev/null | jq -r '.images | keys[]' 2>/dev/null | tr '\n' ' ' || echo "")
+            echo "🎯 Manifest images: $MANIFEST_IMAGES"
+          fi
+          
+          # Step 2: Get current Docker images (excluding system images)  
+          CURRENT_IMAGES=$(docker image ls --format '{{.Repository}}:{{.Tag}} {{.Size}}' | grep -vE "(<none>|buildkit|qemu-user-static|alpine:latest|ubuntu:latest)" || true)
+          
+          echo "🐳 Available Docker images:"
+          echo "$CURRENT_IMAGES" | head -10
+          
+          # Step 3: Smart export strategy
+          exported_count=0
+          
+          if [ -n "$MANIFEST_IMAGES" ]; then
+            # Priority 1: Export images mentioned in manifest
+            echo "🎯 Exporting manifest-based images..."
+            for image_key in $MANIFEST_IMAGES; do
+              echo "Looking for: $image_key"
+              matching_images=$(echo "$CURRENT_IMAGES" | grep -i "$image_key" | cut -d' ' -f1 || true)
+              
+              if [ -n "$matching_images" ]; then
+                echo "$matching_images" | while read docker_image; do
+                  if [ -n "$docker_image" ]; then
+                    safe_name=$(echo $docker_image | sed 's#[:/.]#_#g')
+                    size_info=$(echo "$CURRENT_IMAGES" | grep "^$docker_image " | awk '{print $2}' || echo "unknown")
+                    
+                    echo "   📦 Exporting: $docker_image ($size_info)"
+                    if docker save "$docker_image" -o "docker-cache-arm/${safe_name}.tar" 2>/dev/null; then
+                      tar_size=$(ls -lh "docker-cache-arm/${safe_name}.tar" | awk '{print $5}')
+                      echo "   ✅ Saved: $tar_size"
+                      exported_count=$((exported_count + 1))
+                    else
+                      echo "   ❌ Failed to export"
+                      rm -f "docker-cache-arm/${safe_name}.tar"
+                    fi
+                  fi
+                done
+              else
+                echo "   ⚠️  Not found in current images: $image_key"
               fi
             done
+          fi
+          
+          # Priority 2: If no manifest images found, export all relevant images
+          if [ "$exported_count" -eq 0 ]; then
+            echo "🔄 No manifest images exported, using fallback strategy..."
+            echo "$CURRENT_IMAGES" | while read image_line; do
+              if [ -n "$image_line" ]; then
+                docker_image=$(echo "$image_line" | cut -d' ' -f1)
+                size_info=$(echo "$image_line" | cut -d' ' -f2)
+                safe_name=$(echo $docker_image | sed 's#[:/.]#_#g')
+                
+                echo "   📦 Exporting: $docker_image ($size_info)"
+                if docker save "$docker_image" -o "docker-cache-arm/${safe_name}.tar" 2>/dev/null; then
+                  tar_size=$(ls -lh "docker-cache-arm/${safe_name}.tar" | awk '{print $5}')
+                  echo "   ✅ Saved: $tar_size"
+                  exported_count=$((exported_count + 1))
+                else
+                  echo "   ❌ Failed"
+                  rm -f "docker-cache-arm/${safe_name}.tar"
+                fi
+              fi
+            done
+          fi
+          
+          # Final summary
+          if [ "$exported_count" -eq 0 ]; then
+            echo "No images cached" > docker-cache-arm/.empty
+            echo "❌ No images were cached!"
           else
-            echo "   Strategy: Pull-only - exporting pulled images"
-            # For pull-only builds: export standard pulled images
-            for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|nginx|postgres|redis|mongo|matrix)" | head -10); do
-              if [[ "$image" != "<none>:<none>" ]]; then
-                safe_name=$(echo $image | sed 's#[:/.]#_#g')
-                echo "   Exporting: $image"
-                docker save "$image" -o "docker-cache-arm/${safe_name}.tar" || echo "   Failed: $image"
-              fi
-            done
+            echo "=== ARM CACHE SUMMARY ==="
+            echo "✅ Exported $exported_count image(s)"
+            ls -lah docker-cache-arm/*.tar 2>/dev/null | head -5
+            total_size=$(du -sh docker-cache-arm/ | cut -f1)
+            echo "📊 Total cache size: $total_size"
           fi
-          
-          # Create marker if no images cached
-          if [ ! "$(ls -A docker-cache-arm)" ]; then
-            echo "No images to cache - creating marker" > docker-cache-arm/.empty
-          fi
-          
-          echo "ARM cache summary:"
-          ls -la docker-cache-arm/ | head -10
 
       - name: Upload ARM package
         uses: actions/upload-artifact@v4
@@ -304,39 +356,94 @@ jobs:
           
           printf "\n Intel SHA256: $(sha256sum ${INTEL_PACKAGE}) \n"
 
-      # UNIVERSAL: Export Docker artifacts (same logic as ARM)
-      - name: Export Docker images for cache
+      # SMART: Same intelligent Docker export as ARM
+      - name: Export Docker images (manifest-driven + intelligent fallback)
         run: |
-          echo "📦 Exporting Docker images for cache..."
-          echo "   Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
+          echo "📦 Exporting Docker images with intelligent detection..."
           mkdir -p docker-cache-intel
           
-          if [ "${{ steps.check-dockerfile.outputs.has_dockerfile }}" = "true" ]; then
-            echo "   Strategy: Custom build - exporting built + pulled images"
-            for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|${{ github.repository_owner }}|nginx|postgres|redis|mongo)" | head -15); do
-              if [[ "$image" != "<none>:<none>" ]]; then
-                safe_name=$(echo $image | sed 's#[:/.]#_#g')
-                echo "   Exporting: $image"
-                docker save "$image" -o "docker-cache-intel/${safe_name}.tar" || echo "   Failed: $image"
+          # Step 1: Try to get images from S9PK manifest
+          INTEL_PACKAGE=$(ls *_x86_64.s9pk 2>/dev/null | head -n1)
+          MANIFEST_IMAGES=""
+          
+          if [ -n "$INTEL_PACKAGE" ]; then
+            echo "📋 Reading manifest from: $INTEL_PACKAGE"
+            MANIFEST_IMAGES=$(start-cli s9pk inspect "$INTEL_PACKAGE" manifest 2>/dev/null | jq -r '.images | keys[]' 2>/dev/null | tr '\n' ' ' || echo "")
+            echo "🎯 Manifest images: $MANIFEST_IMAGES"
+          fi
+          
+          # Step 2: Get current Docker images (excluding system images)  
+          CURRENT_IMAGES=$(docker image ls --format '{{.Repository}}:{{.Tag}} {{.Size}}' | grep -vE "(<none>|buildkit|qemu-user-static|alpine:latest|ubuntu:latest)" || true)
+          
+          echo "🐳 Available Docker images:"
+          echo "$CURRENT_IMAGES" | head -10
+          
+          # Step 3: Smart export strategy
+          exported_count=0
+          
+          if [ -n "$MANIFEST_IMAGES" ]; then
+            # Priority 1: Export images mentioned in manifest
+            echo "🎯 Exporting manifest-based images..."
+            for image_key in $MANIFEST_IMAGES; do
+              echo "Looking for: $image_key"
+              matching_images=$(echo "$CURRENT_IMAGES" | grep -i "$image_key" | cut -d' ' -f1 || true)
+              
+              if [ -n "$matching_images" ]; then
+                echo "$matching_images" | while read docker_image; do
+                  if [ -n "$docker_image" ]; then
+                    safe_name=$(echo $docker_image | sed 's#[:/.]#_#g')
+                    size_info=$(echo "$CURRENT_IMAGES" | grep "^$docker_image " | awk '{print $2}' || echo "unknown")
+                    
+                    echo "   📦 Exporting: $docker_image ($size_info)"
+                    if docker save "$docker_image" -o "docker-cache-intel/${safe_name}.tar" 2>/dev/null; then
+                      tar_size=$(ls -lh "docker-cache-intel/${safe_name}.tar" | awk '{print $5}')
+                      echo "   ✅ Saved: $tar_size"
+                      exported_count=$((exported_count + 1))
+                    else
+                      echo "   ❌ Failed to export"
+                      rm -f "docker-cache-intel/${safe_name}.tar"
+                    fi
+                  fi
+                done
+              else
+                echo "   ⚠️  Not found in current images: $image_key"
               fi
             done
+          fi
+          
+          # Priority 2: If no manifest images found, export all relevant images
+          if [ "$exported_count" -eq 0 ]; then
+            echo "🔄 No manifest images exported, using fallback strategy..."
+            echo "$CURRENT_IMAGES" | while read image_line; do
+              if [ -n "$image_line" ]; then
+                docker_image=$(echo "$image_line" | cut -d' ' -f1)
+                size_info=$(echo "$image_line" | cut -d' ' -f2)
+                safe_name=$(echo $docker_image | sed 's#[:/.]#_#g')
+                
+                echo "   📦 Exporting: $docker_image ($size_info)"
+                if docker save "$docker_image" -o "docker-cache-intel/${safe_name}.tar" 2>/dev/null; then
+                  tar_size=$(ls -lh "docker-cache-intel/${safe_name}.tar" | awk '{print $5}')
+                  echo "   ✅ Saved: $tar_size"
+                  exported_count=$((exported_count + 1))
+                else
+                  echo "   ❌ Failed"
+                  rm -f "docker-cache-intel/${safe_name}.tar"
+                fi
+              fi
+            done
+          fi
+          
+          # Final summary
+          if [ "$exported_count" -eq 0 ]; then
+            echo "No images cached" > docker-cache-intel/.empty
+            echo "❌ No images were cached!"
           else
-            echo "   Strategy: Pull-only - exporting pulled images"
-            for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|nginx|postgres|redis|mongo|matrix)" | head -10); do
-              if [[ "$image" != "<none>:<none>" ]]; then
-                safe_name=$(echo $image | sed 's#[:/.]#_#g')
-                echo "   Exporting: $image"
-                docker save "$image" -o "docker-cache-intel/${safe_name}.tar" || echo "   Failed: $image"
-              fi
-            done
+            echo "=== INTEL CACHE SUMMARY ==="
+            echo "✅ Exported $exported_count image(s)"
+            ls -lah docker-cache-intel/*.tar 2>/dev/null | head -5
+            total_size=$(du -sh docker-cache-intel/ | cut -f1)
+            echo "📊 Total cache size: $total_size"
           fi
-          
-          if [ ! "$(ls -A docker-cache-intel)" ]; then
-            echo "No images to cache - creating marker" > docker-cache-intel/.empty
-          fi
-          
-          echo "Intel cache summary:"
-          ls -la docker-cache-intel/ | head -10
 
       - name: Upload Intel package
         uses: actions/upload-artifact@v4
@@ -414,13 +521,21 @@ jobs:
           echo "📦 Importing Docker images from both ARM and Intel builds..."
           echo "   Build type: ${{ needs.BuildARM.outputs.build_type }}"
           
+          imported_count=0
+          
           # Import ARM cache
           if [ -d "docker-cache-arm" ] && [ -n "$(ls -A docker-cache-arm/*.tar 2>/dev/null)" ]; then
             echo "Loading ARM Docker cache..."
             for tar_file in docker-cache-arm/*.tar; do
               if [ -f "$tar_file" ]; then
-                echo "  Loading: $(basename $tar_file)"
-                docker load -i "$tar_file" || true
+                image_name=$(basename "$tar_file" .tar)
+                echo "  Loading: $image_name"
+                if docker load -i "$tar_file" 2>/dev/null; then
+                  echo "  ✅ Loaded: $image_name"
+                  imported_count=$((imported_count + 1))
+                else
+                  echo "  ❌ Failed: $image_name"
+                fi
               fi
             done
           else
@@ -432,16 +547,24 @@ jobs:
             echo "Loading Intel Docker cache..."
             for tar_file in docker-cache-intel/*.tar; do
               if [ -f "$tar_file" ]; then
-                echo "  Loading: $(basename $tar_file)"
-                docker load -i "$tar_file" || true
+                image_name=$(basename "$tar_file" .tar)
+                echo "  Loading: $image_name"
+                if docker load -i "$tar_file" 2>/dev/null; then
+                  echo "  ✅ Loaded: $image_name (or already exists)"
+                  imported_count=$((imported_count + 1))
+                else
+                  echo "  ❌ Failed: $image_name"
+                fi
               fi
             done
           else
             echo "No Intel Docker cache found"
           fi
           
-          echo "Available Docker images after import:"
-          docker image ls --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | head -10
+          echo "=== IMPORT SUMMARY ==="
+          echo "📊 Imported $imported_count image archive(s)"
+          echo "🐳 Available Docker images after import:"
+          docker image ls --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | head -15
 
       - name: Build Universal package (Maximum Cache Optimization)
         env:
@@ -465,6 +588,7 @@ jobs:
             echo "  Docker strategy: Using imported pulled images (no BuildKit cache needed)"
           fi
           
+          echo "🚀 Starting universal build..."
           time RUST_LOG=debug RUST_BACKTRACE=1 make
           
           # Find the universal package
