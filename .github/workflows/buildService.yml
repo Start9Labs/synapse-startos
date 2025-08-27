@@ -16,16 +16,36 @@ jobs:
     outputs:
       package_id: ${{ steps.build.outputs.package_id }}
       arch_package: ${{ steps.build.outputs.arch_package }}
-      sdk_cache_hit: ${{ steps.sdk-setup.outputs.cache-hit }}
+      has_dockerfile: ${{ steps.check-dockerfile.outputs.has_dockerfile }}
     steps:
       - name: Prepare StartOS SDK (Super Cached)
-        id: sdk-setup
         uses: k0gen/sdk@v3-optimization
 
       - name: Checkout services repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # Check if service uses custom Dockerfile
+      - name: Check for custom Dockerfile
+        id: check-dockerfile
+        run: |
+          if [ -f "Dockerfile" ] || find . -name "Dockerfile*" -type f | grep -q .; then
+            echo "has_dockerfile=true" >> $GITHUB_OUTPUT
+            echo "📦 Custom Dockerfile detected - enabling build cache"
+          else
+            echo "has_dockerfile=false" >> $GITHUB_OUTPUT
+            echo "📥 No custom Dockerfile - using pull cache only"
+          fi
+
+      # Enhanced Docker setup with BuildKit cache for custom builds
+      - name: Set up Docker Buildx with build cache
+        if: steps.check-dockerfile.outputs.has_dockerfile == 'true'
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:buildx-stable-1
+            network=host
 
       # Cache Node.js dependencies if they exist
       - name: Cache Node.js dependencies
@@ -70,12 +90,24 @@ jobs:
 
       - name: Build ARM package
         id: build
+        env:
+          # Enable BuildKit cache for custom Docker builds
+          DOCKER_BUILDKIT: 1
+          BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
           
-          echo "🏗️ Building ARM package with caches:"
+          echo "🏗️ Building ARM package with enhanced Docker caching:"
+          echo "  Custom Dockerfile: ${{ steps.check-dockerfile.outputs.has_dockerfile }}"
           echo "  Node modules cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
           echo "  Rust cache hit: ${{ steps.cache-rust.outputs.cache-hit }}"
+          
+          # Set BuildKit cache options for make command if custom Dockerfile exists
+          if [ "${{ steps.check-dockerfile.outputs.has_dockerfile }}" = "true" ]; then
+            export BUILDKIT_CACHE_FROM="type=gha,scope=arm-build"
+            export BUILDKIT_CACHE_TO="type=gha,mode=max,scope=arm-build"
+            echo "  Docker build cache: GitHub Actions (arm-build scope)"
+          fi
           
           time RUST_LOG=debug RUST_BACKTRACE=1 make aarch64
           
@@ -90,16 +122,17 @@ jobs:
           
           printf "\n ARM SHA256: $(sha256sum ${ARCH_PACKAGE}) \n"
 
+      # Export Docker images for cache (both pulled and built images)
       - name: Export Docker images for cache
         run: |
           echo "📦 Exporting Docker images for cache..."
           
-          # Export images used by this specific service
-          for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs)"); do
+          # Export all relevant images (both pulled and custom built)
+          for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|${{ github.repository_owner }})" | head -10); do
             if [[ "$image" != "<none>:<none>" ]]; then
               safe_name=$(echo $image | sed 's#[:/.]#_#g')
               echo "Exporting $image as ${safe_name}.tar"
-              docker save "$image" -o "${safe_name}.tar"
+              docker save "$image" -o "${safe_name}.tar" || echo "Failed to export $image"
             fi
           done
           
@@ -124,16 +157,36 @@ jobs:
     outputs:
       package_id: ${{ steps.build.outputs.package_id }}
       intel_package: ${{ steps.build.outputs.intel_package }}
-      sdk_cache_hit: ${{ steps.sdk-setup.outputs.cache-hit }}
+      has_dockerfile: ${{ steps.check-dockerfile.outputs.has_dockerfile }}
     steps:
       - name: Prepare StartOS SDK (Super Cached)
-        id: sdk-setup
         uses: k0gen/sdk@v3-optimization
 
       - name: Checkout services repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # Check if service uses custom Dockerfile
+      - name: Check for custom Dockerfile
+        id: check-dockerfile
+        run: |
+          if [ -f "Dockerfile" ] || find . -name "Dockerfile*" -type f | grep -q .; then
+            echo "has_dockerfile=true" >> $GITHUB_OUTPUT
+            echo "📦 Custom Dockerfile detected - enabling build cache"
+          else
+            echo "has_dockerfile=false" >> $GITHUB_OUTPUT
+            echo "📥 No custom Dockerfile - using pull cache only"
+          fi
+
+      # Enhanced Docker setup with BuildKit cache for custom builds
+      - name: Set up Docker Buildx with build cache
+        if: steps.check-dockerfile.outputs.has_dockerfile == 'true'
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:buildx-stable-1
+            network=host
 
       # Cache Node.js dependencies if they exist
       - name: Cache Node.js dependencies
@@ -147,7 +200,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-node-modules-
 
-      ## Install Node.js dependencies only if cache miss and package.json exists
+      # Install Node.js dependencies only if cache miss and package.json exists
       - name: Install Node.js dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true' && hashFiles('**/package.json') != ''
         run: |
@@ -162,10 +215,11 @@ jobs:
             npm install
           fi
 
-      # Cache Rust build artifacts
+      # Cache Rust build artifacts (only if Rust project exists)
       - name: Cache Rust build artifacts
+        if: hashFiles('**/Cargo.lock') != ''
         uses: actions/cache@v4
-        id: cache-rust
+        id: cache-rust  
         with:
           path: |
             target/
@@ -177,12 +231,24 @@ jobs:
 
       - name: Build Intel package
         id: build
+        env:
+          # Enable BuildKit cache for custom Docker builds
+          DOCKER_BUILDKIT: 1
+          BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
           
-          echo "🏗️ Building Intel package with caches:"
+          echo "🏗️ Building Intel package with enhanced Docker caching:"
+          echo "  Custom Dockerfile: ${{ steps.check-dockerfile.outputs.has_dockerfile }}"
           echo "  Node modules cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
           echo "  Rust cache hit: ${{ steps.cache-rust.outputs.cache-hit }}"
+          
+          # Set BuildKit cache options for make command if custom Dockerfile exists
+          if [ "${{ steps.check-dockerfile.outputs.has_dockerfile }}" = "true" ]; then
+            export BUILDKIT_CACHE_FROM="type=gha,scope=arm-build type=gha,scope=intel-build"
+            export BUILDKIT_CACHE_TO="type=gha,mode=max,scope=intel-build"
+            echo "  Docker build cache: GitHub Actions (importing from ARM + intel-build scope)"
+          fi
           
           time RUST_LOG=debug RUST_BACKTRACE=1 make x86_64
           
@@ -204,16 +270,17 @@ jobs:
           
           printf "\n Intel SHA256: $(sha256sum ${INTEL_PACKAGE}) \n"
 
+      # Export Docker images for cache (both pulled and built images)
       - name: Export Docker images for cache
         run: |
           echo "📦 Exporting Docker images for cache..."
           
-          # Export images used by this specific service
-          for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs)"); do
+          # Export all relevant images (both pulled and custom built)
+          for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|${{ github.repository_owner }})" | head -10); do
             if [[ "$image" != "<none>:<none>" ]]; then
               safe_name=$(echo $image | sed 's#[:/.]#_#g')
               echo "Exporting $image as ${safe_name}.tar"
-              docker save "$image" -o "${safe_name}.tar"
+              docker save "$image" -o "${safe_name}.tar" || echo "Failed to export $image"
             fi
           done
           
@@ -264,7 +331,16 @@ jobs:
         with:
           submodules: recursive
 
-      # Restore Node.js cache from Intel build (x86_64 runner)
+      # Enhanced Docker setup if custom Dockerfile is used
+      - name: Set up Docker Buildx with build cache
+        if: needs.BuildARM.outputs.has_dockerfile == 'true' || needs.BuildIntel.outputs.has_dockerfile == 'true'
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:buildx-stable-1
+            network=host
+
+      # Restore build dependencies from Intel build (same architecture)
       - name: Restore Node.js dependencies (from Intel build)
         uses: actions/cache/restore@v4
         with:
@@ -275,8 +351,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-X64-node-modules-
 
-      # Restore Rust cache from Intel build (x86_64 runner) 
       - name: Restore Rust build artifacts (from Intel build)
+        if: hashFiles('**/Cargo.lock') != ''
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -328,15 +404,25 @@ jobs:
           echo "Available Docker images after import:"
           docker image ls | grep -E "(start9|ghcr.io/start9labs)" || echo "No relevant images found"
 
-      - name: Build Universal package (Lightning Fast)
+      - name: Build Universal package (Maximum Cache Optimization)
+        env:
+          # Enable BuildKit cache for custom Docker builds
+          DOCKER_BUILDKIT: 1
+          BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
           
           echo "⚡ Building universal package with MAXIMUM cache optimization:"
-          echo "  ARM SDK cache hit: ${{ needs.BuildARM.outputs.sdk_cache_hit }}"  
-          echo "  Intel SDK cache hit: ${{ needs.BuildIntel.outputs.sdk_cache_hit }}"
+          echo "  Custom Dockerfile: ${{ needs.BuildARM.outputs.has_dockerfile }}"
           echo "  Docker cache: ARM + Intel images available"
           echo "  Build artifacts: Restored from Intel build"
+          
+          # Set BuildKit cache options if custom Dockerfile exists
+          if [ "${{ needs.BuildARM.outputs.has_dockerfile }}" = "true" ]; then
+            export BUILDKIT_CACHE_FROM="type=gha,scope=arm-build type=gha,scope=intel-build"
+            export BUILDKIT_CACHE_TO="type=gha,mode=max,scope=universal-build"
+            echo "  Docker build cache: Importing from ARM + Intel build caches"
+          fi
           
           time RUST_LOG=debug RUST_BACKTRACE=1 make
           
