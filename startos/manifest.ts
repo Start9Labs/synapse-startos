@@ -1,4 +1,10 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { SDKImageInputSpec } from '@start9labs/start-sdk/base/lib/types/ManifestTypes'
+
+const BUILD = process.env.BUILD || ''
+
+const architectures =
+  BUILD === 'x86_64' || BUILD === 'aarch64' ? [BUILD] : ['x86_64', 'aarch64']
 
 export const manifest = setupManifest({
   id: 'synapse',
@@ -22,14 +28,18 @@ export const manifest = setupManifest({
       source: {
         dockerTag: 'matrixdotorg/synapse:v1.128.0',
       },
-    },
+      arch: architectures,
+    } as SDKImageInputSpec,
     nginx: {
       source: {
         dockerTag: 'nginx:stable-alpine',
       },
-    },
+      arch: architectures,
+    } as SDKImageInputSpec,
   },
-  hardwareRequirements: {},
+  hardwareRequirements: {
+    arch: architectures,
+  },
   alerts: {
     install: null,
     update: null,
