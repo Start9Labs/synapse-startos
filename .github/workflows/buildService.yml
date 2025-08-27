@@ -122,21 +122,27 @@ jobs:
           
           printf "\n ARM SHA256: $(sha256sum ${ARCH_PACKAGE}) \n"
 
-      # Export Docker images for cache (both pulled and built images)
+      # FIXED: Always create docker cache artifact (even if empty)
       - name: Export Docker images for cache
         run: |
           echo "📦 Exporting Docker images for cache..."
+          mkdir -p docker-cache-arm
           
           # Export all relevant images (both pulled and custom built)
           for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|${{ github.repository_owner }})" | head -10); do
             if [[ "$image" != "<none>:<none>" ]]; then
               safe_name=$(echo $image | sed 's#[:/.]#_#g')
               echo "Exporting $image as ${safe_name}.tar"
-              docker save "$image" -o "${safe_name}.tar" || echo "Failed to export $image"
+              docker save "$image" -o "docker-cache-arm/${safe_name}.tar" || echo "Failed to export $image"
             fi
           done
           
-          ls -la *.tar 2>/dev/null || echo "No Docker images cached"
+          # Create empty marker file if no images were cached
+          if [ ! "$(ls -A docker-cache-arm)" ]; then
+            echo "No images to cache" > docker-cache-arm/.empty
+          fi
+          
+          ls -la docker-cache-arm/ || echo "No Docker images cached"
 
       - name: Upload ARM package
         uses: actions/upload-artifact@v4
@@ -144,12 +150,12 @@ jobs:
           name: ${{ env.arch_package }}
           path: ./${{ env.arch_package }}
 
+      # FIXED: Upload directory instead of glob pattern
       - name: Upload Docker cache
         uses: actions/upload-artifact@v4
         with:
           name: docker-cache-arm
-          path: "*.tar"
-          if-no-files-found: ignore
+          path: docker-cache-arm/
 
   BuildIntel:
     name: Build S9PK (x86_64)
@@ -270,21 +276,27 @@ jobs:
           
           printf "\n Intel SHA256: $(sha256sum ${INTEL_PACKAGE}) \n"
 
-      # Export Docker images for cache (both pulled and built images)
+      # FIXED: Always create docker cache artifact (even if empty)
       - name: Export Docker images for cache
         run: |
           echo "📦 Exporting Docker images for cache..."
+          mkdir -p docker-cache-intel
           
           # Export all relevant images (both pulled and custom built)
           for image in $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E "(start9|ghcr.io/start9labs|${{ github.repository_owner }})" | head -10); do
             if [[ "$image" != "<none>:<none>" ]]; then
               safe_name=$(echo $image | sed 's#[:/.]#_#g')
               echo "Exporting $image as ${safe_name}.tar"
-              docker save "$image" -o "${safe_name}.tar" || echo "Failed to export $image"
+              docker save "$image" -o "docker-cache-intel/${safe_name}.tar" || echo "Failed to export $image"
             fi
           done
           
-          ls -la *.tar 2>/dev/null || echo "No Docker images cached"
+          # Create empty marker file if no images were cached
+          if [ ! "$(ls -A docker-cache-intel)" ]; then
+            echo "No images to cache" > docker-cache-intel/.empty
+          fi
+          
+          ls -la docker-cache-intel/ || echo "No Docker images cached"
 
       - name: Upload Intel package
         uses: actions/upload-artifact@v4
@@ -292,39 +304,21 @@ jobs:
           name: ${{ env.intel_package }}
           path: ./${{ env.intel_package }}
 
+      # FIXED: Upload directory instead of glob pattern
       - name: Upload Docker cache
         uses: actions/upload-artifact@v4
         with:
           name: docker-cache-intel
-          path: "*.tar"
-          if-no-files-found: ignore
+          path: docker-cache-intel/
 
   BuildUniversal:
     name: Build S9PK (Universal)
     runs-on: ubuntu-24.04
     needs: [BuildARM, BuildIntel]
     steps:
-      # CONDITIONAL: Only run SDK setup if both ARM and Intel had cache misses
-      - name: Prepare StartOS SDK (Conditional)
-        if: needs.BuildARM.outputs.sdk_cache_hit != 'true' || needs.BuildIntel.outputs.sdk_cache_hit != 'true'
+      # SIMPLIFIED: Always run SDK setup (removes complexity)
+      - name: Prepare StartOS SDK
         uses: k0gen/sdk@v3-optimization
-
-      # ALTERNATIVE: Minimal SDK setup if ARM/Intel had cache hits
-      - name: Minimal SDK setup (Cache hit scenario)
-        if: needs.BuildARM.outputs.sdk_cache_hit == 'true' && needs.BuildIntel.outputs.sdk_cache_hit == 'true'
-        run: |
-          echo "🚀 ARM and Intel had SDK cache hits - using minimal setup"
-          # Add start-cli to PATH if it exists in cache
-          if [ -f "$HOME/.local/bin/start-cli" ]; then
-            echo "$HOME/.local/bin" >> $GITHUB_PATH
-            echo "✅ start-cli found in cache"
-          else
-            echo "⚠️ start-cli not found - will download quickly"
-            # Quick fallback download
-            mkdir -p ~/.local/bin
-            curl -fL "$(curl -s https://api.github.com/repos/Start9Labs/start-cli/releases/latest | jq -r '.assets[] | select(.name | contains("x86_64-unknown-linux-gnu")) | .browser_download_url')" | tar xz -C ~/.local/bin --strip-components=0
-            echo "$HOME/.local/bin" >> $GITHUB_PATH
-          fi
 
       - name: Checkout services repository
         uses: actions/checkout@v4
@@ -363,14 +357,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-X64-rust-
 
+      # FIXED: Use continue-on-error for artifact downloads
       - name: Download Docker cache from ARM
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: docker-cache-arm
           path: docker-cache-arm/
 
       - name: Download Docker cache from Intel
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: docker-cache-intel
           path: docker-cache-intel/
@@ -388,6 +385,8 @@ jobs:
                 docker load -i "$tar_file" || true
               fi
             done
+          else
+            echo "No ARM Docker cache found"
           fi
           
           # Import Intel cache  
@@ -399,6 +398,8 @@ jobs:
                 docker load -i "$tar_file" || true
               fi
             done
+          else
+            echo "No Intel Docker cache found"
           fi
           
           echo "Available Docker images after import:"
