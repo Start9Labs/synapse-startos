@@ -490,18 +490,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-X64-node-modules-
 
-      - name: Restore Rust build artifacts (from Intel build)
-        if: hashFiles('**/Cargo.lock') != ''
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            target/
-            ~/.cargo/registry/
-            ~/.cargo/git/
-          key: ${{ runner.os }}-X64-rust-${{ hashFiles('**/Cargo.lock') }}-v1
-          restore-keys: |
-            ${{ runner.os }}-X64-rust-
-
       - name: Download Docker cache from ARM
         uses: actions/download-artifact@v4
         continue-on-error: true
@@ -509,16 +497,9 @@ jobs:
           name: docker-cache-arm
           path: docker-cache-arm/
 
-      - name: Download Docker cache from Intel
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: docker-cache-intel
-          path: docker-cache-intel/
-
       - name: Import Docker images from both architectures
         run: |
-          echo "📦 Importing Docker images from both ARM and Intel builds..."
+          echo "📦 Importing Docker images from ARM build..."
           echo "   Build type: ${{ needs.BuildARM.outputs.build_type }}"
           
           imported_count=0
@@ -541,26 +522,7 @@ jobs:
           else
             echo "No ARM Docker cache found"
           fi
-          
-          # Import Intel cache  
-          if [ -d "docker-cache-intel" ] && [ -n "$(ls -A docker-cache-intel/*.tar 2>/dev/null)" ]; then
-            echo "Loading Intel Docker cache..."
-            for tar_file in docker-cache-intel/*.tar; do
-              if [ -f "$tar_file" ]; then
-                image_name=$(basename "$tar_file" .tar)
-                echo "  Loading: $image_name"
-                if docker load -i "$tar_file" 2>/dev/null; then
-                  echo "  ✅ Loaded: $image_name (or already exists)"
-                  imported_count=$((imported_count + 1))
-                else
-                  echo "  ❌ Failed: $image_name"
-                fi
-              fi
-            done
-          else
-            echo "No Intel Docker cache found"
-          fi
-          
+                    
           echo "=== IMPORT SUMMARY ==="
           echo "📊 Imported $imported_count image archive(s)"
           echo "🐳 Available Docker images after import:"
