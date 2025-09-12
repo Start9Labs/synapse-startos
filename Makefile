@@ -1,31 +1,35 @@
 PACKAGE_ID := $(shell awk -F"'" '/id:/ {print $$2}' startos/manifest.ts)
 INGREDIENTS := $(shell start-cli s9pk list-ingredients 2>/dev/null)
+SYNAPSE_ADMIN_VERSION = v0.11.1-etke47
+SYNAPSE_ADMIN_CHECKSUM = 9323ec6921f8170dc9fb65efdcd23e35fd2dea12c588cba34753b0492b7871c2
 
-CMD_ARCH_GOAL := $(filter aarch64 x86_64, $(MAKECMDGOALS))
+CMD_ARCH_GOAL := $(filter aarch64 x86_64 arm x86, $(MAKECMDGOALS))
 ifeq ($(CMD_ARCH_GOAL),)
   BUILD := universal
   S9PK := $(PACKAGE_ID).s9pk
 else
-  BUILD := $(firstword $(CMD_ARCH_GOAL))
+  RAW_ARCH := $(firstword $(CMD_ARCH_GOAL))
+  ACTUAL_ARCH := $(subst x86,x86_64,$(subst arm,aarch64,$(RAW_ARCH)))
+  BUILD := $(ACTUAL_ARCH)
   S9PK := $(PACKAGE_ID)_$(BUILD).s9pk
 endif
 
-.PHONY: all aarch64 x86_64 clean install check-deps check-init package ingredients
+.PHONY: all aarch64 x86_64 arm x86 clean install check-deps check-init package ingredients
 .DELETE_ON_ERROR:
 
 define SUMMARY
 	@manifest=$$(start-cli s9pk inspect $(1) manifest); \
 	size=$$(du -h $(1) | awk '{print $$1}'); \
-	title=$$(echo $$manifest | jq -r .title); \
-	version=$$(echo $$manifest | jq -r .version); \
-	arches=$$(echo $$manifest | jq -r '.hardwareRequirements.arch | join(", ")'); \
-	sdkv=$$(echo $$manifest | jq -r .sdkVersion); \
-	gitHash=$$(echo "$$manifest" | jq -r .gitHash | sed -E 's/(.*-modified)$$/\x1b[0;31m\1\x1b[0m/'); \
-	echo ""; \
-	echo "\033[1;32m✅ Build Complete!\033[0m"; \
-	echo ""; \
-	echo "\033[1;37m📦 $$title\033[0m   \033[36mv$$version\033[0m"; \
-	echo "───────────────────────────────"; \
+	title=$$(printf '%s' "$$manifest" | jq -r .title); \
+	version=$$(printf '%s' "$$manifest" | jq -r .version); \
+	arches=$$(printf '%s' "$$manifest" | jq -r '.hardwareRequirements.arch | join(", ")'); \
+	sdkv=$$(printf '%s' "$$manifest" | jq -r .sdkVersion); \
+	gitHash=$$(printf '%s' "$$manifest" | jq -r .gitHash | sed -E 's/(.*-modified)$$/\x1b[0;31m\1\x1b[0m/'); \
+	printf "\n"; \
+	printf "\033[1;32m✅ Build Complete!\033[0m\n"; \
+	printf "\n"; \
+	printf "\033[1;37m📦 $$title\033[0m   \033[36mv$$version\033[0m\n"; \
+	printf "───────────────────────────────\n"; \
 	printf " \033[1;36mFilename:\033[0m   %s\n" "$(1)"; \
 	printf " \033[1;36mSize:\033[0m       %s\n" "$$size"; \
 	printf " \033[1;36mArch:\033[0m       %s\n" "$$arches"; \
@@ -40,7 +44,10 @@ all: $(PACKAGE_ID).s9pk
 $(BUILD): $(PACKAGE_ID)_$(BUILD).s9pk
 	$(call SUMMARY,$(S9PK))
 
-$(S9PK): $(INGREDIENTS) .git/HEAD .git/index
+x86: x86_64
+arm: aarch64
+
+$(S9PK): $(INGREDIENTS) .git/HEAD .git/index assets/synapse-admin
 	@$(MAKE) --no-print-directory ingredients
 	@echo "   Packing '$(S9PK)'..."
 	BUILD=$(BUILD) start-cli s9pk pack -o $(S9PK)
@@ -69,6 +76,15 @@ check-init:
 		start-cli init; \
 	fi
 
+assets/synapse-admin: tmp/synapse-admin.tar.gz
+	rm -rf assets/synapse-admin
+	tar -xzvf tmp/synapse-admin.tar.gz -C assets
+
+tmp/synapse-admin.tar.gz:
+	mkdir -p tmp
+	(cd tmp && curl --progress-bar -OL https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
+	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
+
 javascript/index.js: $(shell find startos -type f) tsconfig.json node_modules
 	npm run build
 
@@ -80,4 +96,4 @@ package-lock.json: package.json
 
 clean:
 	@echo "Cleaning up build artifacts..."
-	@rm -rf $(PACKAGE_ID).s9pk $(PACKAGE_ID)_x86_64.s9pk $(PACKAGE_ID)_aarch64.s9pk javascript node_modules
+	@rm -rf $(PACKAGE_ID).s9pk $(PACKAGE_ID)_x86_64.s9pk $(PACKAGE_ID)_aarch64.s9pk javascript assets/synapse-admin tmp node_modules
