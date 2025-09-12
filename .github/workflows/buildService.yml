@@ -102,14 +102,30 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
+
+          echo "--- Debugging permissions ---"
+          echo "User: $(whoami)"
+          echo "ID: $(id)"
+          echo "Sudo capabilities:"
+          sudo -l || echo "sudo -l failed"
+          echo "Home directory contents:"
+          ls -la ~
+          echo ".startos directory initial contents:"
+          ls -la ~/.startos
+
+          echo "Attempting to fix permissions..."
           sudo chown -R $(id -u):$(id -g) ~/.startos
-          
+          sudo chmod -R 777 ~/.startos
+          echo "New .startos directory contents:"
+          ls -la ~/.startos
+          echo "--- End debugging permissions ---"
+
           echo "🏗️ Building ARM package:"
           echo "  Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
           echo "  Custom Dockerfile: ${{ steps.check-dockerfile.outputs.has_dockerfile }}"
           echo "  Node modules cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
           echo "  Rust cache hit: ${{ steps.cache-rust.outputs.cache-hit }}"
-          
+
           # CONDITIONAL: Set BuildKit cache options only for custom builds
           if [ "${{ steps.check-dockerfile.outputs.has_dockerfile }}" = "true" ]; then
             export BUILDKIT_CACHE_FROM="type=gha,scope=arm-build"
@@ -118,18 +134,18 @@ jobs:
           else
             echo "  Docker strategy: Pull-only (no BuildKit cache needed)"
           fi
-          
+
           time RUST_LOG=debug RUST_BACKTRACE=1 make aarch64
-          
+
           # Find the generated package (dynamic naming)
           ARCH_PACKAGE=$(ls *_aarch64.s9pk | head -n1)
           PACKAGE_ID=$(start-cli s9pk inspect "$ARCH_PACKAGE" manifest | jq -r '.id')
-          
+
           echo "package_id=${PACKAGE_ID}" >> $GITHUB_OUTPUT
           echo "arch_package=${ARCH_PACKAGE}" >> $GITHUB_OUTPUT
           echo "package_id=${PACKAGE_ID}" >> $GITHUB_ENV
           echo "arch_package=${ARCH_PACKAGE}" >> $GITHUB_ENV
-          
+
           printf "\n ARM SHA256: $(sha256sum ${ARCH_PACKAGE}) \n"
 
       # SMART: Export Docker images based on S9PK manifest
