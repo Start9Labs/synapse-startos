@@ -102,23 +102,7 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
-
-          echo "--- Debugging permissions ---"
-          echo "User: $(whoami)"
-          echo "ID: $(id)"
-          echo "Sudo capabilities:"
-          sudo -l || echo "sudo -l failed"
-          echo "Home directory contents:"
-          ls -la ~
-          echo ".startos directory initial contents:"
-          ls -la ~/.startos
-
-          echo "Attempting to fix permissions..."
-          sudo chown -R $(id -u):$(id -g) ~/.startos
-          sudo chmod -R 777 ~/.startos
-          echo "New .startos directory contents:"
-          ls -la ~/.startos
-          echo "--- End debugging permissions ---"
+          chmod 600 ~/.startos/developer.key.pem
 
           echo "🏗️ Building ARM package:"
           echo "  Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
@@ -176,12 +160,14 @@ jobs:
           if [ -n "$MANIFEST_IMAGES" ]; then
             # Priority 1: Export images mentioned in manifest
             echo "🎯 Exporting manifest-based images..."
-            for image_key in $MANIFEST_IMAGES; do
+            for image_key in $MANIFEST_IMAGES;
+              do
               echo "Looking for: $image_key"
               matching_images=$(echo "$CURRENT_IMAGES" | grep -i "$image_key" | cut -d' ' -f1 || true)
               
               if [ -n "$matching_images" ]; then
-                echo "$matching_images" | while read docker_image; do
+                echo "$matching_images" | while read docker_image;
+                  do
                   if [ -n "$docker_image" ]; then
                     safe_name=$(echo $docker_image | sed 's#[:/.]#_#g')
                     size_info=$(echo "$CURRENT_IMAGES" | grep "^$docker_image " | awk '{print $2}' || echo "unknown")
@@ -206,7 +192,8 @@ jobs:
           # Priority 2: If no manifest images found, export all relevant images
           if [ "$exported_count" -eq 0 ]; then
             echo "🔄 No manifest images exported, using fallback strategy..."
-            echo "$CURRENT_IMAGES" | while read image_line; do
+            echo "$CURRENT_IMAGES" | while read image_line;
+              do
               if [ -n "$image_line" ]; then
                 docker_image=$(echo "$image_line" | cut -d' ' -f1)
                 size_info=$(echo "$image_line" | cut -d' ' -f2)
@@ -337,14 +324,14 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
-          sudo chown -R $(id -u):$(id -g) ~/.startos
-          
+          chmod 600 ~/.startos/developer.key.pem
+
           echo "🏗️ Building Intel package:"
           echo "  Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
           echo "  Custom Dockerfile: ${{ steps.check-dockerfile.outputs.has_dockerfile }}"
           echo "  Node modules cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
           echo "  Rust cache hit: ${{ steps.cache-rust.outputs.cache-hit }}"
-          
+
           # CONDITIONAL: Set BuildKit cache with ARM import for custom builds
           if [ "${{ steps.check-dockerfile.outputs.has_dockerfile }}" = "true" ]; then
             export BUILDKIT_CACHE_FROM="type=gha,scope=arm-build type=gha,scope=intel-build"
@@ -353,25 +340,25 @@ jobs:
           else
             echo "  Docker strategy: Pull-only (no BuildKit cache needed)"
           fi
-          
+
           time RUST_LOG=debug RUST_BACKTRACE=1 make x86
-          
+
           # Find the generated package
           INTEL_PACKAGE=$(ls *_x86_64.s9pk | head -n1)
-          
+
           if [ -z "$INTEL_PACKAGE" ]; then
             echo "❌ No x86_64 package found!"
             ls -la *.s9pk || echo "No .s9pk files found"
             exit 1
           fi
-          
+
           PACKAGE_ID=$(start-cli s9pk inspect "$INTEL_PACKAGE" manifest | jq -r '.id')
-          
+
           echo "package_id=${PACKAGE_ID}" >> $GITHUB_OUTPUT
           echo "intel_package=${INTEL_PACKAGE}" >> $GITHUB_OUTPUT
           echo "package_id=${PACKAGE_ID}" >> $GITHUB_ENV
           echo "intel_package=${INTEL_PACKAGE}" >> $GITHUB_ENV
-          
+
           printf "\n Intel SHA256: $(sha256sum ${INTEL_PACKAGE}) \n"
 
       # SMART: Same intelligent Docker export as ARM
@@ -402,12 +389,14 @@ jobs:
           if [ -n "$MANIFEST_IMAGES" ]; then
             # Priority 1: Export images mentioned in manifest
             echo "🎯 Exporting manifest-based images..."
-            for image_key in $MANIFEST_IMAGES; do
+            for image_key in $MANIFEST_IMAGES;
+              do
               echo "Looking for: $image_key"
               matching_images=$(echo "$CURRENT_IMAGES" | grep -i "$image_key" | cut -d' ' -f1 || true)
               
               if [ -n "$matching_images" ]; then
-                echo "$matching_images" | while read docker_image; do
+                echo "$matching_images" | while read docker_image;
+                  do
                   if [ -n "$docker_image" ]; then
                     safe_name=$(echo $docker_image | sed 's#[:/.]#_#g')
                     size_info=$(echo "$CURRENT_IMAGES" | grep "^$docker_image " | awk '{print $2}' || echo "unknown")
@@ -432,7 +421,8 @@ jobs:
           # Priority 2: If no manifest images found, export all relevant images
           if [ "$exported_count" -eq 0 ]; then
             echo "🔄 No manifest images exported, using fallback strategy..."
-            echo "$CURRENT_IMAGES" | while read image_line; do
+            echo "$CURRENT_IMAGES" | while read image_line;
+              do
               if [ -n "$image_line" ]; then
                 docker_image=$(echo "$image_line" | cut -d' ' -f1)
                 size_info=$(echo "$image_line" | cut -d' ' -f2)
@@ -525,7 +515,8 @@ jobs:
           # Import ARM cache
           if [ -d "docker-cache-arm" ] && [ -n "$(ls -A docker-cache-arm/*.tar 2>/dev/null)" ]; then
             echo "Loading ARM Docker cache..."
-            for tar_file in docker-cache-arm/*.tar; do
+            for tar_file in docker-cache-arm/*.tar;
+              do
               if [ -f "$tar_file" ]; then
                 image_name=$(basename "$tar_file" .tar)
                 echo "  Loading: $image_name"
@@ -544,7 +535,7 @@ jobs:
           echo "=== IMPORT SUMMARY ==="
           echo "📊 Imported $imported_count image archive(s)"
           echo "🐳 Available Docker images after import:"
-          docker image ls --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | head -15
+          docker image ls --format "table {{.Repository}}	{{.Tag}}	{{.Size}}" | head -15
 
       - name: Build Universal package (Maximum Cache Optimization)
         env:
@@ -552,14 +543,14 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
-          sudo chown -R $(id -u):$(id -g) ~/.startos
-          
+          chmod 600 ~/.startos/developer.key.pem
+
           echo "⚡ Building universal package with MAXIMUM cache optimization:"
           echo "  Build type: ${{ needs.BuildARM.outputs.build_type }}"
           echo "  Custom Dockerfile: ${{ needs.BuildARM.outputs.has_dockerfile }}"
           echo "  Docker cache: ARM + Intel images available"
           echo "  Build artifacts: Restored from Intel build"
-          
+
           # CONDITIONAL: Set BuildKit cache for custom builds
           if [ "${{ needs.BuildARM.outputs.has_dockerfile }}" = "true" ]; then
             export BUILDKIT_CACHE_FROM="type=gha,scope=arm-build type=gha,scope=intel-build"
@@ -568,19 +559,19 @@ jobs:
           else
             echo "  Docker strategy: Using imported pulled images (no BuildKit cache needed)"
           fi
-          
+
           echo "🚀 Starting universal build..."
           time RUST_LOG=debug RUST_BACKTRACE=1 make
-          
+
           # Find the universal package
-          UNIVERSAL_PACKAGE=$(ls *.s9pk | grep -v "_aarch64\|_x86_64" | head -n1)
-          
+          UNIVERSAL_PACKAGE=$(ls *.s9pk | grep -v "_aarch64|_x86_64" | head -n1)
+
           if [ -z "$UNIVERSAL_PACKAGE" ]; then
             echo "❌ No universal package found!"
             ls -la *.s9pk || echo "No .s9pk files found"
             exit 1
           fi
-          
+
           echo "universal_package=${UNIVERSAL_PACKAGE}" >> $GITHUB_ENV
           printf "\n ⚡ Universal SHA256: $(sha256sum ${UNIVERSAL_PACKAGE}) \n"
 
