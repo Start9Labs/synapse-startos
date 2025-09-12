@@ -102,7 +102,7 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
-          sudo chown -R runner:docker ~/.startos
+          sudo chown -R $(id -u):$(id -g) ~/.startos
           
           echo "🏗️ Building ARM package:"
           echo "  Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
@@ -321,7 +321,7 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
-          sudo chown -R runner:docker ~/.startos
+          sudo chown -R $(id -u):$(id -g) ~/.startos
           
           echo "🏗️ Building Intel package:"
           echo "  Build type: ${{ steps.check-dockerfile.outputs.build_type }}"
@@ -338,7 +338,7 @@ jobs:
             echo "  Docker strategy: Pull-only (no BuildKit cache needed)"
           fi
           
-          time RUST_LOG=debug RUST_BACKTRACE=1 make x86_64
+          time RUST_LOG=debug RUST_BACKTRACE=1 make x86
           
           # Find the generated package
           INTEL_PACKAGE=$(ls *_x86_64.s9pk | head -n1)
@@ -536,7 +536,7 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           start-cli init
-          sudo chown -R runner:docker ~/.startos
+          sudo chown -R $(id -u):$(id -g) ~/.startos
           
           echo "⚡ Building universal package with MAXIMUM cache optimization:"
           echo "  Build type: ${{ needs.BuildARM.outputs.build_type }}"
