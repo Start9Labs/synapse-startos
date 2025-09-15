@@ -64,7 +64,7 @@ export const resetAdmin = sdk.Action.withoutInput(
           subc.execFail([
             'sqlite3',
             '/data/homeserver.db',
-            `UPDATE users SET password_hash = "${passwordHash}" WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
+            `UPDATE users SET password_hash = '${passwordHash.toString().trim()}' WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
           ]),
       )
     } else {
