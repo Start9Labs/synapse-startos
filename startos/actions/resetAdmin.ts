@@ -38,13 +38,13 @@ export const resetAdmin = sdk.Action.withoutInput(
     const adminUserCreated = await store.read((s) => s.adminUserCreated).once()
 
     if (adminUserCreated) {
-      await sdk.SubContainer.withTemp(
+      const passwordHash = await sdk.SubContainer.withTemp(
         effects,
         { imageId: 'synapse' },
         mount,
-        'update-admin-pass',
-        async (subc) => {
-          const passwordHash = (
+        'get-password-hash',
+        async (subc) =>
+          (
             await subc.execFail([
               'hash_password',
               '-p',
@@ -52,13 +52,20 @@ export const resetAdmin = sdk.Action.withoutInput(
               '-c',
               '/data/homeserver.yaml',
             ])
-          ).stdout
-          await subc.execFail([
+          ).stdout,
+      )
+
+      await sdk.SubContainer.withTemp(
+        effects,
+        { imageId: 'sqlite3' },
+        mount,
+        'save-password-hash',
+        (subc) =>
+          subc.execFail([
             'sqlite3',
             '/data/homeserver.db',
-            `UPDATE users SET password_hash='${passwordHash}' WHERE name='${username}'`,
-          ])
-        },
+            `UPDATE users SET password_hash = "${passwordHash}" WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
+          ]),
       )
     } else {
       await sdk.SubContainer.withTemp(
@@ -93,7 +100,7 @@ export const resetAdmin = sdk.Action.withoutInput(
             name: 'Username',
             description: null,
             value: username,
-            masked: true,
+            masked: false,
             copyable: true,
             qr: false,
           },

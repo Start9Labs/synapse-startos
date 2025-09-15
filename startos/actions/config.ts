@@ -41,6 +41,17 @@ export const inputSpec = InputSpec.of({
       },
     }),
   }),
+  max_upload_size: Value.number({
+    name: 'Max Upload Size',
+    description:
+      'The maximum file size that is permitted to be uploaded by users to your homeserver.',
+    required: true,
+    default: 50,
+    units: 'MB',
+    integer: true,
+    min: 1,
+    max: 2000,
+  }),
   smtp: sdk.inputSpecConstants.smtpInputSpec,
 })
 
@@ -67,7 +78,12 @@ export const config = sdk.Action.withInput(
     if (!yaml) {
       return {}
     }
-    const { enable_registration, listeners, federation_domain_whitelist } = yaml
+    const {
+      enable_registration,
+      listeners,
+      federation_domain_whitelist,
+      max_upload_size,
+    } = yaml
 
     return {
       registration: enable_registration
@@ -79,6 +95,7 @@ export const config = sdk.Action.withInput(
             value: { federation_domain_whitelist },
           }
         : { selection: 'disabled' as const, value: {} },
+      max_upload_size: toMB(max_upload_size),
       smtp: (await store.read((s) => s.smtp).const(effects)) || undefined,
     }
   },
@@ -108,6 +125,21 @@ export const config = sdk.Action.withInput(
           : input.federation.value.federation_domain_whitelist.length
             ? input.federation.value.federation_domain_whitelist
             : undefined,
+      max_upload_size: `${input.max_upload_size}M`,
     })
   },
 )
+
+function toMB(max_upload_size: string): number {
+  const unit = max_upload_size.at(-1)
+  const value = Number(max_upload_size.slice(0, -1))
+
+  switch (unit) {
+    case 'M':
+      return value
+    case 'G':
+      return value / 1000
+    default:
+      return 1
+  }
+}

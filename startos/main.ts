@@ -1,7 +1,6 @@
 import { sdk } from './sdk'
-import { adminPort, homeserverPort, nginxPort } from './utils'
+import { adminPort, homeserverPort, mount, nginxPort } from './utils'
 import { homeserverYaml } from './fileModels/homeserver.yml'
-import { homeserverLogConfig } from './fileModels/homeserver.log.config'
 import * as fs from 'node:fs/promises'
 import { store } from './fileModels/store.json'
 
@@ -13,23 +12,24 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    */
   console.info('[i] Starting Synapse!')
 
-  // Merge to homeserver.yaml to enforce file model protections
-  await homeserverYaml.merge(effects, {})
-  await homeserverLogConfig.merge(effects, {})
+  // Read from homeserver.yaml with const() to ensure service restart if the file changes
+  const config = await homeserverYaml.read().const(effects)
+
+  if (!config) {
+    throw new Error('homeserver.yaml not found')
+  }
+
   const subcontainer = await sdk.SubContainer.of(
     effects,
     { imageId: 'synapse' },
-    sdk.Mounts.of().mountVolume({
-      volumeId: 'main',
-      subpath: null,
-      mountpoint: '/data',
-      readonly: false,
-    }),
-    'synapse',
+    mount,
+    'synapse-sub',
   )
   await subcontainer
     .exec(['chown', '-R', '991:991', '/data'])
     .then((a) => a.throw())
+
+  await store.merge(effects, { serverStarted: true })
 
   const smtp = await store.read((s) => s.smtp).const(effects)
   if (smtp) {
@@ -57,9 +57,6 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
     }
   }
 
-  // Read from homeserver.yaml with const() to ensure service restart if the file changes
-  const config = await homeserverYaml.read().const(effects)
-
   // create and configure nginx container
   const nginxContainer = await sdk.SubContainer.of(
     effects,
@@ -80,7 +77,7 @@ server {
 
     location = /.well-known/matrix/server {
         default_type application/json;
-        return 200 '{ "m.server": "${config?.server_name}:443" }';
+        return 200 '{ "m.server": "${config.server_name}:443" }';
     }
 
     location / {
@@ -89,7 +86,7 @@ server {
 
     location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
         proxy_pass http://localhost:8008;
-        client_max_body_size 50M; # TODO: make this configurable
+        client_max_body_size ${config.max_upload_size};
     }
 
     error_page   500 502 503 504  /50x.html;
@@ -112,7 +109,7 @@ server {
 
     location = /config.json {
         default_type application/json;
-        return 200 '{ "restrictBaseUrl": "https://${config?.server_name}" }';
+        return 200 '{ "restrictBaseUrl": "https://${config.server_name}" }';
     }
 
     error_page   500 502 503 504  /50x.html;
@@ -136,7 +133,7 @@ server {
       exec: { command: ['/start.py'] },
       ready: {
         display: 'Homeserver',
-        gracePeriod: 10000,
+        gracePeriod: 15000,
         fn: () =>
           sdk.healthCheck.checkWebUrl(
             effects,
@@ -165,16 +162,15 @@ server {
     .addHealthCheck('admin-interface', {
       ready: {
         display: 'Admin Dashboard',
-        fn: () => {
-          return sdk.healthCheck.checkWebUrl(
+        fn: () =>
+          sdk.healthCheck.checkWebUrl(
             effects,
             `http://localhost:${adminPort}`,
             {
               successMessage: `Running`,
               errorMessage: `Unreachable`,
             },
-          )
-        },
+          ),
       },
       requires: ['nginx'],
     })

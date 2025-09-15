@@ -3,6 +3,8 @@ import { current, other } from './versions'
 import { configDefaults, mount } from '../utils'
 import { sdk } from '../sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { homeserverLogConfig } from '../fileModels/homeserver.log.config'
+import { store } from '../fileModels/store.json'
 
 export const versionGraph = VersionGraph.of({
   current,
@@ -23,6 +25,15 @@ export const versionGraph = VersionGraph.of({
         }),
     )
 
+    await store.write(effects, {
+      adminUserCreated: false,
+      serverStarted: false,
+      smtp: {
+        selection: 'disabled',
+        value: {},
+      },
+    })
     await homeserverYaml.merge(effects, configDefaults)
+    await homeserverLogConfig.merge(effects, {})
   },
 })

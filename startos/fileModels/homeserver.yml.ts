@@ -14,6 +14,7 @@ const {
   pid_file,
   report_stats,
   suppress_key_server_warning,
+  max_upload_size,
 } = configDefaults
 const { bind_addresses, port, resources, tls, type, x_forwarded } = listeners[0]
 const resource = resources[0]
@@ -75,6 +76,14 @@ const shape = object({
   form_secret: string.optional(),
   macaroon_secret_key: string.optional(),
   registration_shared_secret: string.optional(),
+  max_upload_size: string
+    .map((s) =>
+      ['B', 'K', 'M', 'G'].includes(s.at(-1) || '') &&
+      typeof Number(s.slice(0, -1)) === 'number'
+        ? s
+        : max_upload_size,
+    )
+    .onMismatch(max_upload_size),
 })
 
 export type HomeserverYaml = typeof shape._TYPE

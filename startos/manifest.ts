@@ -36,6 +36,12 @@ export const manifest = setupManifest({
       },
       arch: architectures,
     } as SDKImageInputSpec,
+    sqlite3: {
+      source: {
+        dockerTag: 'alpine/sqlite',
+      },
+      arch: architectures,
+    } as SDKImageInputSpec,
   },
   hardwareRequirements: {
     arch: architectures,

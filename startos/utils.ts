@@ -27,7 +27,7 @@ export const configDefaults = {
     {
       bind_addresses: ['::1', '127.0.0.1'],
       port: homeserverPort,
-      resources: [{ compress: false, names: ['client', 'federation'] }],
+      resources: [{ compress: false, names: ['client'] }],
       tls: false,
       type: 'http',
       x_forwarded: true,
@@ -43,4 +43,5 @@ export const configDefaults = {
   // below need to be set manually
   server_name: '',
   public_baseurl: '',
+  max_upload_size: '50M',
 }

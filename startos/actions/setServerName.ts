@@ -87,19 +87,15 @@ export async function getSynapseInterfaceUrls(
   values: Record<string, string>
 }> {
   const iface = await sdk.serviceInterface.getOwn(effects, 'homeserver').once()
+
   const hostnames =
-    iface?.addressInfo
-      ?.filter(
-        {
-          visibility: 'public',
-          ...(type === 'tor'
-            ? { kind: 'onion' }
-            : { exclude: { kind: 'onion' } }),
-        },
-        'url',
+    iface?.addressInfo?.publicHostnames
+      .filter((h) =>
+        type === 'tor'
+          ? h.kind === 'onion'
+          : h.kind === 'ip' && h.hostname.kind === 'domain',
       )
-      .map((u) => u.hostname) || []
-  // TODO: handle server port?
+      .map((h) => h.hostname.value) || []
 
   return {
     name,

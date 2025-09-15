@@ -6,13 +6,12 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
   const homeserverMulti = sdk.MultiHost.of(effects, 'homeserver-multi')
   const homeserverMultiOrigin = await homeserverMulti.bindPort(nginxPort, {
     protocol: 'http',
-    // addSsl: { preferredExternalPort: 8448 }, // @TODO Aiden does this actually work?
   })
   const homeserver = sdk.createInterface(effects, {
     name: 'Homeserver',
     id: 'homeserver',
     description: 'Your Matrix homeserver instance',
-    type: 'ui',
+    type: 'api',
     masked: false,
     schemeOverride: null,
     username: null,
