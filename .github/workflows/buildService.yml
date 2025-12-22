@@ -25,7 +25,7 @@ jobs:
         id: build
         shell: bash
         run: |
-          start-cli init
+          start-cli init-key
           chmod 600 ~/.startos/developer.key.pem
           RUST_LOG=debug RUST_BACKTRACE=1 make aarch64
 
@@ -63,7 +63,7 @@ jobs:
         id: build
         shell: bash
         run: |
-          start-cli init
+          start-cli init-key
           chmod 600 ~/.startos/developer.key.pem
           RUST_LOG=debug RUST_BACKTRACE=1 make x86
 
@@ -102,7 +102,7 @@ jobs:
         id: build
         shell: bash
         run: |
-          start-cli init
+          start-cli init-key
           chmod 600 ~/.startos/developer.key.pem
           RUST_LOG=debug RUST_BACKTRACE=1 make
 

@@ -26,7 +26,7 @@ export const manifest = setupManifest({
   images: {
     synapse: {
       source: {
-        dockerTag: 'matrixdotorg/synapse:v1.128.0',
+        dockerTag: 'matrixdotorg/synapse:v1.144.0',
       },
       arch: architectures,
     } as SDKImageInputSpec,

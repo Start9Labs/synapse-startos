@@ -4,7 +4,7 @@ import { homeserverYaml } from './fileModels/homeserver.yml'
 import * as fs from 'node:fs/promises'
 import { store } from './fileModels/store.json'
 
-export const main = sdk.setupMain(async ({ effects, started }) => {
+export const main = sdk.setupMain(async ({ effects }) => {
   /**
    * ======================== Setup (optional) ========================
    *
@@ -127,7 +127,7 @@ server {
    *
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
-  return sdk.Daemons.of(effects, started)
+  return sdk.Daemons.of(effects)
     .addDaemon('synapse', {
       subcontainer,
       exec: { command: ['/start.py'] },

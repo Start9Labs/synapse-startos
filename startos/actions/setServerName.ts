@@ -89,7 +89,7 @@ export async function getSynapseInterfaceUrls(
   const iface = await sdk.serviceInterface.getOwn(effects, 'homeserver').once()
 
   const hostnames =
-    iface?.addressInfo?.publicHostnames
+    iface?.addressInfo?.hostnames
       .filter((h) =>
         type === 'tor'
           ? h.kind === 'onion'
@@ -102,7 +102,7 @@ export async function getSynapseInterfaceUrls(
     description,
     warning: type === 'tor' ? warning : null,
     values: hostnames.reduce(
-      (obj, hostname) => ({
+      (obj: Record<string, string>, hostname: string) => ({
         ...obj,
         [hostname]: hostname,
       }),
