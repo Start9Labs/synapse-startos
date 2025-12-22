@@ -1,4 +1,5 @@
 name: Build Service
+
 on:
   workflow_dispatch:
   pull_request:
@@ -9,123 +10,7 @@ on:
     branches: ['main', 'master', 'update/040']
 
 jobs:
-  Build_aarch64:
-    name: Build S9PK (aarch64)
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - name: Prepare StartOS SDK
-        uses: k0gen/sdk@v3-optimization
-
-      - name: Checkout services repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Build aarch64 package
-        id: build
-        shell: bash
-        run: |
-          start-cli init-key
-          chmod 600 ~/.startos/developer.key.pem
-          RUST_LOG=debug RUST_BACKTRACE=1 make aarch64
-
-          PACKAGE_FILE=$(ls *_aarch64.s9pk 2>/dev/null | head -n1)
-          if [ -z "$PACKAGE_FILE" ]; then
-            echo "❌ No aarch64 package found!"
-            ls -la *.s9pk || echo "No .s9pk files found"
-            exit 1
-          fi
-
-          PACKAGE_ID=$(start-cli s9pk inspect "$PACKAGE_FILE" manifest | jq -r '.id')
-          echo "package_id=${PACKAGE_ID}" >> $GITHUB_ENV
-          echo "package_file=${PACKAGE_FILE}" >> $GITHUB_ENV
-          printf "\n aarch64 SHA256: $(sha256sum "${PACKAGE_FILE}") \n"
-
-      - name: Upload aarch64 .s9pk
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.package_file }}
-          path: ./${{ env.package_file }}
-
-  Build_x86_64:
-    name: Build S9PK (x86_64)
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Prepare StartOS SDK
-        uses: k0gen/sdk@v3-optimization
-
-      - name: Checkout services repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Build x86_64 package
-        id: build
-        shell: bash
-        run: |
-          start-cli init-key
-          chmod 600 ~/.startos/developer.key.pem
-          RUST_LOG=debug RUST_BACKTRACE=1 make x86
-
-          PACKAGE_FILE=$(ls *_x86_64.s9pk 2>/dev/null | head -n1)
-          if [ -z "$PACKAGE_FILE" ]; then
-            echo "❌ No x86_64 package found!"
-            ls -la *.s9pk || echo "No .s9pk files found"
-            exit 1
-          fi
-
-          PACKAGE_ID=$(start-cli s9pk inspect "$PACKAGE_FILE" manifest | jq -r '.id')
-          echo "package_id=${PACKAGE_ID}" >> $GITHUB_ENV
-          echo "package_file=${PACKAGE_FILE}" >> $GITHUB_ENV
-          printf "\n x86_64 SHA256: $(sha256sum "${PACKAGE_FILE}") \n"
-
-      - name: Upload x86_64 .s9pk
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.package_file }}
-          path: ./${{ env.package_file }}
-
-  BuildUniversal:
-    name: Build S9PK (Universal)
-    runs-on: ubuntu-24.04
-    needs: [Build_aarch64, Build_x86_64]
-    steps:
-      - name: Prepare StartOS SDK
-        uses: k0gen/sdk@v3-optimization
-
-      - name: Checkout services repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Build Universal package
-        id: build
-        shell: bash
-        run: |
-          start-cli init-key
-          chmod 600 ~/.startos/developer.key.pem
-          RUST_LOG=debug RUST_BACKTRACE=1 make
-
-          # Prefer a non-arch-suffixed universal package if present
-          PACKAGE_FILE=$(ls *.s9pk 2>/dev/null | grep -Ev '_(aarch64|x86_64)\.s9pk$' | head -n1)
-          if [ -z "$PACKAGE_FILE" ]; then
-            # Fallback: if packaging already renames to id.s9pk only, just take the first .s9pk
-            PACKAGE_FILE=$(ls *.s9pk 2>/dev/null | head -n1)
-          fi
-
-          if [ -z "$PACKAGE_FILE" ]; then
-            echo "❌ No universal package found!"
-            ls -la *.s9pk || echo "No .s9pk files found"
-            exit 1
-          fi
-
-          PACKAGE_ID=$(start-cli s9pk inspect "$PACKAGE_FILE" manifest | jq -r '.id')
-          echo "package_id=${PACKAGE_ID}" >> $GITHUB_ENV
-          echo "package_file=${PACKAGE_FILE}" >> $GITHUB_ENV
-          printf "\n ⚡ Universal SHA256: $(sha256sum "${PACKAGE_FILE}") \n"
-
-      - name: Upload Universal .s9pk
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.package_file }}
-          path: ./${{ env.package_file }}
+  build:
+    uses: start9labs/shared-workflows/.github/workflows/buildService.yml@master
+    secrets:
+      DEV_KEY: ${{ secrets.DEV_KEY }}
