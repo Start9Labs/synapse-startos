@@ -77,15 +77,6 @@ check-init:
 		start-cli init-key; \
 	fi
 
-assets/synapse-admin: tmp/synapse-admin.tar.gz
-	rm -rf assets/synapse-admin
-	tar -xzvf tmp/synapse-admin.tar.gz -C assets
-
-tmp/synapse-admin.tar.gz:
-	mkdir -p tmp
-	(cd tmp && curl --progress-bar -OL https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
-	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
-
 javascript/index.js: $(shell find startos -type f) tsconfig.json node_modules
 	npm run build
 
@@ -98,3 +89,15 @@ package-lock.json: package.json
 clean:
 	@echo "Cleaning up build artifacts..."
 	@rm -rf $(PACKAGE_ID).s9pk $(PACKAGE_ID)_x86_64.s9pk $(PACKAGE_ID)_aarch64.s9pk $(PACKAGE_ID)_riscv64.s9pk javascript assets/synapse-admin tmp node_modules
+
+
+# Custom recipes for synapse
+
+assets/synapse-admin: tmp/synapse-admin.tar.gz
+	rm -rf assets/synapse-admin
+	tar -xzvf tmp/synapse-admin.tar.gz -C assets
+
+tmp/synapse-admin.tar.gz:
+	mkdir -p tmp
+	(cd tmp && curl --progress-bar -OL https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
+	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
