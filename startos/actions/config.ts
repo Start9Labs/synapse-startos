@@ -1,5 +1,5 @@
 import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { store } from '../fileModels/store.json'
+import { storeJson } from '../fileModels/store.json'
 import { sdk } from '../sdk'
 
 const { InputSpec, Value, Variants, List } = sdk
@@ -96,7 +96,7 @@ export const config = sdk.Action.withInput(
           }
         : { selection: 'disabled' as const, value: {} },
       max_upload_size: toMB(max_upload_size),
-      smtp: (await store.read((s) => s.smtp).const(effects)) || undefined,
+      smtp: (await storeJson.read((s) => s.smtp).const(effects)) || undefined,
     }
   },
 
@@ -114,7 +114,7 @@ export const config = sdk.Action.withInput(
         ? ['client']
         : ['client', 'federation']
 
-    await store.merge(effects, { smtp: input.smtp })
+    await storeJson.merge(effects, { smtp: input.smtp })
 
     await homeserverYaml.merge(effects, {
       enable_registration: input.registration === 'enabled',

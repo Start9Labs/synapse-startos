@@ -1,7 +1,7 @@
 import { sdk } from '../sdk'
 import { utils } from '@start9labs/start-sdk'
 import { mount } from '../utils'
-import { store } from '../fileModels/store.json'
+import { storeJson } from '../fileModels/store.json'
 
 const randomPassword = {
   charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
@@ -14,7 +14,7 @@ export const resetAdmin = sdk.Action.withoutInput(
 
   // metadata
   async ({ effects }) => {
-    const adminUserCreated = await store
+    const adminUserCreated = await storeJson
       .read((s) => s.adminUserCreated)
       .const(effects)
 
@@ -35,7 +35,9 @@ export const resetAdmin = sdk.Action.withoutInput(
     const username = 'admin'
     const password = utils.getDefaultString(randomPassword)
 
-    const adminUserCreated = await store.read((s) => s.adminUserCreated).once()
+    const adminUserCreated = await storeJson
+      .read((s) => s.adminUserCreated)
+      .once()
 
     if (adminUserCreated) {
       const passwordHash = await sdk.SubContainer.withTemp(
@@ -85,7 +87,7 @@ export const resetAdmin = sdk.Action.withoutInput(
             '--admin',
           ]),
       )
-      await store.merge(effects, { adminUserCreated: true })
+      await storeJson.merge(effects, { adminUserCreated: true })
     }
 
     return {

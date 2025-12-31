@@ -1,7 +1,7 @@
 import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
 import { sdk } from '../sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { store } from '../fileModels/store.json'
+import { storeJson } from '../fileModels/store.json'
 
 const { InputSpec, Value, Variants } = sdk
 
@@ -21,7 +21,7 @@ export const inputSpec = InputSpec.of({
         name: 'Clearnet',
         spec: InputSpec.of({
           server_name: Value.dynamicSelect(async ({ effects }) =>
-            getSynapseInterfaceUrls(effects, 'clearnet'),
+            getSynapseInterfaceHostnames(effects, 'clearnet'),
           ),
         }),
       },
@@ -29,7 +29,7 @@ export const inputSpec = InputSpec.of({
         name: 'Tor',
         spec: InputSpec.of({
           server_name: Value.dynamicSelect(async ({ effects }) =>
-            getSynapseInterfaceUrls(effects, 'tor'),
+            getSynapseInterfaceHostnames(effects, 'tor'),
           ),
         }),
       },
@@ -47,10 +47,10 @@ export const setServerName = sdk.Action.withInput(
       name: 'Set Server Address/URL',
       description:
         'Choose a permanent address/URL for your Synapse server. After you start your server for the first time, this can never be changed.',
-      warning: null,
+      warning: 'This can never be changed after you start your server',
       allowedStatuses: 'only-stopped',
       group: null,
-      visibility: (await store.read((s) => s.serverStarted).const(effects))
+      visibility: (await storeJson.read((s) => s.serverStarted).const(effects))
         ? 'hidden'
         : 'enabled',
     }
@@ -76,7 +76,7 @@ export const setServerName = sdk.Action.withInput(
   },
 )
 
-export async function getSynapseInterfaceUrls(
+export async function getSynapseInterfaceHostnames(
   effects: Effects,
   type: 'clearnet' | 'tor',
 ): Promise<{
@@ -86,16 +86,18 @@ export async function getSynapseInterfaceUrls(
   default: string
   values: Record<string, string>
 }> {
-  const iface = await sdk.serviceInterface.getOwn(effects, 'homeserver').once()
-
-  const hostnames =
-    iface?.addressInfo?.hostnames
-      .filter((h) =>
-        type === 'tor'
-          ? h.kind === 'onion'
-          : h.kind === 'ip' && h.hostname.kind === 'domain',
+  let hostnames =
+    (await sdk.serviceInterface
+      .getOwn(effects, 'homeserver', (i) =>
+        i?.addressInfo?.hostnames
+          .filter((h) =>
+            type === 'tor'
+              ? h.kind === 'onion'
+              : h.kind === 'ip' && h.hostname.kind === 'domain',
+          )
+          .map((h) => h.hostname.value),
       )
-      .map((h) => h.hostname.value) || []
+      .once()) || []
 
   return {
     name,

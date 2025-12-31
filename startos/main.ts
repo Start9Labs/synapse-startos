@@ -1,8 +1,8 @@
 import { sdk } from './sdk'
 import { adminPort, homeserverPort, mount, nginxPort } from './utils'
 import { homeserverYaml } from './fileModels/homeserver.yml'
-import * as fs from 'node:fs/promises'
-import { store } from './fileModels/store.json'
+import { storeJson } from './fileModels/store.json'
+import { writeFile } from 'fs/promises'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   /**
@@ -14,24 +14,23 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
   const config = await homeserverYaml.read().const(effects)
-
   if (!config) {
     throw new Error('homeserver.yaml not found')
   }
 
-  const subcontainer = await sdk.SubContainer.of(
+  const synapseSub = await sdk.SubContainer.of(
     effects,
     { imageId: 'synapse' },
     mount,
     'synapse-sub',
   )
-  await subcontainer
+  await synapseSub
     .exec(['chown', '-R', '991:991', '/data'])
     .then((a) => a.throw())
 
-  await store.merge(effects, { serverStarted: true })
+  await storeJson.merge(effects, { serverStarted: true })
 
-  const smtp = await store.read((s) => s.smtp).const(effects)
+  const smtp = await storeJson.read((s) => s.smtp).const(effects)
   if (smtp) {
     const creds =
       smtp.selection === 'disabled'
@@ -58,7 +57,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   }
 
   // create and configure nginx container
-  const nginxContainer = await sdk.SubContainer.of(
+  const nginxSub = await sdk.SubContainer.of(
     effects,
     { imageId: 'nginx' },
     sdk.Mounts.of().mountAssets({
@@ -67,10 +66,10 @@ export const main = sdk.setupMain(async ({ effects }) => {
     }),
     'nginx',
   )
-  fs.writeFile(
-    `${nginxContainer.rootfs}/etc/nginx/conf.d/default.conf`,
-    `
-server {
+
+  await writeFile(
+    `${nginxSub.rootfs}/etc/nginx/conf.d/default.conf`,
+    `server {
     listen ${nginxPort} default_server;
     listen [::]:${nginxPort} default_server;
     server_name  _;
@@ -116,8 +115,7 @@ server {
     location = /50x.html {
         root   /usr/share/nginx/html;
     }
-}
-`,
+}`,
   )
 
   /**
@@ -129,7 +127,7 @@ server {
    */
   return sdk.Daemons.of(effects)
     .addDaemon('synapse', {
-      subcontainer,
+      subcontainer: synapseSub,
       exec: { command: ['/start.py'] },
       ready: {
         display: 'Homeserver',
@@ -147,7 +145,7 @@ server {
       requires: [],
     })
     .addDaemon('nginx', {
-      subcontainer: nginxContainer,
+      subcontainer: nginxSub,
       exec: { command: sdk.useEntrypoint() },
       ready: {
         display: null,

@@ -1,15 +1,9 @@
 import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
 import { rm, readFile } from 'fs/promises'
-import { store } from '../../fileModels/store.json'
+import { storeJson } from '../../fileModels/store.json'
 
-const defaultStore = {
-  adminUserCreated: true,
-  serverStarted: true,
-  smtp: { selection: 'disabled' as const, value: {} },
-}
-
-export const v_1_144_0_1 = VersionInfo.of({
-  version: '1.144.0:1-alpha.0',
+export const v_1_144_0_1_a1 = VersionInfo.of({
+  version: '1.144.0:1-alpha.1',
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
@@ -30,17 +24,17 @@ export const v_1_144_0_1 = VersionInfo.of({
 
       if (configYaml) {
         // Write store
-        await store.merge(effects, {
-          ...defaultStore,
+        await storeJson.merge(effects, {
+          adminUserCreated: true,
+          serverStarted: true,
           smtp:
             configYaml['email-notifications'] &&
             configYaml['smtp-host'] &&
             configYaml['smtp-port'] &&
             configYaml['from-name'] &&
-            configYaml['smtp-user'] &&
-            configYaml['smtp-pass']
+            configYaml['smtp-user']
               ? {
-                  selection: 'custom' as const,
+                  selection: 'custom',
                   value: {
                     server: configYaml['smtp-host'],
                     port: configYaml['smtp-port'],
@@ -49,7 +43,7 @@ export const v_1_144_0_1 = VersionInfo.of({
                     password: configYaml['smtp-pass'],
                   },
                 }
-              : defaultStore.smtp,
+              : { selection: 'disabled', value: {} },
         })
 
         // Clean up legacy folder

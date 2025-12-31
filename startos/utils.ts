@@ -4,19 +4,21 @@ export const homeserverPort = 8008
 export const nginxPort = 80
 export const adminPort = 8080
 
+export const mountpoint = '/data'
+
 export const mount = sdk.Mounts.of().mountVolume({
   volumeId: 'main',
   subpath: null,
-  mountpoint: '/data',
+  mountpoint,
   readonly: false,
 })
 
 export const configDefaults = {
   database: {
     args: {
-      database: '/data/homeserver.db' as const,
+      database: `${mountpoint}/homeserver.db`,
     },
-    name: 'sqlite3' as const,
+    name: 'sqlite3',
   },
   email: null,
   enable_registration: false,
@@ -32,16 +34,16 @@ export const configDefaults = {
       type: 'http',
       x_forwarded: true,
     },
-  ] as const,
-  log_config: '/data/homeserver.log.config' as const,
-  media_store_path: '/data/media_store' as const,
-  pid_file: '/data/homeserver.pid' as const,
+  ],
+  log_config: `${mountpoint}/homeserver.log.config`,
+  media_store_path: `${mountpoint}/media_store`,
+  pid_file: `${mountpoint}/homeserver.pid`,
   report_stats: false,
-  signing_key_path: '/data/homeserver.signing.key' as const,
+  signing_key_path: `${mountpoint}/homeserver.signing.key`,
   suppress_key_server_warning: true,
   trusted_key_servers: [{ server_name: 'matrix.org' }],
   // below need to be set manually
   server_name: '',
   public_baseurl: '',
   max_upload_size: '50M',
-}
+} as const

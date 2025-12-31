@@ -4,7 +4,7 @@ import { configDefaults, mount } from '../utils'
 import { sdk } from '../sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { homeserverLogConfig } from '../fileModels/homeserver.log.config'
-import { store } from '../fileModels/store.json'
+import { storeJson } from '../fileModels/store.json'
 
 export const versionGraph = VersionGraph.of({
   current,
@@ -25,7 +25,7 @@ export const versionGraph = VersionGraph.of({
         }),
     )
 
-    await store.write(effects, {
+    await storeJson.write(effects, {
       adminUserCreated: false,
       serverStarted: false,
       smtp: {
