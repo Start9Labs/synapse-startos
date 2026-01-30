@@ -1,4 +1,5 @@
 import { matches, FileHelper } from '@start9labs/start-sdk'
+import { sdk } from '../sdk'
 
 const { literal } = matches
 
@@ -48,7 +49,7 @@ export type HomeserverLogConfig = typeof shape._TYPE
 
 export const homeserverLogConfig = FileHelper.yaml(
   {
-    volumeId: 'main',
+    base: sdk.volumes.main,
     subpath: 'homeserver.log.config',
   },
   shape.withMismatch((_) => shape.unsafeCast({})),

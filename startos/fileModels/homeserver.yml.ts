@@ -1,4 +1,5 @@
 import { matches, FileHelper } from '@start9labs/start-sdk'
+import { sdk } from '../sdk'
 import { configDefaults } from '../utils'
 
 const { object, string, literal, boolean, arrayOf, array, anyOf, natural } =
@@ -84,13 +85,14 @@ const shape = object({
         : max_upload_size,
     )
     .onMismatch(max_upload_size),
+  app_service_config_files: arrayOf(string).onMismatch([]),
 })
 
 export type HomeserverYaml = typeof shape._TYPE
 
 export const homeserverYaml = FileHelper.yaml(
   {
-    volumeId: 'main',
+    base: sdk.volumes.main,
     subpath: 'homeserver.yaml',
   },
   shape.withMismatch((_) => shape.unsafeCast({})),

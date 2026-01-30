@@ -17,10 +17,22 @@ export const manifest = setupManifest({
     long: 'Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).',
   },
   volumes: ['main'],
+  hardwareRequirements: {},
+  alerts: {
+    install: null,
+    update: null,
+    uninstall: null,
+    restore: null,
+    start: null,
+    stop: null,
+  },
   images: {
     synapse: {
       source: {
-        dockerTag: 'matrixdotorg/synapse:v1.144.0',
+        dockerBuild: {
+          workdir: './synapse',
+          dockerfile: './Dockerfile',
+        },
       },
     },
     nginx: {
@@ -30,7 +42,9 @@ export const manifest = setupManifest({
     },
     sqlite3: {
       source: {
-        dockerTag: 'alpine/sqlite',
+        dockerBuild: {
+          dockerfile: './Dockerfile-sqlite',
+        },
       },
     },
   },
