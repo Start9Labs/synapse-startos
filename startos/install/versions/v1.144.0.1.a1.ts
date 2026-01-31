@@ -4,7 +4,13 @@ import { storeJson } from '../../fileModels/store.json'
 
 export const v_1_144_0_1_a1 = VersionInfo.of({
   version: '1.144.0:1-alpha.1',
-  releaseNotes: 'Revamped for StartOS 0.4.0',
+  releaseNotes: {
+    en_US: 'Revamped for StartOS 0.4.0',
+    es_ES: 'Renovado para StartOS 0.4.0',
+    de_DE: 'Überarbeitet für StartOS 0.4.0',
+    pl_PL: 'Przebudowany dla StartOS 0.4.0',
+    fr_FR: 'Remanié pour StartOS 0.4.0',
+  },
   migrations: {
     up: async ({ effects }) => {
       // get old config.yaml

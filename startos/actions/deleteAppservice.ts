@@ -1,5 +1,6 @@
 import { unlink } from 'node:fs/promises'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { mountpoint } from '../utils'
 
@@ -22,8 +23,8 @@ export const inputSpec = InputSpec.of({
     const keys = Object.keys(values)
 
     return {
-      name: 'Appservice',
-      description: 'Select the appservice to remove',
+      name: i18n('Appservice'),
+      description: i18n('Select the appservice to remove'),
       values,
       default: keys[0] || '',
     }
@@ -34,10 +35,10 @@ export const deleteAppservice = sdk.Action.withInput(
   'delete-appservice',
 
   async ({ effects }) => ({
-    name: 'Delete Appservice',
-    description: 'Remove a registered appservice (bridge) from the homeserver.',
+    name: i18n('Delete Appservice'),
+    description: i18n('Remove a registered appservice (bridge) from the homeserver.'),
     warning:
-      'This will remove the appservice registration. The bridge service will no longer be able to communicate with Synapse until re-registered.',
+      i18n('This will remove the appservice registration. The bridge service will no longer be able to communicate with Synapse until re-registered.'),
     allowedStatuses: 'any',
     group: null,
     visibility: 'enabled',

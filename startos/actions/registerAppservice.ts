@@ -1,4 +1,5 @@
 import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { mountpoint } from '../utils'
 
@@ -8,58 +9,58 @@ const appservicesSubpath = 'appservices'
 
 export const inputSpec = InputSpec.of({
   id: Value.text({
-    name: 'Appservice ID',
-    description: 'Unique identifier for this appservice (e.g. "signal")',
+    name: i18n('Appservice ID'),
+    description: i18n('Unique identifier for this appservice (e.g. "signal")'),
     required: true,
     default: null,
     placeholder: 'signal',
     masked: false,
   }),
   asToken: Value.text({
-    name: 'AS Token',
+    name: i18n('AS Token'),
     description:
-      'Appservice token used by the bridge to authenticate with the homeserver',
+      i18n('Appservice token used by the bridge to authenticate with the homeserver'),
     required: true,
     default: null,
     placeholder: null,
     masked: true,
   }),
   hsToken: Value.text({
-    name: 'HS Token',
+    name: i18n('HS Token'),
     description:
-      'Homeserver token used by the homeserver to authenticate with the bridge',
+      i18n('Homeserver token used by the homeserver to authenticate with the bridge'),
     required: true,
     default: null,
     placeholder: null,
     masked: true,
   }),
   senderLocalpart: Value.text({
-    name: 'Sender Localpart',
-    description: 'The localpart of the bot user (e.g. "signalbot")',
+    name: i18n('Sender Localpart'),
+    description: i18n('The localpart of the bot user (e.g. "signalbot")'),
     required: true,
     default: null,
     placeholder: 'signalbot',
     masked: false,
   }),
   url: Value.text({
-    name: 'Bridge URL',
+    name: i18n('Bridge URL'),
     description:
-      'The URL where the homeserver can reach the bridge appservice',
+      i18n('The URL where the homeserver can reach the bridge appservice'),
     required: true,
     default: null,
     placeholder: 'http://mautrix-signal.startos:29328',
     masked: false,
   }),
   rateLimited: Value.toggle({
-    name: 'Rate Limited',
+    name: i18n('Rate Limited'),
     description:
-      'Whether requests from this appservice should be rate limited',
+      i18n('Whether requests from this appservice should be rate limited'),
     default: false,
   }),
   userNamespaceRegex: Value.text({
-    name: 'User Namespace Regex',
+    name: i18n('User Namespace Regex'),
     description:
-      'Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*")',
+      i18n('Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*")'),
     required: true,
     default: null,
     placeholder: '@signal_.*:.*',
@@ -71,9 +72,9 @@ export const registerAppservice = sdk.Action.withInput(
   'register-appservice',
 
   async ({ effects }) => ({
-    name: 'Register Appservice',
+    name: i18n('Register Appservice'),
     description:
-      'Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.',
+      i18n('Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.'),
     warning: null,
     allowedStatuses: 'any',
     group: null,

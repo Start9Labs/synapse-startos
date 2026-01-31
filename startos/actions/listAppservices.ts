@@ -1,5 +1,6 @@
 import { YAML } from '@start9labs/start-sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { mountpoint } from '../utils'
 
@@ -24,9 +25,9 @@ export const listAppservices = sdk.Action.withoutInput(
   'list-appservices',
 
   async ({ effects }) => ({
-    name: 'List Appservices',
+    name: i18n('List Appservices'),
     description:
-      'View all registered Matrix appservices (bridges) on this homeserver.',
+      i18n('View all registered Matrix appservices (bridges) on this homeserver.'),
     warning: null,
     allowedStatuses: 'any',
     group: null,
@@ -41,8 +42,8 @@ export const listAppservices = sdk.Action.withoutInput(
     if (files.length === 0) {
       return {
         version: '1' as const,
-        title: 'Registered Appservices',
-        message: 'No appservices are currently registered.',
+        title: i18n('Registered Appservices'),
+        message: i18n('No appservices are currently registered.'),
         result: null,
       }
     }
@@ -58,7 +59,7 @@ export const listAppservices = sdk.Action.withoutInput(
         const fields: ResultEntry[] = [
           {
             type: 'single',
-            name: 'ID',
+            name: i18n('ID'),
             description: null,
             value: parsed.id || 'unknown',
             masked: false,
@@ -67,7 +68,7 @@ export const listAppservices = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'URL',
+            name: i18n('URL'),
             description: null,
             value: parsed.url || 'not configured',
             masked: false,
@@ -76,7 +77,7 @@ export const listAppservices = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'Sender Localpart',
+            name: i18n('Sender Localpart'),
             description: null,
             value: parsed.sender_localpart || 'unknown',
             masked: false,
@@ -85,7 +86,7 @@ export const listAppservices = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'AS Token',
+            name: i18n('AS Token'),
             description: null,
             value: parsed.as_token || 'unknown',
             masked: true,
@@ -94,7 +95,7 @@ export const listAppservices = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'HS Token',
+            name: i18n('HS Token'),
             description: null,
             value: parsed.hs_token || 'unknown',
             masked: true,
@@ -103,7 +104,7 @@ export const listAppservices = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'Rate Limited',
+            name: i18n('Rate Limited'),
             description: null,
             value: String(parsed.rate_limited ?? 'unknown'),
             masked: false,
@@ -115,7 +116,7 @@ export const listAppservices = sdk.Action.withoutInput(
         if (parsed.namespaces?.users?.[0]?.regex) {
           fields.push({
             type: 'single',
-            name: 'User Namespace',
+            name: i18n('User Namespace'),
             description: null,
             value: parsed.namespaces.users[0].regex,
             masked: false,
@@ -135,7 +136,7 @@ export const listAppservices = sdk.Action.withoutInput(
           type: 'single',
           name: subpath,
           description: null,
-          value: 'Error reading registration file',
+          value: i18n('Error reading registration file'),
           masked: false,
           copyable: false,
           qr: false,
@@ -145,7 +146,7 @@ export const listAppservices = sdk.Action.withoutInput(
 
     return {
       version: '1' as const,
-      title: 'Registered Appservices',
+      title: i18n('Registered Appservices'),
       message: null,
       result: {
         type: 'group' as const,

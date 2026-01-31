@@ -1,3 +1,4 @@
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { utils } from '@start9labs/start-sdk'
 import { mount } from '../utils'
@@ -19,10 +20,10 @@ export const resetAdmin = sdk.Action.withoutInput(
       .const(effects)
 
     return {
-      name: adminUserCreated ? 'Reset Admin Password' : 'Create Admin User',
+      name: adminUserCreated ? i18n('Reset Admin Password') : i18n('Create Admin User'),
       description: adminUserCreated
-        ? 'Reset your admin user password'
-        : 'Create your admin user and password',
+        ? i18n('Reset your admin user password')
+        : i18n('Create your admin user and password'),
       warning: null,
       allowedStatuses: adminUserCreated ? 'only-stopped' : 'only-running',
       group: null,
@@ -92,14 +93,14 @@ export const resetAdmin = sdk.Action.withoutInput(
 
     return {
       version: '1',
-      title: 'Success',
-      message: 'Your admin user credentials are below',
+      title: i18n('Success'),
+      message: i18n('Your admin user credentials are below'),
       result: {
         type: 'group',
         value: [
           {
             type: 'single',
-            name: 'Username',
+            name: i18n('Username'),
             description: null,
             value: username,
             masked: false,
@@ -108,7 +109,7 @@ export const resetAdmin = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'Password',
+            name: i18n('Password'),
             description: null,
             value: password,
             masked: true,

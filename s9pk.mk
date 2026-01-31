@@ -1,4 +1,4 @@
-PACKAGE_ID := $(shell awk -F"'" '/id:/ {print $$2}' startos/manifest.ts)
+PACKAGE_ID := $(shell awk -F"'" '/id:/ {print $$2}' startos/manifest/index.ts)
 INGREDIENTS := $(shell start-cli s9pk list-ingredients 2>/dev/null)
 ALL_ARCHES ?= x86 arm riscv
 ALL_TARGETS ?= all_arches
