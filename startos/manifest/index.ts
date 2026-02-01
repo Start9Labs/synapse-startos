@@ -14,15 +14,6 @@ export const manifest = setupManifest({
     'https://github.com/Start9Labs/synapse-startos/blob/master/instructions.md',
   description: { short, long },
   volumes: ['main'],
-  hardwareRequirements: {},
-  alerts: {
-    install: null,
-    update: null,
-    uninstall: null,
-    restore: null,
-    start: null,
-    stop: null,
-  },
   images: {
     synapse: {
       source: {

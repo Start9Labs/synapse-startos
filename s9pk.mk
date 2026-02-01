@@ -1,14 +1,14 @@
 PACKAGE_ID := $(shell awk -F"'" '/id:/ {print $$2}' startos/manifest/index.ts)
 INGREDIENTS := $(shell start-cli s9pk list-ingredients 2>/dev/null)
-ALL_ARCHES ?= x86 arm riscv
-ALL_TARGETS ?= all_arches
+ARCHES ?= x86 arm riscv
+TARGETS ?= arches
 ifdef VARIANT
 BASE_NAME := $(PACKAGE_ID)_$(VARIANT)
 else
 BASE_NAME := $(PACKAGE_ID)
 endif
 
-.PHONY: all all_arches aarch64 x86_64 riscv64 arm arm64 x86 riscv arch/* clean install check-deps check-init package ingredients
+.PHONY: all arches aarch64 x86_64 riscv64 arm arm64 x86 riscv arch/* clean install check-deps check-init package ingredients
 .DELETE_ON_ERROR:
 .SECONDARY:
 
@@ -33,9 +33,9 @@ define SUMMARY
 	echo ""
 endef
 
-all: $(ALL_TARGETS)
+all: $(TARGETS)
 
-all_arches: $(ALL_ARCHES)
+arches: $(ARCHES)
 
 universal: $(BASE_NAME).s9pk
 	$(call SUMMARY,$<)
@@ -87,8 +87,8 @@ publish: | all
 	fi; \
 	command -v s3cmd >/dev/null || \
 		(echo "Error: s3cmd not found. It must be installed to publish using s3." && exit 1)
-	printf "\n🚀 Publishing $(ALL_TARGETS) to %s; indexing on %s ...\n" "$$S3BASE" "$$REGISTRY"; \
-	for s9pk in $(ALL_TARGETS); do \
+	printf "\n🚀 Publishing $(TARGETS) to %s; indexing on %s ...\n" "$$S3BASE" "$$REGISTRY"; \
+	for s9pk in $(TARGETS); do \
 		start-cli s9pk publish $$s9pk; \
 	done
 
