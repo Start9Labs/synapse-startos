@@ -1,11 +1,10 @@
 import { unlink } from 'node:fs/promises'
+import { appservicesSubpath } from '../fileModels/appserviceRegistration.yaml'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { sdk } from '../sdk'
 import { mountpoint } from '../utils'
 
 const { InputSpec, Value } = sdk
-
-const appservicesSubpath = 'appservices'
 
 export const inputSpec = InputSpec.of({
   id: Value.dynamicSelect(async ({ effects }) => {
@@ -15,7 +14,7 @@ export const inputSpec = InputSpec.of({
 
     const values: Record<string, string> = {}
     for (const f of files) {
-      const match = f.match(/\/appservices\/(.+)\.yaml$/)
+      const match = f.match(new RegExp(`/${appservicesSubpath}/(.+)\\.yaml$`))
       if (match) values[match[1]] = match[1]
     }
 
@@ -50,12 +49,10 @@ export const deleteAppservice = sdk.Action.withInput(
   async ({ effects, input }) => {
     const { id } = input
 
-    const registrationFile = `${appservicesSubpath}/${id}.yaml`
-    const registrationPath = `${mountpoint}/${registrationFile}`
-    const volumePath = `/media/startos/volumes/main/${registrationFile}`
+    const registrationPath = `${mountpoint}/${appservicesSubpath}/${id}.yaml`
 
     try {
-      await unlink(volumePath)
+      await unlink(sdk.volumes.main.subpath(`${appservicesSubpath}/${id}.yaml`))
     } catch (e: any) {
       if (e.code !== 'ENOENT') throw e
     }

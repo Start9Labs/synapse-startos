@@ -1,10 +1,12 @@
+import {
+  appserviceRegistrationYaml,
+  appservicesSubpath,
+} from '../fileModels/appserviceRegistration.yaml'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { sdk } from '../sdk'
 import { mountpoint } from '../utils'
 
 const { InputSpec, Value } = sdk
-
-const appservicesSubpath = 'appservices'
 
 export const inputSpec = InputSpec.of({
   id: Value.text({
@@ -95,25 +97,21 @@ export const registerAppservice = sdk.Action.withInput(
       userNamespaceRegex,
     } = input
 
-    const registrationYaml = [
-      `id: ${id}`,
-      `url: ${url}`,
-      `as_token: ${asToken}`,
-      `hs_token: ${hsToken}`,
-      `sender_localpart: ${senderLocalpart}`,
-      `rate_limited: ${rateLimited}`,
-      `namespaces:`,
-      `  users:`,
-      `    - regex: '${userNamespaceRegex}'`,
-      `      exclusive: true`,
-      `  aliases: []`,
-      `  rooms: []`,
-    ].join('\n')
+    const registrationPath = `${mountpoint}/${appservicesSubpath}/${id}.yaml`
 
-    const registrationFile = `${appservicesSubpath}/${id}.yaml`
-    const registrationPath = `${mountpoint}/${registrationFile}`
-
-    await sdk.volumes.main.writeFile(registrationFile, registrationYaml)
+    await appserviceRegistrationYaml(id).write(effects, {
+      id,
+      url,
+      as_token: asToken,
+      hs_token: hsToken,
+      sender_localpart: senderLocalpart,
+      rate_limited: rateLimited,
+      namespaces: {
+        users: [{ regex: userNamespaceRegex, exclusive: true }],
+        aliases: [],
+        rooms: [],
+      },
+    })
 
     const currentFiles =
       (await homeserverYaml.read((h) => h.app_service_config_files).once()) ||

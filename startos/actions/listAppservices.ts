@@ -1,24 +1,84 @@
-import { YAML } from '@start9labs/start-sdk'
+import type { T } from '@start9labs/start-sdk'
+import {
+  appserviceRegistrationYaml,
+  appservicesSubpath,
+  type AppserviceRegistration,
+} from '../fileModels/appserviceRegistration.yaml'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { sdk } from '../sdk'
-import { mountpoint } from '../utils'
 
-type ResultEntry =
-  | {
-      type: 'single'
-      name: string
-      description: string | null
-      value: string
-      masked: boolean
-      copyable: boolean
-      qr: boolean
-    }
-  | {
-      type: 'group'
-      name: string
-      description: string | null
-      value: ResultEntry[]
-    }
+const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] => {
+  const fields: T.ActionResultMember[] = [
+    {
+      type: 'single',
+      name: 'ID',
+      description: null,
+      value: reg.id,
+      masked: false,
+      copyable: true,
+      qr: false,
+    },
+    {
+      type: 'single',
+      name: 'URL',
+      description: null,
+      value: reg.url,
+      masked: false,
+      copyable: true,
+      qr: false,
+    },
+    {
+      type: 'single',
+      name: 'Sender Localpart',
+      description: null,
+      value: reg.sender_localpart,
+      masked: false,
+      copyable: true,
+      qr: false,
+    },
+    {
+      type: 'single',
+      name: 'AS Token',
+      description: null,
+      value: reg.as_token,
+      masked: true,
+      copyable: true,
+      qr: false,
+    },
+    {
+      type: 'single',
+      name: 'HS Token',
+      description: null,
+      value: reg.hs_token,
+      masked: true,
+      copyable: true,
+      qr: false,
+    },
+    {
+      type: 'single',
+      name: 'Rate Limited',
+      description: null,
+      value: String(reg.rate_limited),
+      masked: false,
+      copyable: false,
+      qr: false,
+    },
+  ]
+
+  if (reg.namespaces.users[0]?.regex) {
+    fields.push({
+      type: 'single',
+      name: 'User Namespace',
+      description: null,
+      value: reg.namespaces.users[0].regex,
+      masked: false,
+      copyable: true,
+      qr: false,
+    })
+  }
+
+  return fields
+}
 
 export const listAppservices = sdk.Action.withoutInput(
   'list-appservices',
@@ -47,93 +107,27 @@ export const listAppservices = sdk.Action.withoutInput(
       }
     }
 
-    const groups: ResultEntry[] = []
+    const groups: T.ActionResultMember[] = []
 
     for (const filePath of files) {
-      const subpath = filePath.replace(`${mountpoint}/`, '')
+      const match = filePath.match(new RegExp(`/${appservicesSubpath}/(.+)\\.yaml$`))
+      if (!match) continue
+      const id = match[1]
+
       try {
-        const content = await sdk.volumes.main.readFile(subpath, 'utf-8')
-        const parsed = YAML.parse(content as string)
-
-        const fields: ResultEntry[] = [
-          {
-            type: 'single',
-            name: 'ID',
-            description: null,
-            value: parsed.id || 'unknown',
-            masked: false,
-            copyable: true,
-            qr: false,
-          },
-          {
-            type: 'single',
-            name: 'URL',
-            description: null,
-            value: parsed.url || 'not configured',
-            masked: false,
-            copyable: true,
-            qr: false,
-          },
-          {
-            type: 'single',
-            name: 'Sender Localpart',
-            description: null,
-            value: parsed.sender_localpart || 'unknown',
-            masked: false,
-            copyable: true,
-            qr: false,
-          },
-          {
-            type: 'single',
-            name: 'AS Token',
-            description: null,
-            value: parsed.as_token || 'unknown',
-            masked: true,
-            copyable: true,
-            qr: false,
-          },
-          {
-            type: 'single',
-            name: 'HS Token',
-            description: null,
-            value: parsed.hs_token || 'unknown',
-            masked: true,
-            copyable: true,
-            qr: false,
-          },
-          {
-            type: 'single',
-            name: 'Rate Limited',
-            description: null,
-            value: String(parsed.rate_limited ?? 'unknown'),
-            masked: false,
-            copyable: false,
-            qr: false,
-          },
-        ]
-
-        if (parsed.namespaces?.users?.[0]?.regex) {
-          fields.push({
-            type: 'single',
-            name: 'User Namespace',
-            description: null,
-            value: parsed.namespaces.users[0].regex,
-            masked: false,
-            copyable: true,
-            qr: false,
-          })
-        }
+        const reg = await appserviceRegistrationYaml(id).read().once()
+        if (!reg) throw new Error(`appservices/${id}.yaml not found`)
 
         groups.push({
           type: 'group',
-          name: parsed.id || subpath,
+          name: reg.id,
           description: null,
-          value: fields,
+          value: appserviceFields(reg),
         })
       } catch {
         groups.push({
           type: 'single',
-          name: subpath,
+          name: id,
           description: null,
           value: 'Error reading registration file',
           masked: false,
