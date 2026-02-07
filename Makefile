@@ -1,7 +1,9 @@
-SYNAPSE_ADMIN_VERSION = v0.11.1-etke50
-SYNAPSE_ADMIN_CHECKSUM = c2a6888db6e4ac2766f17be2bc703d284a7e5f6e8af1c1a7fda0af9ae44e06aa
+ARCHES := x86 arm
 
 include s9pk.mk
+
+SYNAPSE_ADMIN_VERSION = v0.11.1-etke50
+SYNAPSE_ADMIN_CHECKSUM = c2a6888db6e4ac2766f17be2bc703d284a7e5f6e8af1c1a7fda0af9ae44e06aa
 
 # Add synapse-admin as additional prerequisite for s9pk targets
 $(BASE_NAME).s9pk: assets/synapse-admin

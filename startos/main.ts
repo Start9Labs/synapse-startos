@@ -1,3 +1,4 @@
+import { i18n } from './i18n'
 import { sdk } from './sdk'
 import { adminPort, homeserverPort, mount, nginxPort } from './utils'
 import { homeserverYaml } from './fileModels/homeserver.yml'
@@ -10,12 +11,12 @@ export const main = sdk.setupMain(async ({ effects }) => {
    *
    * In this section, we fetch any resources or run any desired preliminary commands.
    */
-  console.info('[i] Starting Synapse!')
+  console.info(i18n('[i] Starting Synapse!'))
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
   const config = await homeserverYaml.read().const(effects)
   if (!config) {
-    throw new Error('homeserver.yaml not found')
+    throw new Error(i18n('homeserver.yaml not found'))
   }
 
   const synapseSub = await sdk.SubContainer.of(
@@ -130,15 +131,15 @@ server {
       subcontainer: synapseSub,
       exec: { command: ['/start.py'] },
       ready: {
-        display: 'Homeserver',
+        display: i18n('Homeserver'),
         gracePeriod: 15000,
         fn: () =>
           sdk.healthCheck.checkWebUrl(
             effects,
             `http://localhost:${homeserverPort}/health`,
             {
-              successMessage: 'Your Synapse homeserver is ready',
-              errorMessage: 'Your Synapse homeserver cannot be reached',
+              successMessage: i18n('Your Synapse homeserver is ready'),
+              errorMessage: i18n('Your Synapse homeserver cannot be reached'),
             },
           ),
       },
@@ -151,22 +152,22 @@ server {
         display: null,
         fn: () =>
           sdk.healthCheck.checkPortListening(effects, nginxPort, {
-            errorMessage: 'Web Server is not running',
-            successMessage: 'Web Server is running',
+            errorMessage: i18n('Web Server is not running'),
+            successMessage: i18n('Web Server is running'),
           }),
       },
       requires: ['synapse'],
     })
     .addHealthCheck('admin-interface', {
       ready: {
-        display: 'Admin Dashboard',
+        display: i18n('Admin Dashboard'),
         fn: () =>
           sdk.healthCheck.checkWebUrl(
             effects,
             `http://localhost:${adminPort}`,
             {
-              successMessage: `Running`,
-              errorMessage: `Unreachable`,
+              successMessage: i18n('Running'),
+              errorMessage: i18n('Unreachable'),
             },
           ),
       },

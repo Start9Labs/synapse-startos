@@ -1,4 +1,5 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { short, long } from './i18n'
 
 export const manifest = setupManifest({
   id: 'synapse',
@@ -11,21 +12,8 @@ export const manifest = setupManifest({
   donationUrl: null,
   docsUrl:
     'https://github.com/Start9Labs/synapse-startos/blob/master/instructions.md',
-  description: {
-    short:
-      'Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.',
-    long: 'Synapse is the battle-tested, reference implementation of the Matrix protocol. Matrix is a next-generation, federated, full-featured, encrypted, independent messaging system. There are no trusted third parties involved. (see matrix.org for details).',
-  },
+  description: { short, long },
   volumes: ['main'],
-  hardwareRequirements: {},
-  alerts: {
-    install: null,
-    update: null,
-    uninstall: null,
-    restore: null,
-    start: null,
-    stop: null,
-  },
   images: {
     synapse: {
       source: {

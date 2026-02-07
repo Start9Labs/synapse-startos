@@ -5,13 +5,14 @@ import {
   type AppserviceRegistration,
 } from '../fileModels/appserviceRegistration.yaml'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 
 const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] => {
   const fields: T.ActionResultMember[] = [
     {
       type: 'single',
-      name: 'ID',
+      name: i18n('ID'),
       description: null,
       value: reg.id,
       masked: false,
@@ -20,7 +21,7 @@ const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] =
     },
     {
       type: 'single',
-      name: 'URL',
+      name: i18n('URL'),
       description: null,
       value: reg.url,
       masked: false,
@@ -29,7 +30,7 @@ const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] =
     },
     {
       type: 'single',
-      name: 'Sender Localpart',
+      name: i18n('Sender Localpart'),
       description: null,
       value: reg.sender_localpart,
       masked: false,
@@ -38,7 +39,7 @@ const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] =
     },
     {
       type: 'single',
-      name: 'AS Token',
+      name: i18n('AS Token'),
       description: null,
       value: reg.as_token,
       masked: true,
@@ -47,7 +48,7 @@ const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] =
     },
     {
       type: 'single',
-      name: 'HS Token',
+      name: i18n('HS Token'),
       description: null,
       value: reg.hs_token,
       masked: true,
@@ -56,7 +57,7 @@ const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] =
     },
     {
       type: 'single',
-      name: 'Rate Limited',
+      name: i18n('Rate Limited'),
       description: null,
       value: String(reg.rate_limited),
       masked: false,
@@ -68,7 +69,7 @@ const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] =
   if (reg.namespaces.users[0]?.regex) {
     fields.push({
       type: 'single',
-      name: 'User Namespace',
+      name: i18n('User Namespace'),
       description: null,
       value: reg.namespaces.users[0].regex,
       masked: false,
@@ -84,9 +85,9 @@ export const listAppservices = sdk.Action.withoutInput(
   'list-appservices',
 
   async ({ effects }) => ({
-    name: 'List Appservices',
+    name: i18n('List Appservices'),
     description:
-      'View all registered Matrix appservices (bridges) on this homeserver.',
+      i18n('View all registered Matrix appservices (bridges) on this homeserver.'),
     warning: null,
     allowedStatuses: 'any',
     group: null,
@@ -101,8 +102,8 @@ export const listAppservices = sdk.Action.withoutInput(
     if (files.length === 0) {
       return {
         version: '1' as const,
-        title: 'Registered Appservices',
-        message: 'No appservices are currently registered.',
+        title: i18n('Registered Appservices'),
+        message: i18n('No appservices are currently registered.'),
         result: null,
       }
     }
@@ -129,7 +130,7 @@ export const listAppservices = sdk.Action.withoutInput(
           type: 'single',
           name: id,
           description: null,
-          value: 'Error reading registration file',
+          value: i18n('Error reading registration file'),
           masked: false,
           copyable: false,
           qr: false,
@@ -139,7 +140,7 @@ export const listAppservices = sdk.Action.withoutInput(
 
     return {
       version: '1' as const,
-      title: 'Registered Appservices',
+      title: i18n('Registered Appservices'),
       message: null,
       result: {
         type: 'group' as const,

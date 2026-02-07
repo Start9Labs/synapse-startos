@@ -1,3 +1,4 @@
+import { i18n } from './i18n'
 import { sdk } from './sdk'
 import { nginxPort, adminPort } from './utils'
 
@@ -8,9 +9,9 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     protocol: 'http',
   })
   const homeserver = sdk.createInterface(effects, {
-    name: 'Homeserver',
+    name: i18n('Homeserver'),
     id: 'homeserver',
-    description: 'Your Matrix homeserver instance',
+    description: i18n('Your Matrix homeserver instance'),
     type: 'api',
     masked: false,
     schemeOverride: null,
@@ -26,9 +27,9 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     protocol: 'http',
   })
   const admin = sdk.createInterface(effects, {
-    name: 'Admin Dashboard',
+    name: i18n('Admin Dashboard'),
     id: 'admin',
-    description: 'Your admin web dashboard of Synapse',
+    description: i18n('Your admin web dashboard of Synapse'),
     type: 'ui',
     masked: false,
     schemeOverride: null,
