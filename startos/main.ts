@@ -11,7 +11,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
    *
    * In this section, we fetch any resources or run any desired preliminary commands.
    */
-  console.info(i18n('[i] Starting Synapse!'))
+  console.info(i18n('Starting Synapse!'))
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
   const config = await homeserverYaml.read().const(effects)

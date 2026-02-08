@@ -10,8 +10,7 @@ export const manifest = setupManifest({
   supportSite: 'https://github.com/element-hq/synapse/issues',
   marketingSite: 'https://matrix.org/',
   donationUrl: null,
-  docsUrl:
-    'https://github.com/Start9Labs/synapse-startos/blob/master/instructions.md',
+  docsUrl: 'https://element-hq.github.io/synapse/latest/index.html',
   description: { short, long },
   volumes: ['main'],
   images: {
