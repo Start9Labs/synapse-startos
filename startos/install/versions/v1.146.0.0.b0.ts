@@ -2,14 +2,14 @@ import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
 import { rm, readFile } from 'fs/promises'
 import { storeJson } from '../../fileModels/store.json'
 
-export const v_1_144_0_1_a1 = VersionInfo.of({
-  version: '1.144.0:1-alpha.1',
+export const v_1_146_0_0_b0 = VersionInfo.of({
+  version: '1.146.0:0-beta.0',
   releaseNotes: {
-    en_US: 'Revamped for StartOS 0.4.0',
-    es_ES: 'Renovado para StartOS 0.4.0',
-    de_DE: 'Überarbeitet für StartOS 0.4.0',
-    pl_PL: 'Przebudowany dla StartOS 0.4.0',
-    fr_FR: 'Remanié pour StartOS 0.4.0',
+    en_US: 'Updated upstream Synapse to 1.146.0',
+    es_ES: 'Actualizado Synapse upstream a 1.146.0',
+    de_DE: 'Upstream Synapse auf 1.146.0 aktualisiert',
+    pl_PL: 'Zaktualizowano upstream Synapse do 1.146.0',
+    fr_FR: 'Mise à jour de Synapse upstream vers 1.146.0',
   },
   migrations: {
     up: async ({ effects }) => {
