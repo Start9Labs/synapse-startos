@@ -1,28 +1,28 @@
-import { matches, FileHelper } from '@start9labs/start-sdk'
+import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const { object, string, boolean, arrayOf } = matches
-
-const shape = object({
-  id: string,
-  url: string,
-  as_token: string,
-  hs_token: string,
-  sender_localpart: string,
-  rate_limited: boolean.onMismatch(false),
-  namespaces: object({
-    users: arrayOf(
-      object({
-        regex: string,
-        exclusive: boolean.onMismatch(true),
-      }),
-    ).onMismatch([]),
-    aliases: arrayOf(string).onMismatch([]),
-    rooms: arrayOf(string).onMismatch([]),
+const shape = z.object({
+  id: z.string(),
+  url: z.string(),
+  as_token: z.string(),
+  hs_token: z.string(),
+  sender_localpart: z.string(),
+  rate_limited: z.boolean().catch(false),
+  namespaces: z.object({
+    users: z
+      .array(
+        z.object({
+          regex: z.string(),
+          exclusive: z.boolean().catch(true),
+        }),
+      )
+      .catch([]),
+    aliases: z.array(z.string()).catch([]),
+    rooms: z.array(z.string()).catch([]),
   }),
 })
 
-export type AppserviceRegistration = typeof shape._TYPE
+export type AppserviceRegistration = z.infer<typeof shape>
 
 export const appservicesSubpath = 'appservices'
 

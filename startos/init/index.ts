@@ -4,9 +4,11 @@ import { setInterfaces } from '../interfaces'
 import { versionGraph } from '../install/versionGraph'
 import { actions } from '../actions'
 import { restoreInit } from '../backups'
+import { seedFiles } from './seedFiles'
 import { setup } from './setup'
 
 export const init = sdk.setupInit(
+  seedFiles,
   restoreInit,
   versionGraph,
   setInterfaces,

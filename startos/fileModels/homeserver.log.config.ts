@@ -1,7 +1,5 @@
-import { matches, FileHelper } from '@start9labs/start-sdk'
+import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-
-const { literal } = matches
 
 const staticConfig = {
   version: 1,
@@ -43,14 +41,14 @@ const staticConfig = {
   },
 }
 
-const shape = literal(staticConfig).onMismatch(staticConfig)
+const shape = z.any().transform(() => staticConfig)
 
-export type HomeserverLogConfig = typeof shape._TYPE
+export type HomeserverLogConfig = typeof staticConfig
 
 export const homeserverLogConfig = FileHelper.yaml(
   {
     base: sdk.volumes.main,
     subpath: 'homeserver.log.config',
   },
-  shape.withMismatch((_) => shape.unsafeCast({})),
+  shape,
 )

@@ -93,10 +93,11 @@ export async function getSynapseInterfaceHostnames(
         i?.addressInfo?.hostnames
           .filter((h) =>
             type === 'tor'
-              ? h.kind === 'onion'
-              : h.kind === 'ip' && h.hostname.kind === 'domain',
+              ? h.hostname.endsWith('.onion')
+              : h.metadata.kind === 'public-domain' ||
+                h.metadata.kind === 'private-domain',
           )
-          .map((h) => h.hostname.value),
+          .map((h) => h.hostname),
       )
       .once()) || []
 

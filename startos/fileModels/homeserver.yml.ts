@@ -1,9 +1,6 @@
-import { matches, FileHelper } from '@start9labs/start-sdk'
+import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 import { configDefaults } from '../utils'
-
-const { object, string, literal, boolean, arrayOf, array, anyOf, natural } =
-  matches
 
 const {
   enable_registration,
@@ -20,80 +17,90 @@ const {
 const { bind_addresses, port, resources, tls, type, x_forwarded } = listeners[0]
 const resource = resources[0]
 
-const databaseArgs = object({
-  database: literal('/data/homeserver.db').onMismatch('/data/homeserver.db'),
-})
-const database = object({
-  args: databaseArgs.withMismatch((_) => databaseArgs.unsafeCast({})),
-  name: literal('sqlite3').onMismatch('sqlite3'),
-})
-const shape = object({
-  database: database.withMismatch((_) => database.unsafeCast({})),
-  email: object({
-    enable_notifs: literal(true),
-    notif_from: string,
-    require_transport_security: literal(true),
-    smtp_host: string,
-    smtp_pass: string.optional(),
-    smtp_port: natural,
-    smtp_user: string,
-  })
+const shape = z.object({
+  database: z
+    .object({
+      args: z
+        .object({
+          database: z.string().catch('/data/homeserver.db'),
+        })
+        .catch({ database: '/data/homeserver.db' }),
+      name: z.string().catch('sqlite3'),
+    })
+    .catch({ args: { database: '/data/homeserver.db' }, name: 'sqlite3' }),
+  email: z
+    .object({
+      enable_notifs: z.literal(true),
+      notif_from: z.string(),
+      require_transport_security: z.literal(true),
+      smtp_host: z.string(),
+      smtp_pass: z.string().optional(),
+      smtp_port: z.number(),
+      smtp_user: z.string(),
+    })
     .nullable()
-    .onMismatch(email),
-  enable_registration: boolean.onMismatch(enable_registration),
-  enable_registration_without_verification: boolean.onMismatch(
+    .catch(email),
+  enable_registration: z.boolean().catch(enable_registration),
+  enable_registration_without_verification: z.boolean().catch(
     enable_registration_without_verification,
   ),
-  federation_certificate_verification_whitelist: arrayOf(string).onMismatch([]),
-  federation_domain_whitelist: arrayOf(string).optional(),
-  listeners: array(
-    object({
-      bind_addresses: arrayOf(string).onMismatch(bind_addresses), // @TODO enforce contents
-      port: literal(port).onMismatch(port),
-      resources: array(
-        object({
-          compress: boolean.onMismatch(resource.compress),
-          names: arrayOf(
-            anyOf(literal('client'), literal('federation')),
-          ).onMismatch(resource.names),
-        }),
-      ),
-      tls: literal(tls).onMismatch(tls),
-      type: literal(type).onMismatch(type),
-      x_forwarded: literal(x_forwarded).onMismatch(x_forwarded),
-    }),
-  ).onMismatch(listeners),
-  log_config: literal(log_config).onMismatch(log_config),
-  media_store_path: literal(media_store_path).onMismatch(media_store_path),
-  pid_file: literal(pid_file).onMismatch(pid_file),
-  report_stats: boolean.onMismatch(report_stats),
-  signing_key_path: string,
-  suppress_key_server_warning: boolean.onMismatch(suppress_key_server_warning),
-  trusted_key_servers: arrayOf(object({ server_name: string })).onMismatch([]),
+  federation_certificate_verification_whitelist: z
+    .array(z.string())
+    .catch([]),
+  federation_domain_whitelist: z.array(z.string()).optional(),
+  listeners: z
+    .array(
+      z.object({
+        bind_addresses: z.array(z.string()).catch([...bind_addresses]),
+        port: z.number().catch(port),
+        resources: z.array(
+          z.object({
+            compress: z.boolean().catch(resource.compress),
+            names: z
+              .array(z.enum(['client', 'federation']))
+              .catch(resource.names as any),
+          }),
+        ),
+        tls: z.boolean().catch(tls),
+        type: z.string().catch(type),
+        x_forwarded: z.boolean().catch(x_forwarded),
+      }),
+    )
+    .catch(listeners as any),
+  log_config: z.string().catch(log_config),
+  media_store_path: z.string().catch(media_store_path),
+  pid_file: z.string().catch(pid_file),
+  report_stats: z.boolean().catch(report_stats),
+  signing_key_path: z.string(),
+  suppress_key_server_warning: z.boolean().catch(suppress_key_server_warning),
+  trusted_key_servers: z
+    .array(z.object({ server_name: z.string() }))
+    .catch([]),
   // below need to be set manually
-  server_name: string,
-  public_baseurl: string,
+  server_name: z.string(),
+  public_baseurl: z.string(),
   // below are set automatically
-  form_secret: string.optional(),
-  macaroon_secret_key: string.optional(),
-  registration_shared_secret: string.optional(),
-  max_upload_size: string
-    .map((s) =>
+  form_secret: z.string().optional(),
+  macaroon_secret_key: z.string().optional(),
+  registration_shared_secret: z.string().optional(),
+  max_upload_size: z
+    .string()
+    .transform((s) =>
       ['B', 'K', 'M', 'G'].includes(s.at(-1) || '') &&
       typeof Number(s.slice(0, -1)) === 'number'
         ? s
         : max_upload_size,
     )
-    .onMismatch(max_upload_size),
-  app_service_config_files: arrayOf(string).onMismatch([]),
+    .catch(max_upload_size),
+  app_service_config_files: z.array(z.string()).catch([]),
 })
 
-export type HomeserverYaml = typeof shape._TYPE
+export type HomeserverYaml = z.infer<typeof shape>
 
 export const homeserverYaml = FileHelper.yaml(
   {
     base: sdk.volumes.main,
     subpath: 'homeserver.yaml',
   },
-  shape.withMismatch((_) => shape.unsafeCast({})),
+  shape,
 )

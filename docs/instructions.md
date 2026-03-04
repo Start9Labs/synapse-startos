@@ -1,163 +1,134 @@
-<h1>Welcome To Synapse!</h1>
+<h1>Welcome to Synapse!</h1>
 <p>Synapse is your personal gateway to the <a href="https://matrix.org/" target="_blank">Matrix</a> federation. With
   it, you can communicate with anyone, anywhere, without restriction, without permission, independently, and in total,
   trustless privacy.</p>
-<p style="color: red;">Warning! Synapse is an incredibly powerful and complex piece of software. Please read these
-  instructions carefully. If you
-  find yourself in trouble, the best thing to do is stop clicking and contact support.</p>
 
 <br />
-<h2><u>Instructions</u></h2>
+<h2><u>Getting Started</u></h2>
 
-<h3>Step 1: Initial Config</h3>
+<h3>Step 1: Set Your Server Address</h3>
+<p>After installing Synapse, you will be presented with a critical task to <b>Set Server Address/URL</b>. This determines
+  the "domain" part of all user IDs on your server (e.g. <code>@user:my.domain.com</code>).</p>
 <ol>
-  <li>
-    <b>Federation</b>: Enabling Federation allows you to discover and join rooms on other Tor-enabled servers and vice versa. If you want a totally private chat server, you should disable Federation. Either way, you will <i>not</i> be able to interact with rooms and people on clearnet servers, such as matrix.org.
-  </li>
-  <li>
-    <b>Email Notifications</b>: If you wish to receive email notification from your Synapse server, you must provide your own SMTP credentials.
-  </li>
-  <li>
-    <b>Advanced - Enable Registration</b>: If you enable registration, anyone will be able to create an account on your Synapse server. It is <i>highly</i> recommended that you disable registrations whenever possible. The only time we recommend turning it on is if you quickly want multiple people to create accounts on your server, then you should turn it back off.
-  </li>
-</ol>
-<br />
-<hr style="border: 1px dashed #bbb;" />
-<br />
-
-<h3>Step 2: Creating Your First Account</h3>
-<p>
-  With registrations disabled, the only way to create an account on your Server is through the Admin Portal.
-</p>
-<ol>
-  <li>In your Synapse dashboard, click "Launch UI"</li>
-  <li>
-    Log in with your Admin Username and Password (located in Properties). For "Homeserver URL", do <i>not</i> enter your Homeserver address. Instead, enter your Admin Portal URL. Hint: this is the URL currently showing in your browser URL bar, minus the path. e.g. https://exampleaddress.local or http://exampleaddress.onion.
-  </li>
-  <li>In the "Users" tab, you will notice the admin user already created.</li>
-  <li>In the "Users" tab, click "+ Create"</li>
-  <li>
-    Choose a User-ID, Displayname, and Password for your account. Optionally enter an email address under the 3PIDs section. It is not recommended to make this user a Server Administrator, as it is best to limit admin access.
-  </li>
-</ol>
-
-<br />
-<hr style="border: 1px dashed #bbb;" />
-<br />
-
-<h3>Step 3: Using Your Server</h3>
-<p>In order to use your new Synapse server, you will need to select a client app. We recommend:
-  <ul>
-    <li><a href="https://element.io" target="_blank" noreferrer>Element</a></li>
-    <li><a href="https://schildi.chat" target="_blank" noreferrer>SchildiChat</a></li>
-  </ul>
-</p>
-
-<br />
-<hr style="border: 1px dashed #bbb;" />
-<br />
-
-<h3>Step 4: Enable Cross Signing</h3>
-<ol>
-  <li>Go to Settings --> Security & Privacy --> Cross-signing</li>
-  <li>If you see a green checkmark with <code>Cross-signing is ready for use</code>, then you are good to go</li>
-  <li>If you see <code>Cross-signing has not been set up</code>, then click <code>Set Up</code>, then follow the
-    instructions to complete setup</li>
-  <li>Alternatively, if you see <code>Cross-signing is ready but keys are not backed up</code>, follow the backup instructions in Step 4</li>
-</ol>
-<p>Explanation: The Matrix protocol uses advanced cryptography to ensure that you are, in fact, communicating with the
-  people you think you are,
-  and not impostors. To make this as simple as possible, Matrix offers something called Cross Signing, which allows
-  users to verify each other, and then for each user to verify their own various devices. The alternative is that
-  every user would need to verify every
-  device of everyone they interact with, which is simply annoying. You can read more about Cross Signing 
-  <a href="https://element.io/blog/e2e-encryption-by-default-cross-signing-is-here/" target="_blank">here</a>.
-</p>
-
-<br />
-<hr style="border: 1px dashed #bbb;" />
-<br />
-
-<h3>Step 5: Joining a Remote Room</h3>
-<ol>
-  <li>On the main dashboard, select <code>Explore Public Rooms</code>.</li>
-  <li>In the search field, paste in the alias of the room you want to join. Room aliases start with #. For example, if you want to join a room on a friend's server, you would need their .onion address and the room name. It would look something like this: <code>#room-name:yxtgpdjhafirrf3jskstue3bcs5wrrj47u4ljbmcgrubq46uxwpz7fad.onion</code>. Then click <code>&#8626; Join</code>.</li>
-  <li>Joining a room can take a while, depending on how many users are currently in the room. If it fails, simply try again.</li>
-  <li>Please note that to join a room on a remote server over federation, you need to know the .onion address of that server. This is like sharing secrets between each other, but the secret is one party's V3 .onion homeserver address with the room name.</li>
-</ol>
-
-<br />
-<hr style="border: 1px dashed #bbb;" />
-<br />
-
-<h3>Step 6: Creating Backups - <span style="color: red;">Important, Read Carefully!</span></h3>
-<p><u>Encryption Keys</u>: Matrix uses end-to-end (E2E) encryption, meaning all encryption/decryption is performed
-  locally on your phone/computer using keys stored on the device. To further complicate things, these keys are
-  frequently changed to ensure maximum security. And to even further complicate things, when you log out of
-  Element, these keys are purged from memory. Meaning, if you log out of all your Element client apps, you will
-  lose your keys and be unable to decrypt your own message history!</p>
-<p><u>Message History</u>: Additionally, your entire (encrypted) message history is stored on your personal
-  Synapse server, which is running on your physical Start9 server. So there are two, separate types of backups
-  that are needed: (1) the encryption keys on your device and (2) the message history on your Start9 server.</p>
-<ul>
-  <li>
-    <h4>Backing up encryption keys</h4>
-    <p>There are two methods of backing up encryption keys: Manual and Automatic</p>
+  <li>Choose your network type:
     <ul>
-      <li>
-        <h5>Manual</h5>
-        <p>Because your encryption keys are rotated frequently, it is almost impossible to perform manual backups
-          and guarantee that all messages can be recovered. However, performing periodic backups can at least
-          ensure the recovery of messages up until that point in time.</p>
-        <ol>
-          <li>
-            In your Element app, go to Settings --> Security & Privacy --> Cryptography --> "Export
-            E2E room keys"
-          </li>
-          <li>
-            Optionally enter a passphrase to protect the backup and save the file somewhere safe
-          </li>
-          <li>
-            Remember, the keys involved in this backup will only be capable of decrypting messages up until the
-            time of backup. New messages will likely be unrecoverable
-          </li>
-        </ol>
-      </li>
-      <li>
-        <h5>Automatic</h5>
-        <p>This option will <i>automatically</i> store encrypted backups of your keys on your Start9 server whenever they
-          are rotated
-          and is the recommended way of doing key backup</p>
-        <ol>
-          <li>
-            In your Element app, go to Settings --> Security & Privacy --> Secure Backup --> "Set up".
-          </li>
-          <li>
-            You will be prompted to select either <code>Generate a Security Key</code> or
-            <code>Enter a Security Phrase</code>.
-            This is a misleading choice. Either way, Element will generate a security key.
-            If you select <code>Generate a Security Key</code> (recommended), Element will display the Security Key
-            for you to store on your own.
-            If you select <code>Enter a Security Phrase</code>, Element will encrypt the Security Key with your
-            Security Phrase,
-            then store it on your Start9 server. In the former case, you will need to keep and protect a private key.
-            In the latter case, you will need to keep and protect a chosen passphrase. Either way, you will need to
-            store something.
-            The reason it is recommended to select <code>Generate a Security Key</code> is because, if someone gets
-            access to your Synapse server,
-            it is <i>far</i> more likely they will guess your chosen passphrase than be able to brute force a private
-            key.
-          </li>
-          <li>
-            Regardless of which option you choose, you must store the value somewhere safe. <b>Do not lose
-              it!</b>. It is recommended to store it in your self-hosted Bitwarden.
-          </li>
-        </ol>
-      </li>
+      <li><b>Clearnet</b> (recommended): Use a domain name. Allows federation with any Matrix server, including matrix.org.</li>
+      <li><b>Tor</b>: Use a <code>.onion</code> address. Tor servers can <i>only</i> federate with other <code>.onion</code> servers, and clients must be configured for Tor.</li>
     </ul>
   </li>
+  <li>Select an address from the available options for your chosen network type.</li>
+</ol>
+<p style="color: red;"><b>Warning:</b> Your server address is <b>permanent</b> and cannot be changed after the first
+  start. Choose carefully.</p>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h3>Step 2: Create Your Admin User</h3>
+<p>After setting your server address, start the service, then complete the optional task to <b>Create Admin User</b>.
+  Alternatively, find this action in the Actions menu.</p>
+<ol>
+  <li>Run the <b>Create Admin User</b> action (requires the service to be running).</li>
+  <li>A random password will be generated and displayed. <b>Copy and save it immediately</b> &mdash; it will not be shown
+    again.</li>
+  <li>If you lose the password, you can reset it later using the <b>Reset Admin Password</b> action (requires the service
+    to be stopped).</li>
+</ol>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h3>Step 3: Configure Your Server</h3>
+<p>Use the <b>Config</b> action (available at any time) to adjust the following settings:</p>
+<ul>
   <li>
-    <h4>Backing up message history</h4>
-    <p>All of your (encrypted) messages are securely stored on your dedicated Start9 server. Given the importance of preserving your data, it is crucial to regularly create backups of Synapse on StartOS to ensure its protection and availability.</p>
+    <b>Registration</b>: Allow public account creation. Disabled by default. It is recommended to keep this disabled
+    and create accounts for others using the Admin Dashboard. If you do enable it, disable it again once the needed
+    accounts are created.
+  </li>
+  <li>
+    <b>Federation</b>: Allow communication with other Matrix servers. Disabled by default. When enabled, you can
+    optionally restrict federation to a whitelist of specific server domains.
+  </li>
+  <li>
+    <b>Max Upload Size</b>: The file size limit for uploads (default 50 MB).
+  </li>
+  <li>
+    <b>SMTP</b>: Enable email notifications. Choose System SMTP (if configured on your server) or provide custom
+    SMTP credentials.
   </li>
 </ul>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h3>Step 4: Create Accounts</h3>
+<p>With registration disabled, the way to create accounts is through the Admin Dashboard.</p>
+<ol>
+  <li>Open the <b>Admin Dashboard</b> interface from the Synapse service page.</li>
+  <li>Log in with the admin credentials from Step 2. For "Homeserver URL", enter the URL shown in your browser's
+    address bar (minus any path).</li>
+  <li>In the "Users" tab, click "+ Create" to add new accounts.</li>
+  <li>Choose a User-ID, display name, and password. It is recommended <i>not</i> to make regular users Server Administrators.</li>
+</ol>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h3>Step 5: Connect with a Client</h3>
+<p>To use your Synapse server, you will need a Matrix client app. Popular options include:</p>
+<ul>
+  <li><a href="https://element.io" target="_blank" noreferrer>Element</a></li>
+  <li><a href="https://schildi.chat" target="_blank" noreferrer>SchildiChat</a></li>
+  <li><a href="https://fluffychat.im" target="_blank" noreferrer>FluffyChat</a></li>
+</ul>
+<p>When configuring your client, use the address you chose in Step 1 as your homeserver URL.</p>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h2><u>Security</u></h2>
+
+<h3>Cross-Signing</h3>
+<p>Matrix uses end-to-end encryption with cross-signing, which lets you verify other users once and then have that
+  verification carry across all your devices. Check your client's security settings to ensure cross-signing is set
+  up. If it shows "not set up", follow the prompts to enable it.</p>
+
+<h3>Encryption Key Backup</h3>
+<p>Matrix encryption keys are stored on your devices and rotated frequently. If you log out of all client sessions, you
+  will lose your keys and be unable to decrypt your message history. To prevent this:</p>
+<ul>
+  <li>
+    <b>Automatic backup (recommended)</b>: In your client's security settings, set up <b>Secure Backup</b>. This
+    encrypts your keys and stores them on your Synapse server. You will be given a Security Key or asked to create a
+    Security Phrase &mdash; store it somewhere safe.
+  </li>
+  <li>
+    <b>Manual export</b>: Most clients allow you to export your E2E room keys to a file. This only covers keys up to
+    the time of export, so repeat it periodically.
+  </li>
+</ul>
+
+<h3>Message History Backup</h3>
+<p>Your encrypted message history is stored on your Synapse server. Use the StartOS backup feature to regularly back up
+  the Synapse service, which includes all data, media, keys, and configuration.</p>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h2><u>Federation</u></h2>
+<p>If federation is enabled, you can join rooms on other Matrix servers.</p>
+<ol>
+  <li>In your client, select <b>Explore Public Rooms</b>.</li>
+  <li>Enter the room alias, including the server domain. For example: <code>#room-name:matrix.example.com</code>
+    or <code>#room-name:abc...xyz.onion</code>.</li>
+  <li>Joining a room may take a while depending on its size. If it fails, try again.</li>
+</ol>
+<p><b>Note:</b> Tor-based servers can only federate with other Tor-based servers. Clearnet servers can federate with
+  any server.</p>

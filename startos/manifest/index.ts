@@ -1,16 +1,19 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { short, long } from './i18n'
+import { long, short } from './i18n'
 
 export const manifest = setupManifest({
   id: 'synapse',
   title: 'Synapse',
   license: 'AGPL-3.0',
-  wrapperRepo: 'https://github.com/Start9Labs/synapse-startos',
+  packageRepo: 'https://github.com/Start9Labs/synapse-startos/tree/update/040',
   upstreamRepo: 'https://github.com/element-hq/synapse',
-  supportSite: 'https://github.com/element-hq/synapse/issues',
-  marketingSite: 'https://matrix.org/',
+  marketingUrl: 'https://matrix.org/',
   donationUrl: null,
-  docsUrl: 'https://element-hq.github.io/synapse/latest/index.html',
+  docsUrls: [
+    'https://github.com/Start9Labs/synapse-startos/tree/update/040/docs/instructions.md',
+    'https://element-hq.github.io/synapse/latest/index.html',
+    'https://element.io/user-guide',
+  ],
   description: { short, long },
   volumes: ['main'],
   images: {
@@ -21,11 +24,13 @@ export const manifest = setupManifest({
           dockerfile: './Dockerfile',
         },
       },
+      arch: ['x86_64', 'aarch64'],
     },
     nginx: {
       source: {
         dockerTag: 'nginx:stable-alpine',
       },
+      arch: ['x86_64', 'aarch64'],
     },
     sqlite3: {
       source: {
@@ -33,6 +38,7 @@ export const manifest = setupManifest({
           dockerfile: './Dockerfile-sqlite',
         },
       },
+      arch: ['x86_64', 'aarch64'],
     },
   },
   dependencies: {},

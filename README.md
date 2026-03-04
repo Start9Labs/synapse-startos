@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" alt="Synapse Logo" width="21%">
+  <img src="icon.svg" alt="Synapse Logo" width="21%">
 </p>
 
 # Synapse on StartOS
@@ -7,8 +7,8 @@
 > **Upstream docs:** <https://element-hq.github.io/synapse/>
 >
 > Everything not listed in this document should behave the same as upstream
-> Synapse v1.144.0. If a feature, setting, or behavior is not mentioned
-> here, the upstream documentation is accurate and fully applicable.
+> Synapse. If a feature, setting, or behavior is not mentioned here, the
+> upstream documentation is accurate and fully applicable.
 
 [Synapse](https://github.com/element-hq/synapse) is the battle-tested, reference implementation of the [Matrix](https://matrix.org/) protocol -- a next-generation, federated, full-featured, encrypted, independent messaging system.
 
@@ -264,7 +264,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 
 ```yaml
 package_id: synapse
-upstream_version: 1.144.0
 images:
   synapse: dockerBuild (./synapse/Dockerfile)
   nginx: nginx:stable-alpine

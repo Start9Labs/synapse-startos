@@ -37,20 +37,20 @@ export const main = sdk.setupMain(async ({ effects }) => {
       smtp.selection === 'disabled'
         ? null
         : smtp.selection === 'custom'
-          ? smtp.value
+          ? smtp.value.provider.value
           : await sdk.getSystemSmtp(effects).const()
 
     if (creds) {
-      const { server, port, from, login, password } = creds
+      const { host, port, from, username, password } = creds
       await homeserverYaml.merge(effects, {
         email: {
           enable_notifs: true,
           require_transport_security: true,
           notif_from:
             (smtp.selection === 'system' && smtp.value.customFrom) || from,
-          smtp_host: server,
+          smtp_host: host,
           smtp_port: port,
-          smtp_user: login,
+          smtp_user: username,
           smtp_pass: password || undefined,
         },
       })
