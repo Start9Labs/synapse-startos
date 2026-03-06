@@ -46,11 +46,18 @@ export const v_1_146_0_0_b1 = VersionInfo.of({
                       selection: 'other' as const,
                       value: {
                         host: configYaml['smtp-host'],
-                        port: configYaml['smtp-port'],
                         from: configYaml['from-name'],
                         username: configYaml['smtp-user'],
                         password: configYaml['smtp-pass'],
-                        security: 'starttls' as const,
+                        security: {
+                          selection: 'starttls' as const,
+                          value: {
+                            port: String(configYaml['smtp-port']) as
+                              | '587'
+                              | '25'
+                              | '2525',
+                          },
+                        },
                       },
                     },
                   },

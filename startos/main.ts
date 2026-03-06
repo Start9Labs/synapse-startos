@@ -32,26 +32,33 @@ export const main = sdk.setupMain(async ({ effects }) => {
   await storeJson.merge(effects, { serverStarted: true })
 
   const smtp = await storeJson.read((s) => s.smtp).const(effects)
-  if (smtp) {
-    const creds =
-      smtp.selection === 'disabled'
-        ? null
-        : smtp.selection === 'custom'
-          ? smtp.value.provider.value
-          : await sdk.getSystemSmtp(effects).const()
-
-    if (creds) {
-      const { host, port, from, username, password } = creds
+  if (smtp && smtp.selection !== 'disabled') {
+    if (smtp.selection === 'system') {
+      const creds = await sdk.getSystemSmtp(effects).const()
+      if (creds) {
+        await homeserverYaml.merge(effects, {
+          email: {
+            enable_notifs: true,
+            require_transport_security: true,
+            notif_from: smtp.value.customFrom || creds.from,
+            smtp_host: creds.host,
+            smtp_port: creds.port,
+            smtp_user: creds.username,
+            smtp_pass: creds.password || undefined,
+          },
+        })
+      }
+    } else {
+      const p = smtp.value.provider.value
       await homeserverYaml.merge(effects, {
         email: {
           enable_notifs: true,
           require_transport_security: true,
-          notif_from:
-            (smtp.selection === 'system' && smtp.value.customFrom) || from,
-          smtp_host: host,
-          smtp_port: port,
-          smtp_user: username,
-          smtp_pass: password || undefined,
+          notif_from: p.from,
+          smtp_host: p.host,
+          smtp_port: Number(p.security.value.port),
+          smtp_user: p.username,
+          smtp_pass: p.password || undefined,
         },
       })
     }
