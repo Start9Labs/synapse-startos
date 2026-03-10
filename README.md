@@ -4,7 +4,7 @@
 
 # Synapse on StartOS
 
-> **Upstream docs:** <https://element-hq.github.io/synapse/>
+> **Upstream docs:** <https://element-hq.github.io/synapse/latest>
 >
 > Everything not listed in this document should behave the same as upstream
 > Synapse. If a feature, setting, or behavior is not mentioned here, the
