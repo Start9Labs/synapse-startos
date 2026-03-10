@@ -11,8 +11,8 @@ export const manifest = setupManifest({
   donationUrl: null,
   docsUrls: [
     'https://github.com/Start9Labs/synapse-startos/tree/update/040/docs/instructions.md',
-    'https://element-hq.github.io/synapse/latest/index.html',
-    'https://element.io/user-guide',
+    'https://element-hq.github.io/synapse/latest',
+    'https://docs.element.io/latest/element-support/understanding-your-element-accounts/#up',
   ],
   description: { short, long },
   volumes: ['main'],
