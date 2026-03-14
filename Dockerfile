@@ -1,6 +1,6 @@
 FROM ghcr.io/etkecc/synapse-admin:v0.10.3-etke38 AS synapse-admin
 
-FROM matrixdotorg/synapse:v1.128.0
+FROM matrixdotorg/synapse:v1.149.1
 
 ARG PLATFORM
 ENV YQ_VER=v4.3.2

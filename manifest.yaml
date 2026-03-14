@@ -1,11 +1,15 @@
 id: synapse
 title: Synapse
-version: 1.128.0
+version: 1.149.1
 release-notes: |
-  * Upstream Synapse updated to v1.128.0 ([changelog](https://github.com/element-hq/synapse/compare/v1.98.0...v1.128.0))
-  * Switched to etke fork of Synapse Admin v0.10.3-etke38 ([changelog](https://github.com/etkecc/synapse-admin/releases/tag/v0.10.3-etke38))
-  * Updated bundling process to use Deno emit module
-  * Changed license from Apache License v2 to AGPL-3.0 to match upstream
+  * Upstream Synapse updated to v1.149.1 ([changelog](https://github.com/element-hq/synapse/compare/v1.128.0...v1.149.1))
+  * SECURITY: Blocks federation requests using known insecure signing key (CVE-2026-24044)
+  * New `enable_local_media_storage` config option
+  * Stabilized MSC4312 OAuth UIA for cross-signing reset
+  * MSC4354 Sticky Event metadata, MSC4388 secure QR sign-in
+  * Fixed restricted v12 room joins, memory leak from stopped looping calls
+  * Reactor tick time optimizations, Rust HTTP client improvements
+  * Removed deprecated MSC2697 (dehydrated devices) and MSC3244
 license: AGPL-3.0 
 wrapper-repo: https://github.com/Start9Labs/synapse-startos
 upstream-repo: https://github.com/element-hq/synapse
