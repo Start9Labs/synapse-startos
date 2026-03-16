@@ -2,14 +2,10 @@ import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
 import { rm, readFile } from 'fs/promises'
 import { storeJson } from '../../fileModels/store.json'
 
-export const v_1_146_0_1_b0 = VersionInfo.of({
-  version: '1.146.0:1-beta.0',
+export const v_1_149_1_0_b0 = VersionInfo.of({
+  version: '1.149.1:0-beta.0',
   releaseNotes: {
-    en_US: 'Update to StartOS SDK beta.59',
-    es_ES: 'Actualización a StartOS SDK beta.59',
-    de_DE: 'Update auf StartOS SDK beta.59',
-    pl_PL: 'Aktualizacja do StartOS SDK beta.59',
-    fr_FR: 'Mise à jour vers StartOS SDK beta.59',
+    en_US: 'Update Synapse to 1.149.1',
   },
   migrations: {
     up: async ({ effects }) => {
