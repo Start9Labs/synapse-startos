@@ -8,7 +8,9 @@ const { InputSpec, Value, Variants, List } = sdk
 export const inputSpec = InputSpec.of({
   registration: Value.select({
     name: i18n('Registration'),
-    description: i18n('Allow outsiders to create their own accounts on your homeserver. This is not recommended, as it leaves your server vulnerable to attack. It is preferable for you to create accounts on their behalf using your server\'s admin portal.'),
+    description: i18n(
+      "Allow outsiders to create their own accounts on your homeserver. This is not recommended, as it leaves your server vulnerable to attack. It is preferable for you to create accounts on their behalf using your server's admin portal.",
+    ),
     default: 'disabled',
     values: {
       disabled: i18n('Disabled'),
@@ -18,8 +20,9 @@ export const inputSpec = InputSpec.of({
   federation: Value.union({
     name: i18n('Federation'),
     default: 'disabled',
-    description:
-      i18n('If enabled, users on your homeserver will be able to join rooms on other homeservers and vica versa. If disabled, users on your homeserver will only be able to interact with other users and rooms on your homeserver.'),
+    description: i18n(
+      'If enabled, users on your homeserver will be able to join rooms on other homeservers and vica versa. If disabled, users on your homeserver will only be able to interact with other users and rooms on your homeserver.',
+    ),
     variants: Variants.of({
       disabled: { name: i18n('Disabled'), spec: InputSpec.of({}) },
       enabled: {
@@ -30,8 +33,9 @@ export const inputSpec = InputSpec.of({
               {
                 name: i18n('Domain Whitelist (optional)'),
                 default: [],
-                description:
-                  i18n('If you only want your server to federate with specific homeservers and reject all others, enter the server addresses/domains here. If no domains are provided, your server will be capable of federating with all public Matrix servers'),
+                description: i18n(
+                  'If you only want your server to federate with specific homeservers and reject all others, enter the server addresses/domains here. If no domains are provided, your server will be capable of federating with all public Matrix servers',
+                ),
               },
               {
                 placeholder: 'matrix.start9labs.com',
@@ -44,8 +48,9 @@ export const inputSpec = InputSpec.of({
   }),
   max_upload_size: Value.number({
     name: i18n('Max Upload Size'),
-    description:
-      i18n('The maximum file size that is permitted to be uploaded by users to your homeserver.'),
+    description: i18n(
+      'The maximum file size that is permitted to be uploaded by users to your homeserver.',
+    ),
     required: true,
     default: 50,
     units: i18n('MB'),
@@ -97,7 +102,8 @@ export const config = sdk.Action.withInput(
           }
         : { selection: 'disabled' as const, value: {} },
       max_upload_size: toMB(max_upload_size),
-      smtp: (await storeJson.read((s) => s.smtp).const(effects)) || undefined,
+      smtp: ((await storeJson.read((s) => s.smtp).const(effects)) ||
+        undefined) as any,
     }
   },
 

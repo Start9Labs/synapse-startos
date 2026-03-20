@@ -62,8 +62,8 @@ export const inputSpec = InputSpec.of({
   userNamespaceRegex: Value.text({
     name: i18n('User Namespace Regex'),
     description:
-      i18n('Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*")'),
-    required: true,
+      i18n('Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*"). Leave empty if the appservice does not manage user namespaces.'),
+    required: false,
     default: null,
     placeholder: '@signal_.*:.*',
     masked: false,
@@ -108,7 +108,9 @@ export const registerAppservice = sdk.Action.withInput(
       sender_localpart: senderLocalpart,
       rate_limited: rateLimited,
       namespaces: {
-        users: [{ regex: userNamespaceRegex, exclusive: true }],
+        users: userNamespaceRegex
+          ? [{ regex: userNamespaceRegex, exclusive: true }]
+          : [],
         aliases: [],
         rooms: [],
       },

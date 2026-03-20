@@ -1,22 +1,26 @@
 import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
+import { i18n } from '../i18n'
+import { sdk } from '../sdk'
 
 const { InputSpec, Value, Variants } = sdk
 
 const name = i18n('Address/URL')
-const description =
-  i18n('Your server address/url determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.')
-const warning =
-  i18n('Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.')
+const description = i18n(
+  'Your server address/url determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.',
+)
+const warning = i18n(
+  'Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.',
+)
 
 export const inputSpec = InputSpec.of({
   network: Value.union({
     name: i18n('Network'),
     default: 'clearnet',
-    description: i18n('Choose whether your server will be hosted on clearnet (recommended) or Tor. IMPORTANT: Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.'),
+    description: i18n(
+      'Choose whether your server will be hosted on clearnet (recommended) or Tor. IMPORTANT: Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.',
+    ),
     variants: Variants.of({
       clearnet: {
         name: i18n('Clearnet'),

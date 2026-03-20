@@ -1,97 +1,111 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-import { configDefaults } from '../utils'
+import { homeserverPort } from '../utils'
 
-const {
-  enable_registration,
-  enable_registration_without_verification,
-  email,
-  listeners,
-  log_config,
-  media_store_path,
-  pid_file,
-  report_stats,
-  suppress_key_server_warning,
-  max_upload_size,
-} = configDefaults
-const { bind_addresses, port, resources, tls, type, x_forwarded } = listeners[0]
-const resource = resources[0]
+// shared constants
+const dbPath = '/data/homeserver.db'
+const defaultMaxUpload = '50M'
+
+// extracted defaults
+const dbDefault = { args: { database: dbPath }, name: 'sqlite3' }
+const resourceDefault = {
+  compress: false,
+  names: ['client'] as ('client' | 'federation')[],
+}
+const listenerDefault = {
+  bind_addresses: ['::1', '127.0.0.1'],
+  port: homeserverPort,
+  resources: [resourceDefault],
+  tls: false,
+  type: 'http',
+  x_forwarded: true,
+}
+
+// extracted shapes
+const dbShape = z
+  .object({
+    args: z
+      .object({ database: z.string().catch(dbPath) })
+      .catch(dbDefault.args),
+    name: z.string().catch(dbDefault.name),
+  })
+  .catch(dbDefault)
+
+const resourceShape = z
+  .object({
+    compress: z.boolean().catch(resourceDefault.compress),
+    names: z
+      .array(z.enum(['client', 'federation']))
+      .catch(resourceDefault.names),
+  })
+  .catch(resourceDefault)
+
+const listenerShape = z
+  .object({
+    bind_addresses: z
+      .array(z.string())
+      .catch(listenerDefault.bind_addresses),
+    port: z.number().catch(listenerDefault.port),
+    resources: z.array(resourceShape).catch(listenerDefault.resources),
+    tls: z.boolean().catch(listenerDefault.tls),
+    type: z.string().catch(listenerDefault.type),
+    x_forwarded: z.boolean().catch(listenerDefault.x_forwarded),
+  })
+  .catch(listenerDefault)
 
 const shape = z.object({
-  database: z
-    .object({
-      args: z
-        .object({
-          database: z.string().catch('/data/homeserver.db'),
-        })
-        .catch({ database: '/data/homeserver.db' }),
-      name: z.string().catch('sqlite3'),
-    })
-    .catch({ args: { database: '/data/homeserver.db' }, name: 'sqlite3' }),
+  // enforced
+  database: dbShape,
+  listeners: z.array(listenerShape).catch([listenerDefault]),
+  log_config: z.string().catch('/data/homeserver.log.config'),
+  media_store_path: z.string().catch('/data/media_store'),
+  pid_file: z.string().catch('/data/homeserver.pid'),
+  report_stats: z.boolean().catch(false),
+  suppress_key_server_warning: z.boolean().catch(true),
+
+  // set by synapse generate
+  signing_key_path: z.string(),
+  form_secret: z.string().optional(),
+  macaroon_secret_key: z.string().optional(),
+  registration_shared_secret: z.string().optional(),
+
+  // set by actions
+  server_name: z.string(),
+  public_baseurl: z.string(),
+
+  // configurable
   email: z
     .object({
+      // enforced
       enable_notifs: z.literal(true),
-      notif_from: z.string(),
       require_transport_security: z.literal(true),
+      // set by SMTP config
+      notif_from: z.string(),
       smtp_host: z.string(),
       smtp_pass: z.string().optional(),
       smtp_port: z.number(),
       smtp_user: z.string(),
     })
     .nullable()
-    .catch(email),
-  enable_registration: z.boolean().catch(enable_registration),
-  enable_registration_without_verification: z.boolean().catch(
-    enable_registration_without_verification,
-  ),
+    .catch(null),
+  enable_registration: z.boolean().catch(false),
+  enable_registration_without_verification: z.boolean().catch(true),
   federation_certificate_verification_whitelist: z
     .array(z.string())
     .catch([]),
   federation_domain_whitelist: z.array(z.string()).optional(),
-  listeners: z
-    .array(
-      z.object({
-        bind_addresses: z.array(z.string()).catch([...bind_addresses]),
-        port: z.number().catch(port),
-        resources: z.array(
-          z.object({
-            compress: z.boolean().catch(resource.compress),
-            names: z
-              .array(z.enum(['client', 'federation']))
-              .catch(resource.names as any),
-          }),
-        ),
-        tls: z.boolean().catch(tls),
-        type: z.string().catch(type),
-        x_forwarded: z.boolean().catch(x_forwarded),
-      }),
-    )
-    .catch(listeners as any),
-  log_config: z.string().catch(log_config),
-  media_store_path: z.string().catch(media_store_path),
-  pid_file: z.string().catch(pid_file),
-  report_stats: z.boolean().catch(report_stats),
-  signing_key_path: z.string(),
-  suppress_key_server_warning: z.boolean().catch(suppress_key_server_warning),
   trusted_key_servers: z
     .array(z.object({ server_name: z.string() }))
     .catch([]),
-  // below need to be set manually
-  server_name: z.string(),
-  public_baseurl: z.string(),
-  // below are set automatically
-  form_secret: z.string().optional(),
-  macaroon_secret_key: z.string().optional(),
-  registration_shared_secret: z.string().optional(),
   max_upload_size: z
     .string()
     .transform((s) =>
       ['B', 'K', 'M', 'G'].includes(s.at(-1) || '') &&
       typeof Number(s.slice(0, -1)) === 'number'
         ? s
-        : max_upload_size,
+        : defaultMaxUpload,
     )
-    .catch(max_upload_size),
+    .catch(defaultMaxUpload),
   app_service_config_files: z.array(z.string()).catch([]),
 })
 

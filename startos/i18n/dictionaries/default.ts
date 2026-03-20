@@ -60,7 +60,7 @@ const dict = {
   'The URL where the homeserver can reach the bridge appservice': 56,
   'Whether requests from this appservice should be rate limited': 57,
   'User Namespace Regex': 58,
-  'Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*")': 59,
+  'Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*"). Leave empty if the appservice does not manage user namespaces.': 59,
   'Register Appservice': 60,
   'Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.': 61,
   'Reset Admin Password': 62,

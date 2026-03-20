@@ -1,14 +1,10 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const shape = z.object({
-  id: z.string(),
-  url: z.string(),
-  as_token: z.string(),
-  hs_token: z.string(),
-  sender_localpart: z.string(),
-  rate_limited: z.boolean().catch(false),
-  namespaces: z.object({
+const defaultNamespaces = { users: [] as { regex: string; exclusive: boolean }[], aliases: [] as string[], rooms: [] as string[] }
+
+const namespacesShape = z
+  .object({
     users: z
       .array(
         z.object({
@@ -16,10 +12,23 @@ const shape = z.object({
           exclusive: z.boolean().catch(true),
         }),
       )
-      .catch([]),
-    aliases: z.array(z.string()).catch([]),
-    rooms: z.array(z.string()).catch([]),
-  }),
+      .catch(defaultNamespaces.users),
+    aliases: z.array(z.string()).catch(defaultNamespaces.aliases),
+    rooms: z.array(z.string()).catch(defaultNamespaces.rooms),
+  })
+  .catch(defaultNamespaces)
+
+const shape = z.object({
+  // set per-appservice
+  id: z.string(),
+  url: z.string(),
+  as_token: z.string(),
+  hs_token: z.string(),
+  sender_localpart: z.string(),
+  // enforced
+  rate_limited: z.boolean().catch(false),
+  // configurable
+  namespaces: namespacesShape,
 })
 
 export type AppserviceRegistration = z.infer<typeof shape>

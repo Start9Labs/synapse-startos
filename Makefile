@@ -1,13 +1,16 @@
 ARCHES := x86 arm
-
+# overrides to s9pk.mk must precede the include statement
 include s9pk.mk
 
 SYNAPSE_ADMIN_VERSION = v0.11.1-etke50
 SYNAPSE_ADMIN_CHECKSUM = c2a6888db6e4ac2766f17be2bc703d284a7e5f6e8af1c1a7fda0af9ae44e06aa
 
-# Add synapse-admin as additional prerequisite for s9pk targets
-$(BASE_NAME).s9pk: assets/synapse-admin
-$(BASE_NAME)_%.s9pk: assets/synapse-admin
+# Ensure synapse-admin is built as part of 'ingredients' (which the s9pk
+# recipe runs before packing). A prerequisite-only pattern rule like
+# $(BASE_NAME)_%.s9pk: assets/synapse-admin is silently ignored by GNU Make
+# (pattern rules without recipes are discarded), so we hook into 'ingredients'
+# instead.
+ingredients: assets/synapse-admin
 
 # Override clean to also remove synapse-admin artifacts
 clean:

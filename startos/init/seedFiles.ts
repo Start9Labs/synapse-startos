@@ -2,7 +2,7 @@ import { homeserverLogConfig } from '../fileModels/homeserver.log.config'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
 import { sdk } from '../sdk'
-import { configDefaults, mount } from '../utils'
+import { mount } from '../utils'
 
 export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
   if (kind !== 'install') return
@@ -26,6 +26,6 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
     adminUserCreated: false,
     serverStarted: false,
   })
-  await homeserverYaml.merge(effects, configDefaults)
+  await homeserverYaml.merge(effects, {})
   await homeserverLogConfig.merge(effects, {})
 })
