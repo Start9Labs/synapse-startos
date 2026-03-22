@@ -71,7 +71,7 @@ const shape = z.object({
 
   // set by actions
   server_name: z.string(),
-  public_baseurl: z.string(),
+  public_baseurl: z.string().catch('https://placeholder.com'),
 
   // configurable
   email: z

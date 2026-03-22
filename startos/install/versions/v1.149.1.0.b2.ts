@@ -2,10 +2,10 @@ import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
 import { rm, readFile } from 'fs/promises'
 import { storeJson } from '../../fileModels/store.json'
 
-export const v_1_149_1_0_b1 = VersionInfo.of({
-  version: '1.149.1:0-beta.1',
+export const v_1_149_1_0_b2 = VersionInfo.of({
+  version: '1.149.1:0-beta.2',
   releaseNotes: {
-    en_US: 'Update Synapse to 1.149.1',
+    en_US: 'Fix initial install failure caused by missing public_baseurl default in file model',
   },
   migrations: {
     up: async ({ effects }) => {
@@ -46,12 +46,9 @@ export const v_1_149_1_0_b1 = VersionInfo.of({
                         username: configYaml['smtp-user'],
                         password: configYaml['smtp-pass'],
                         security: {
-                          selection: 'starttls' as const,
+                          selection: 'tls' as const,
                           value: {
-                            port: String(configYaml['smtp-port']) as
-                              | '587'
-                              | '25'
-                              | '2525',
+                            port: '465' as const,
                           },
                         },
                       },
