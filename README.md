@@ -67,7 +67,7 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 | Step | Upstream | StartOS |
 |------|----------|---------|
-| Generate config | `python -m synapse.app.homeserver --generate-config` | Automatic via `preInstall` |
+| Generate config | `python -m synapse.app.homeserver --generate-config` | Automatic via `setupOnInit` |
 | Set server name | Edit `homeserver.yaml` | "Set Server Address/URL" action (critical task) |
 | Create admin user | `register_new_matrix_user` CLI | "Create Admin User" action (optional task) |
 

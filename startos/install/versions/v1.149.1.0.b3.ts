@@ -2,8 +2,8 @@ import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
 import { rm, readFile } from 'fs/promises'
 import { storeJson } from '../../fileModels/store.json'
 
-export const v_1_149_1_0_b2 = VersionInfo.of({
-  version: '1.149.1:0-beta.2',
+export const v_1_149_1_0_b3 = VersionInfo.of({
+  version: '1.149.1:0-beta.3',
   releaseNotes: {
     en_US: 'Fix initial install failure caused by missing public_baseurl default in file model',
   },

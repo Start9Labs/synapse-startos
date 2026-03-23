@@ -1,3 +1,4 @@
+import { smtpPrefill } from '@start9labs/start-sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
@@ -102,8 +103,9 @@ export const config = sdk.Action.withInput(
           }
         : { selection: 'disabled' as const, value: {} },
       max_upload_size: toMB(max_upload_size),
-      smtp: ((await storeJson.read((s) => s.smtp).const(effects)) ||
-        undefined) as any,
+      smtp: smtpPrefill(
+        await storeJson.read((s) => s.smtp).const(effects),
+      ),
     }
   },
 
