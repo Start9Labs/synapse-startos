@@ -5,7 +5,6 @@ import { sdk } from '../sdk'
 import { mount } from '../utils'
 
 export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
-  await homeserverYaml.merge(effects, {})
   await homeserverLogConfig.merge(effects, {})
 
   if (kind === 'install') {
@@ -31,4 +30,7 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
   } else {
     await storeJson.merge(effects, {})
   }
+
+  // Must run after synapse generate on install (creates signing_key_path, server_name)
+  await homeserverYaml.merge(effects, {})
 })
