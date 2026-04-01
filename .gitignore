@@ -1,7 +1,10 @@
-.env/
 *.s9pk
-synapse-vps.tar
-.vscode/
+startos/*.js
+node_modules/
 .DS_Store
-scripts/*.js
+.vscode/
 docker-images
+javascript
+ncc-cache
+tmp/
+assets/synapse-admin

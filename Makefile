@@ -1,63 +1,28 @@
-PKG_ID := $(shell yq e ".id" manifest.yaml)
-PKG_VERSION := $(shell yq e ".version" manifest.yaml)
-TS_FILES := $(shell find ./ -name \*.ts)
+ARCHES := x86 arm
+# overrides to s9pk.mk must precede the include statement
+include s9pk.mk
 
-.DELETE_ON_ERROR:
+SYNAPSE_ADMIN_VERSION = v0.11.1-etke50
+SYNAPSE_ADMIN_CHECKSUM = c2a6888db6e4ac2766f17be2bc703d284a7e5f6e8af1c1a7fda0af9ae44e06aa
 
-all: verify
+# Ensure synapse-admin is built as part of 'ingredients' (which the s9pk
+# recipe runs before packing). A prerequisite-only pattern rule like
+# $(BASE_NAME)_%.s9pk: assets/synapse-admin is silently ignored by GNU Make
+# (pattern rules without recipes are discarded), so we hook into 'ingredients'
+# instead.
+ingredients: assets/synapse-admin
 
-install:
-ifeq (,$(wildcard ~/.embassy/config.yaml))
-	@echo; echo "You must define \"host: http://server-name.local\" in ~/.embassy/config.yaml config file first"; echo
-else
-	start-cli package install $(PKG_ID).s9pk
-endif
-
+# Override clean to also remove synapse-admin artifacts
 clean:
-	rm -f $(PKG_ID).s9pk
-	rm -f scripts/*.js
-	rm -rf docker-images
-	rm -f synapse-vps.tar
+	@echo "Cleaning up build artifacts..."
+	@rm -rf $(PACKAGE_ID).s9pk $(PACKAGE_ID)_x86_64.s9pk $(PACKAGE_ID)_aarch64.s9pk $(PACKAGE_ID)_riscv64.s9pk javascript assets/synapse-admin tmp node_modules
 
-arm:
-	@rm -f docker-images/x86_64.tar
-	@ARCH=aarch64 $(MAKE)
+# Custom recipes for synapse-admin
+assets/synapse-admin: tmp/synapse-admin.tar.gz
+	rm -rf assets/synapse-admin
+	tar -xzvf tmp/synapse-admin.tar.gz -C assets
 
-x86:
-	@rm -f docker-images/aarch64.tar
-	@ARCH=x86_64 $(MAKE)
-
-verify: $(PKG_ID).s9pk
-	@start-sdk verify s9pk $(PKG_ID).s9pk
-	@echo " Done!"
-	@echo "   Filesize: $(shell du -h $(PKG_ID).s9pk) is ready"
-
-$(PKG_ID).s9pk: manifest.yaml instructions.md icon.png LICENSE scripts/embassy.js docker-images/aarch64.tar docker-images/x86_64.tar
-ifeq ($(ARCH),aarch64)
-	@echo "start-sdk: Preparing aarch64 package ..."
-else ifeq ($(ARCH),x86_64)
-	@echo "start-sdk: Preparing x86_64 package ..."
-else
-	@echo "start-sdk: Preparing Universal Package ..."
-endif
-	@start-sdk pack
-
-docker-images/aarch64.tar: Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-onion configurator.py $(shell find ./www)
-ifeq ($(ARCH),x86_64)
-else
-	mkdir -p docker-images
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --build-arg PLATFORM=arm64 --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/arm64 -o type=docker,dest=docker-images/aarch64.tar .
-endif
-
-docker-images/x86_64.tar: Dockerfile docker_entrypoint.sh check-federation.sh priv-config-forward-onion configurator.py $(shell find ./www)
-ifeq ($(ARCH),aarch64)
-else
-	mkdir -p docker-images
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --build-arg PLATFORM=amd64 --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=docker-images/x86_64.tar .
-endif
-
-scripts/embassy.js: $(TS_FILES)
-	deno run --allow-read --allow-write --allow-env --allow-net scripts/bundle.ts
-
-vps: Dockerfile.vps
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --build-arg PLATFORM=amd64 -f Dockerfile --tag matrixdotorg/synapse:v$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=synapse-vps.tar .
+tmp/synapse-admin.tar.gz:
+	mkdir -p tmp
+	(cd tmp && curl --progress-bar -OL https://github.com/etkecc/synapse-admin/releases/download/$(SYNAPSE_ADMIN_VERSION)/synapse-admin.tar.gz)
+	echo "$(SYNAPSE_ADMIN_CHECKSUM)  tmp/synapse-admin.tar.gz" | shasum -a 256 -c
