@@ -22,9 +22,9 @@
 - [Configuration Management](#configuration-management)
 - [Network Access and Interfaces](#network-access-and-interfaces)
 - [Actions (StartOS UI)](#actions-startos-ui)
-- [Dependencies](#dependencies)
 - [Backups and Restore](#backups-and-restore)
 - [Health Checks](#health-checks)
+- [Dependencies](#dependencies)
 - [Limitations and Differences](#limitations-and-differences)
 - [What Is Unchanged from Upstream](#what-is-unchanged-from-upstream)
 - [Contributing](#contributing)
@@ -37,8 +37,8 @@
 | Property | Value |
 |----------|-------|
 | Synapse image | Custom `dockerBuild` from upstream source (workdir `./synapse`) |
-| Nginx image | `nginx:stable-alpine` (upstream unmodified) |
-| PostgreSQL image | `postgres:16-alpine` (database sidecar) |
+| Nginx image | `nginx` Alpine (upstream unmodified) |
+| PostgreSQL image | `postgres` Alpine (database sidecar) |
 | Architectures | x86_64, aarch64 |
 
 Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on port 80, proxies Matrix API traffic to Synapse on port 8008, and serves the [Synapse Admin](https://github.com/etkecc/synapse-admin) dashboard on port 8080.
@@ -107,13 +107,6 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 | Admin Dashboard | 8080 (nginx) | HTTP | UI | Synapse Admin web interface |
 
 Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, handles `.well-known/matrix/server` responses, and enforces `max_upload_size` on Matrix API routes.
-
-**Access methods (StartOS 0.4.0):**
-
-- LAN IP with unique port
-- `<hostname>.local` with unique port
-- Tor `.onion` address
-- Custom domains (if configured)
 
 ---
 
@@ -199,12 +192,6 @@ Accepts appservice credentials (ID, tokens, URL, namespace regex) and writes the
 
 ---
 
-## Dependencies
-
-None. Synapse is a standalone application.
-
----
-
 ## Backups and Restore
 
 **Included in backup:**
@@ -227,6 +214,12 @@ None. Synapse is a standalone application.
 | Homeserver | HTTP GET `http://localhost:8008/health` | 15 seconds | "Homeserver" |
 | Nginx | Port listening on 80 | Default | Hidden |
 | Admin Dashboard | HTTP GET `http://localhost:8080` | Default | "Admin Dashboard" |
+
+---
+
+## Dependencies
+
+None.
 
 ---
 
@@ -267,8 +260,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 package_id: synapse
 images:
   synapse: dockerBuild (./synapse/Dockerfile)
-  nginx: nginx:stable-alpine
-  postgres: postgres:16-alpine
+  nginx: nginx (Alpine)
+  postgres: postgres (Alpine)
 architectures: [x86_64, aarch64]
 volumes:
   main: /data
