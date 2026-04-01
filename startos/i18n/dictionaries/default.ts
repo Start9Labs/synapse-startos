@@ -78,7 +78,7 @@ const dict = {
   Tor: 74,
   'Set Server Address/URL': 75,
   'Choose a permanent address/URL for your Synapse server.': 76,
-  'This can never be changed. For clearnet (recommended), add a public domain to the Homeserver interface. For Tor, install Tor from the marketplace and add an onion address to the Homeserver interface.': 77,
+  'This can never be changed. You must first add a public domain to the Homeserver interface.': 77,
   'Choose the permanent address/URL of your Synapse Matrix server': 78,
   'Your admin username and password are below. Write them down or save them to a password manager.': 79,
   Database: 80,

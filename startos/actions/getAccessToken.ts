@@ -1,4 +1,3 @@
-import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { homeserverPort } from '../utils'
@@ -41,9 +40,9 @@ export const getAccessToken = sdk.Action.withInput(
       'Get a Matrix access token for a user by providing their username and password.',
     ),
     warning: null,
-    allowedStatuses: 'only-running' as const,
+    allowedStatuses: 'only-running',
     group: null,
-    visibility: 'enabled' as const,
+    visibility: 'enabled',
   }),
 
   // form input specification
@@ -53,10 +52,7 @@ export const getAccessToken = sdk.Action.withInput(
   async () => ({}),
 
   // the execution function
-  async ({ effects, input }) => {
-    const config = await homeserverYaml.read().once()
-    if (!config) throw new Error('homeserver.yaml not found')
-
+  async ({ input }) => {
     const res = await fetch(`http://localhost:${homeserverPort}/_matrix/client/v3/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

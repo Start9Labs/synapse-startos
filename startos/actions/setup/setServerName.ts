@@ -4,42 +4,12 @@ import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
 import { createAdminUser } from './createAdminUser'
 
-const { InputSpec, Value, Variants } = sdk
-
-const name = i18n('Address/URL')
-const description = i18n(
-  'Your server address/URL determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.',
-)
-const warning = i18n(
-  'Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.',
-)
+const { InputSpec, Value } = sdk
 
 export const inputSpec = InputSpec.of({
-  network: Value.union({
-    name: i18n('Network'),
-    default: 'clearnet',
-    description: i18n(
-      'Choose whether your server will be hosted on clearnet (recommended) or Tor. IMPORTANT: Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.',
-    ),
-    variants: Variants.of({
-      clearnet: {
-        name: i18n('Clearnet'),
-        spec: InputSpec.of({
-          server_name: Value.dynamicSelect(async ({ effects }) =>
-            getSynapseInterfaceHostnames(effects, 'clearnet'),
-          ),
-        }),
-      },
-      tor: {
-        name: i18n('Tor'),
-        spec: InputSpec.of({
-          server_name: Value.dynamicSelect(async ({ effects }) =>
-            getSynapseInterfaceHostnames(effects, 'tor'),
-          ),
-        }),
-      },
-    }),
-  }),
+  server_name: Value.dynamicSelect(async ({ effects }) =>
+    getClearnetHostnames(effects),
+  ),
 })
 
 export const setServerName = sdk.Action.withInput(
@@ -47,37 +17,30 @@ export const setServerName = sdk.Action.withInput(
   'set-server-name',
 
   // metadata
-  async ({ effects }) => {
-    return {
-      name: i18n('Set Server Address/URL'),
-      description: i18n(
-        'Choose a permanent address/URL for your Synapse server.',
-      ),
-      warning: i18n(
-        'This can never be changed. For clearnet (recommended), add a public domain to the Homeserver interface. For Tor, install Tor from the marketplace and add an onion address to the Homeserver interface.',
-      ),
-      allowedStatuses: 'only-stopped',
-      group: null,
-      visibility: 'hidden',
-    }
-  },
+  async () => ({
+    name: i18n('Set Server Address/URL'),
+    description: i18n(
+      'Choose a permanent address/URL for your Synapse server.',
+    ),
+    warning: i18n(
+      'This can never be changed. You must first add a public domain to the Homeserver interface.',
+    ),
+    allowedStatuses: 'only-stopped',
+    group: null,
+    visibility: 'hidden',
+  }),
 
   // form input specification
   inputSpec,
 
   // optionally pre-fill the input form
-  async ({ effects }) => {},
+  async () => ({}),
 
   // the execution function
   async ({ effects, input }) => {
-    const server_name = input.network.value.server_name
-
     await homeserverYaml.merge(effects, {
-      server_name,
-      public_baseurl:
-        input.network.selection === 'clearnet'
-          ? `https://${server_name}`
-          : `http://${server_name}`,
+      server_name: input.server_name,
+      public_baseurl: `https://${input.server_name}`,
     })
 
     await sdk.action.createOwnTask(effects, createAdminUser, 'critical', {
@@ -88,34 +51,32 @@ export const setServerName = sdk.Action.withInput(
   },
 )
 
-export async function getSynapseInterfaceHostnames(
-  effects: Effects,
-  type: 'clearnet' | 'tor',
-): Promise<{
+async function getClearnetHostnames(effects: Effects): Promise<{
   name: string
   description?: string | null
   warning?: string | null
   default: string
   values: Record<string, string>
 }> {
-  let hostnames =
+  const hostnames =
     (await sdk.serviceInterface
       .getOwn(effects, 'homeserver', (i) =>
         i?.addressInfo?.hostnames
-          .filter((h) =>
-            type === 'tor'
-              ? h.hostname.endsWith('.onion')
-              : h.metadata.kind === 'public-domain' ||
-                h.metadata.kind === 'private-domain',
+          .filter(
+            (h) =>
+              h.metadata.kind === 'public-domain' ||
+              h.metadata.kind === 'private-domain',
           )
           .map((h) => h.hostname),
       )
       .once()) || []
 
   return {
-    name,
-    description,
-    warning: type === 'tor' ? warning : null,
+    name: i18n('Address/URL'),
+    description: i18n(
+      'Your server address/URL determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.',
+    ),
+    warning: null,
     values: hostnames.reduce(
       (obj: Record<string, string>, hostname: string) => ({
         ...obj,
