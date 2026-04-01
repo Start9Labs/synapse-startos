@@ -2,10 +2,14 @@ import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
 import { rm, readFile } from 'fs/promises'
 import { storeJson } from '../fileModels/store.json'
 
-export const v_1_149_1_0_b5 = VersionInfo.of({
-  version: '1.149.1:0-beta.5',
+export const v_1_150_0_0 = VersionInfo.of({
+  version: '1.150.0:0',
   releaseNotes: {
-    en_US: 'Fix initial install failure caused by missing public_baseurl default in file model',
+    en_US: 'Switch from SQLite to PostgreSQL. Add admin user creation wizard. Fix Synapse Admin dashboard CORS issues.',
+    es_ES: 'Cambio de SQLite a PostgreSQL. Asistente de creación de usuario administrador. Corrección de problemas CORS en el panel de Synapse Admin.',
+    de_DE: 'Umstellung von SQLite auf PostgreSQL. Assistent zur Erstellung eines Admin-Benutzers. Behebung von CORS-Problemen im Synapse Admin Dashboard.',
+    pl_PL: 'Przejście z SQLite na PostgreSQL. Kreator tworzenia użytkownika administratora. Naprawa problemów CORS w panelu Synapse Admin.',
+    fr_FR: "Passage de SQLite à PostgreSQL. Assistant de création d'utilisateur administrateur. Correction des problèmes CORS du tableau de bord Synapse Admin.",
   },
   migrations: {
     up: async ({ effects }) => {
@@ -27,7 +31,6 @@ export const v_1_149_1_0_b5 = VersionInfo.of({
       if (configYaml) {
         // Write store
         await storeJson.merge(effects, {
-          adminUserCreated: true,
           serverStarted: true,
           smtp:
             configYaml['email-notifications'] &&

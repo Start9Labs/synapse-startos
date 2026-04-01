@@ -1,9 +1,9 @@
 import { unlink } from 'node:fs/promises'
-import { appservicesSubpath } from '../fileModels/appserviceRegistration.yaml'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { mountpoint } from '../utils'
+import { appservicesSubpath } from '../../fileModels/appserviceRegistration.yaml'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { mountpoint } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -35,11 +35,14 @@ export const deleteAppservice = sdk.Action.withInput(
 
   async ({ effects }) => ({
     name: i18n('Delete Appservice'),
-    description: i18n('Remove a registered appservice (bridge) from the homeserver.'),
-    warning:
-      i18n('This will remove the appservice registration. The bridge service will no longer be able to communicate with Synapse until re-registered.'),
+    description: i18n(
+      'Remove a registered appservice (bridge) from the homeserver.',
+    ),
+    warning: i18n(
+      'This will remove the appservice registration. The bridge service will no longer be able to communicate with Synapse until re-registered.',
+    ),
     allowedStatuses: 'any',
-    group: null,
+    group: 'App Services',
     visibility: 'enabled',
   }),
 

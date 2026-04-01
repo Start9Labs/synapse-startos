@@ -1,95 +1,76 @@
+import { utils } from '@start9labs/start-sdk'
+import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { utils } from '@start9labs/start-sdk'
-import { mount } from '../utils'
-import { storeJson } from '../fileModels/store.json'
-
-const randomPassword = {
-  charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
-  len: 22,
-}
+import { mount, postgresDb, postgresUser } from '../utils'
 
 export const resetAdmin = sdk.Action.withoutInput(
   // id
   'reset-admin',
 
   // metadata
-  async ({ effects }) => {
-    const adminUserCreated = await storeJson
-      .read((s) => s.adminUserCreated)
-      .const(effects)
-
-    return {
-      name: adminUserCreated ? i18n('Reset Admin Password') : i18n('Create Admin User'),
-      description: adminUserCreated
-        ? i18n('Reset your admin user password')
-        : i18n('Create your admin user and password'),
-      warning: null,
-      allowedStatuses: adminUserCreated ? 'only-stopped' : 'only-running',
-      group: null,
-      visibility: 'enabled',
-    }
-  },
+  async () => ({
+    name: i18n('Reset Admin Password'),
+    description: i18n('Reset your admin user password'),
+    warning: null,
+    allowedStatuses: 'only-running',
+    group: null,
+    visibility: 'enabled',
+  }),
 
   // the execution function
   async ({ effects }) => {
-    const username = 'admin'
-    const password = utils.getDefaultString(randomPassword)
+    const password = utils.getDefaultString({
+      charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
+      len: 22,
+    })
 
-    const adminUserCreated = await storeJson
-      .read((s) => s.adminUserCreated)
-      .once()
+    const config = await homeserverYaml.read().once()
+    if (!config) throw new Error('homeserver.yaml not found')
 
-    if (adminUserCreated) {
-      const passwordHash = await sdk.SubContainer.withTemp(
-        effects,
-        { imageId: 'synapse' },
-        mount,
-        'get-password-hash',
-        async (subc) =>
-          (
-            await subc.execFail([
-              'hash_password',
-              '-p',
-              password,
-              '-c',
-              '/data/homeserver.yaml',
-            ])
-          ).stdout,
-      )
-
-      await sdk.SubContainer.withTemp(
-        effects,
-        { imageId: 'sqlite3' },
-        mount,
-        'save-password-hash',
-        (subc) =>
-          subc.execFail([
-            'sqlite3',
-            '/data/homeserver.db',
-            `UPDATE users SET password_hash = '${passwordHash.toString().trim()}' WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
-          ]),
-      )
-    } else {
-      await sdk.SubContainer.withTemp(
-        effects,
-        { imageId: 'synapse' },
-        mount,
-        'set-admin-pass',
-        (subc) =>
-          subc.execFail([
-            'register_new_matrix_user',
-            '--config',
-            '/data/homeserver.yaml',
-            '--user',
-            username,
-            '--password',
+    const passwordHash = await sdk.SubContainer.withTemp(
+      effects,
+      { imageId: 'synapse' },
+      mount,
+      'get-password-hash',
+      async (subc) =>
+        (
+          await subc.execFail([
+            'hash_password',
+            '-p',
             password,
-            '--admin',
-          ]),
-      )
-      await storeJson.merge(effects, { adminUserCreated: true })
-    }
+            '-c',
+            '/data/homeserver.yaml',
+          ])
+        ).stdout,
+    )
+
+    const hash = sqlLiteral(passwordHash.toString().trim())
+    await sdk.SubContainer.withTemp(
+      effects,
+      { imageId: 'postgres' },
+      sdk.Mounts.of(),
+      'save-password-hash',
+      (subc) =>
+        subc.execFail(
+          [
+            'psql',
+            '-h',
+            '127.0.0.1',
+            '-U',
+            postgresUser,
+            '-d',
+            postgresDb,
+            '-c',
+            `UPDATE users SET password_hash = '${hash}' WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
+          ],
+          {
+            env: {
+              PGPASSWORD: config.database.args.password,
+            },
+          },
+        ),
+    )
 
     return {
       version: '1',
@@ -102,7 +83,7 @@ export const resetAdmin = sdk.Action.withoutInput(
             type: 'single',
             name: i18n('Username'),
             description: null,
-            value: username,
+            value: 'admin',
             masked: false,
             copyable: true,
             qr: false,
@@ -121,3 +102,7 @@ export const resetAdmin = sdk.Action.withoutInput(
     }
   },
 )
+
+function sqlLiteral(s: string): string {
+  return s.replace(/'/g, "''")
+}

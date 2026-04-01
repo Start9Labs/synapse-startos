@@ -1,14 +1,14 @@
 import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createAdminUser } from './createAdminUser'
 
 const { InputSpec, Value, Variants } = sdk
 
 const name = i18n('Address/URL')
 const description = i18n(
-  'Your server address/url determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.',
+  'Your server address/URL determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.',
 )
 const warning = i18n(
   'Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.',
@@ -50,14 +50,15 @@ export const setServerName = sdk.Action.withInput(
   async ({ effects }) => {
     return {
       name: i18n('Set Server Address/URL'),
-      description:
-        i18n('Choose a permanent address/URL for your Synapse server. After you start your server for the first time, this can never be changed.'),
-      warning: i18n('This can never be changed after you start your server'),
+      description: i18n(
+        'Choose a permanent address/URL for your Synapse server.',
+      ),
+      warning: i18n(
+        'This can never be changed. For clearnet (recommended), add a public domain to the Homeserver interface. For Tor, install Tor from the marketplace and add an onion address to the Homeserver interface.',
+      ),
       allowedStatuses: 'only-stopped',
       group: null,
-      visibility: (await storeJson.read((s) => s.serverStarted).const(effects))
-        ? 'hidden'
-        : 'enabled',
+      visibility: 'hidden',
     }
   },
 
@@ -77,6 +78,12 @@ export const setServerName = sdk.Action.withInput(
         input.network.selection === 'clearnet'
           ? `https://${server_name}`
           : `http://${server_name}`,
+    })
+
+    await sdk.action.createOwnTask(effects, createAdminUser, 'critical', {
+      reason: i18n(
+        'Create a root admin user for your Synapse Matrix homeserver',
+      ),
     })
   },
 )

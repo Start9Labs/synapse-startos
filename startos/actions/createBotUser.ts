@@ -7,8 +7,9 @@ const { InputSpec, Value } = sdk
 export const inputSpec = InputSpec.of({
   username: Value.dynamicText(async () => ({
     name: i18n('Username'),
-    description:
-      i18n('The localpart for the bot user (e.g. "mybot" creates @mybot:your.domain)'),
+    description: i18n(
+      'The localpart for the bot user (e.g. "mybot" creates @mybot:your.domain)',
+    ),
     required: true as const,
     default: null,
     placeholder: 'mybot',
@@ -31,11 +32,13 @@ export const createBotUser = sdk.Action.withInput(
 
   async ({ effects }) => ({
     name: i18n('Create Bot User'),
-    description: i18n('Create a new bot (non-admin) user account on the homeserver.'),
+    description: i18n(
+      'Create a new bot (non-admin) user account on the homeserver.',
+    ),
     warning: null,
     allowedStatuses: 'only-running',
     group: null,
-    visibility: 'hidden' as const,
+    visibility: 'enabled',
   }),
 
   inputSpec,

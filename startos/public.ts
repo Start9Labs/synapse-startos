@@ -1,9 +1,9 @@
 import type { T } from '@start9labs/start-sdk'
+import { registerAppservice } from './actions/appServices/registerAppservice'
 import {
   appserviceRegistrationYaml,
   appservicesSubpath,
 } from './fileModels/appserviceRegistration.yaml'
-import { registerAppservice } from './actions/registerAppservice'
 import { sdk } from './sdk'
 
 const synapseMountpoint = '/mnt/synapse'
@@ -49,10 +49,7 @@ export const ensureAppserviceRegistration = async (
       .read()
       .once()
 
-    if (
-      reg?.as_token !== params.asToken ||
-      reg?.hs_token !== params.hsToken
-    ) {
+    if (reg?.as_token !== params.asToken || reg?.hs_token !== params.hsToken) {
       console.info(
         `[i] Appservice registration tokens mismatch for ${params.id}`,
       )
@@ -66,21 +63,27 @@ export const ensureAppserviceRegistration = async (
   }
 
   if (needsRegistration) {
-    await sdk.action.createTask(effects, 'synapse', registerAppservice, 'critical', {
-      input: {
-        kind: 'partial',
-        value: {
-          id: params.id,
-          asToken: params.asToken,
-          hsToken: params.hsToken,
-          senderLocalpart: params.senderLocalpart,
-          url: params.url,
-          rateLimited: params.rateLimited,
-          userNamespaceRegex: params.userNamespaceRegex,
+    await sdk.action.createTask(
+      effects,
+      'synapse',
+      registerAppservice,
+      'critical',
+      {
+        input: {
+          kind: 'partial',
+          value: {
+            id: params.id,
+            asToken: params.asToken,
+            hsToken: params.hsToken,
+            senderLocalpart: params.senderLocalpart,
+            url: params.url,
+            rateLimited: params.rateLimited,
+            userNamespaceRegex: params.userNamespaceRegex,
+          },
         },
+        when: { condition: 'input-not-matches', once: false },
+        reason: params.reason,
       },
-      when: { condition: 'input-not-matches', once: false },
-      reason: params.reason,
-    })
+    )
   }
 }

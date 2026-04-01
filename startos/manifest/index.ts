@@ -5,17 +5,17 @@ export const manifest = setupManifest({
   id: 'synapse',
   title: 'Synapse',
   license: 'AGPL-3.0',
-  packageRepo: 'https://github.com/Start9Labs/synapse-startos/tree/update/040',
+  packageRepo: 'https://github.com/Start9Labs/synapse-startos',
   upstreamRepo: 'https://github.com/element-hq/synapse',
   marketingUrl: 'https://matrix.org/',
   donationUrl: null,
   docsUrls: [
-    'https://github.com/Start9Labs/synapse-startos/tree/update/040/docs/instructions.md',
+    'https://github.com/Start9Labs/synapse-startos/docs/instructions.md',
     'https://element-hq.github.io/synapse/latest',
     'https://docs.element.io/latest/element-support/understanding-your-element-accounts/#up',
   ],
   description: { short, long },
-  volumes: ['main'],
+  volumes: ['main', 'db'],
   images: {
     synapse: {
       source: {
@@ -32,11 +32,9 @@ export const manifest = setupManifest({
       },
       arch: ['x86_64', 'aarch64'],
     },
-    sqlite3: {
+    postgres: {
       source: {
-        dockerBuild: {
-          dockerfile: './Dockerfile-sqlite',
-        },
+        dockerTag: 'postgres:16-alpine',
       },
       arch: ['x86_64', 'aarch64'],
     },

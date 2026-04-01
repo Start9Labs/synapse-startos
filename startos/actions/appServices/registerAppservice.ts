@@ -1,11 +1,11 @@
 import {
   appserviceRegistrationYaml,
   appservicesSubpath,
-} from '../fileModels/appserviceRegistration.yaml'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { mountpoint } from '../utils'
+} from '../../fileModels/appserviceRegistration.yaml'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { mountpoint } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -20,8 +20,9 @@ export const inputSpec = InputSpec.of({
   }),
   asToken: Value.text({
     name: i18n('AS Token'),
-    description:
-      i18n('Appservice token used by the bridge to authenticate with the homeserver'),
+    description: i18n(
+      'Appservice token used by the bridge to authenticate with the homeserver',
+    ),
     required: true,
     default: null,
     placeholder: null,
@@ -29,8 +30,9 @@ export const inputSpec = InputSpec.of({
   }),
   hsToken: Value.text({
     name: i18n('HS Token'),
-    description:
-      i18n('Homeserver token used by the homeserver to authenticate with the bridge'),
+    description: i18n(
+      'Homeserver token used by the homeserver to authenticate with the bridge',
+    ),
     required: true,
     default: null,
     placeholder: null,
@@ -46,8 +48,9 @@ export const inputSpec = InputSpec.of({
   }),
   url: Value.text({
     name: i18n('Bridge URL'),
-    description:
-      i18n('The URL where the homeserver can reach the bridge appservice'),
+    description: i18n(
+      'The URL where the homeserver can reach the bridge appservice',
+    ),
     required: true,
     default: null,
     placeholder: 'http://mautrix-signal.startos:29328',
@@ -55,14 +58,16 @@ export const inputSpec = InputSpec.of({
   }),
   rateLimited: Value.toggle({
     name: i18n('Rate Limited'),
-    description:
-      i18n('Whether requests from this appservice should be rate limited'),
+    description: i18n(
+      'Whether requests from this appservice should be rate limited',
+    ),
     default: false,
   }),
   userNamespaceRegex: Value.text({
     name: i18n('User Namespace Regex'),
-    description:
-      i18n('Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*"). Leave empty if the appservice does not manage user namespaces.'),
+    description: i18n(
+      'Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*"). Leave empty if the appservice does not manage user namespaces.',
+    ),
     required: false,
     default: null,
     placeholder: '@signal_.*:.*',
@@ -75,11 +80,12 @@ export const registerAppservice = sdk.Action.withInput(
 
   async ({ effects }) => ({
     name: i18n('Register Appservice'),
-    description:
-      i18n('Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.'),
+    description: i18n(
+      'Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.',
+    ),
     warning: null,
     allowedStatuses: 'any',
-    group: null,
+    group: 'App Services',
     visibility: 'enabled',
   }),
 

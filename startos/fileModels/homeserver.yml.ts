@@ -1,13 +1,20 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-import { homeserverPort } from '../utils'
+import { homeserverPort, postgresDb, postgresUser } from '../utils'
 
 // shared constants
-const dbPath = '/data/homeserver.db'
 const defaultMaxUpload = '50M'
 
 // extracted defaults
-const dbDefault = { args: { database: dbPath }, name: 'sqlite3' }
+const dbDefault = {
+  args: {
+    user: postgresUser,
+    password: '',
+    database: postgresDb,
+    host: '127.0.0.1' as const,
+  },
+  name: 'psycopg2' as const,
+}
 const resourceDefault = {
   compress: false,
   names: ['client'] as ('client' | 'federation')[],
@@ -25,9 +32,14 @@ const listenerDefault = {
 const dbShape = z
   .object({
     args: z
-      .object({ database: z.string().catch(dbPath) })
+      .object({
+        user: z.literal(postgresUser).catch(postgresUser),
+        password: z.string().catch(''),
+        database: z.literal(postgresDb).catch(postgresDb),
+        host: z.literal('127.0.0.1').catch('127.0.0.1'),
+      })
       .catch(dbDefault.args),
-    name: z.string().catch(dbDefault.name),
+    name: z.literal('psycopg2').catch('psycopg2' as const),
   })
   .catch(dbDefault)
 
@@ -42,9 +54,7 @@ const resourceShape = z
 
 const listenerShape = z
   .object({
-    bind_addresses: z
-      .array(z.string())
-      .catch(listenerDefault.bind_addresses),
+    bind_addresses: z.array(z.string()).catch(listenerDefault.bind_addresses),
     port: z.number().catch(listenerDefault.port),
     resources: z.array(resourceShape).catch(listenerDefault.resources),
     tls: z.boolean().catch(listenerDefault.tls),
@@ -90,13 +100,9 @@ const shape = z.object({
     .catch(null),
   enable_registration: z.boolean().catch(false),
   enable_registration_without_verification: z.boolean().catch(true),
-  federation_certificate_verification_whitelist: z
-    .array(z.string())
-    .catch([]),
+  federation_certificate_verification_whitelist: z.array(z.string()).catch([]),
   federation_domain_whitelist: z.array(z.string()).optional(),
-  trusted_key_servers: z
-    .array(z.object({ server_name: z.string() }))
-    .catch([]),
+  trusted_key_servers: z.array(z.object({ server_name: z.string() })).catch([]),
   max_upload_size: z
     .string()
     .transform((s) =>
@@ -108,8 +114,6 @@ const shape = z.object({
     .catch(defaultMaxUpload),
   app_service_config_files: z.array(z.string()).catch([]),
 })
-
-export type HomeserverYaml = z.infer<typeof shape>
 
 export const homeserverYaml = FileHelper.yaml(
   {

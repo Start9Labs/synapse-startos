@@ -2,7 +2,6 @@ import { FileHelper, smtpShape, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
 const shape = z.object({
-  adminUserCreated: z.boolean().catch(true),
   serverStarted: z.boolean().catch(true),
   smtp: smtpShape,
 })

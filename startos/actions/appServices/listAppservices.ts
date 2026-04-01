@@ -3,12 +3,14 @@ import {
   appserviceRegistrationYaml,
   appservicesSubpath,
   type AppserviceRegistration,
-} from '../fileModels/appserviceRegistration.yaml'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+} from '../../fileModels/appserviceRegistration.yaml'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
-const appserviceFields = (reg: AppserviceRegistration): T.ActionResultMember[] => {
+const appserviceFields = (
+  reg: AppserviceRegistration,
+): T.ActionResultMember[] => {
   const fields: T.ActionResultMember[] = [
     {
       type: 'single',
@@ -86,11 +88,12 @@ export const listAppservices = sdk.Action.withoutInput(
 
   async ({ effects }) => ({
     name: i18n('List Appservices'),
-    description:
-      i18n('View all registered Matrix appservices (bridges) on this homeserver.'),
+    description: i18n(
+      'View all registered Matrix appservices (bridges) on this homeserver.',
+    ),
     warning: null,
     allowedStatuses: 'any',
-    group: null,
+    group: 'App Services',
     visibility: 'enabled',
   }),
 
@@ -101,7 +104,7 @@ export const listAppservices = sdk.Action.withoutInput(
 
     if (files.length === 0) {
       return {
-        version: '1' as const,
+        version: '1',
         title: i18n('Registered Appservices'),
         message: i18n('No appservices are currently registered.'),
         result: null,
@@ -111,7 +114,9 @@ export const listAppservices = sdk.Action.withoutInput(
     const groups: T.ActionResultMember[] = []
 
     for (const filePath of files) {
-      const match = filePath.match(new RegExp(`/${appservicesSubpath}/(.+)\\.yaml$`))
+      const match = filePath.match(
+        new RegExp(`/${appservicesSubpath}/(.+)\\.yaml$`),
+      )
       if (!match) continue
       const id = match[1]
 
@@ -139,11 +144,11 @@ export const listAppservices = sdk.Action.withoutInput(
     }
 
     return {
-      version: '1' as const,
+      version: '1',
       title: i18n('Registered Appservices'),
       message: null,
       result: {
-        type: 'group' as const,
+        type: 'group',
         value: groups,
       },
     }

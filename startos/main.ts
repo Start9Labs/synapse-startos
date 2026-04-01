@@ -1,9 +1,17 @@
-import { i18n } from './i18n'
-import { sdk } from './sdk'
-import { adminPort, homeserverPort, mount, nginxPort } from './utils'
+import { writeFile } from 'fs/promises'
 import { homeserverYaml } from './fileModels/homeserver.yml'
 import { storeJson } from './fileModels/store.json'
-import { writeFile } from 'fs/promises'
+import { i18n } from './i18n'
+import { sdk } from './sdk'
+import {
+  adminPort,
+  checkPostgresReady,
+  getPostgresEnv,
+  getPostgresSub,
+  homeserverPort,
+  mount,
+  nginxPort,
+} from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   /**
@@ -18,16 +26,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
   if (!config) {
     throw new Error(i18n('homeserver.yaml not found'))
   }
-
-  const synapseSub = await sdk.SubContainer.of(
-    effects,
-    { imageId: 'synapse' },
-    mount,
-    'synapse-sub',
-  )
-  await synapseSub
-    .exec(['chown', '-R', '991:991', '/data'])
-    .then((a) => a.throw())
 
   await storeJson.merge(effects, { serverStarted: true })
 
@@ -87,8 +85,13 @@ export const main = sdk.setupMain(async ({ effects }) => {
         return 200 '{ "m.server": "${config.server_name}:443" }';
     }
 
+    location = /.well-known/matrix/client {
+        default_type application/json;
+        return 200 '{ "m.homeserver": { "base_url": "https://${config.server_name}" } }';
+    }
+
     location / {
-      proxy_pass http://localhost:8008;
+        proxy_pass http://localhost:8008;
     }
 
     location ~* ^(\/_matrix|\/_synapse\/client|\/_synapse\/admin) {
@@ -110,13 +113,23 @@ server {
     root /var/www/html;
     index index.html index.htm;
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
     location = /config.json {
         default_type application/json;
-        return 200 '{ "restrictBaseUrl": "https://${config.server_name}" }';
+        return 200 '{ "restrictBaseUrl": "https://$http_host" }';
+    }
+
+    location = /.well-known/matrix/client {
+        default_type application/json;
+        return 200 '{ "m.homeserver": { "base_url": "https://$http_host" } }';
+    }
+
+    location ~* ^(\/_matrix|\/_synapse) {
+        proxy_pass http://localhost:${homeserverPort};
+        client_max_body_size ${config.max_upload_size};
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
     }
 
     error_page   500 502 503 504  /50x.html;
@@ -133,7 +146,34 @@ server {
    *
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
+
+  const synapseSub = await sdk.SubContainer.of(
+    effects,
+    { imageId: 'synapse' },
+    mount,
+    'synapse-sub',
+  )
+
+  const postgresSub = await getPostgresSub(effects, 'postgres-sub')
+
   return sdk.Daemons.of(effects)
+    .addOneshot('chown', {
+      subcontainer: synapseSub,
+      exec: { command: ['chown', '-R', '991:991', '/data'] },
+      requires: [],
+    })
+    .addDaemon('postgres', {
+      subcontainer: postgresSub,
+      exec: {
+        command: sdk.useEntrypoint(['-c', 'listen_addresses=127.0.0.1']),
+        env: getPostgresEnv(config.database.args.password),
+      },
+      ready: {
+        display: i18n('Database'),
+        fn: () => checkPostgresReady(postgresSub),
+      },
+      requires: [],
+    })
     .addDaemon('synapse', {
       subcontainer: synapseSub,
       exec: { command: ['/start.py'] },
@@ -150,7 +190,7 @@ server {
             },
           ),
       },
-      requires: [],
+      requires: ['chown', 'postgres'],
     })
     .addDaemon('nginx', {
       subcontainer: nginxSub,
