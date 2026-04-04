@@ -1,3 +1,0 @@
-[submodule "synapse"]
-	path = synapse
-	url = https://github.com/element-hq/synapse.git

@@ -19,10 +19,7 @@ export const manifest = setupManifest({
   images: {
     synapse: {
       source: {
-        dockerBuild: {
-          workdir: './synapse',
-          dockerfile: './Dockerfile',
-        },
+        dockerTag: 'ghcr.io/element-hq/synapse:v1.150.0',
       },
       arch: ['x86_64', 'aarch64'],
     },
