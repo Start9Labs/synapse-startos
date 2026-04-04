@@ -10,7 +10,7 @@ export const manifest = setupManifest({
   marketingUrl: 'https://matrix.org/',
   donationUrl: null,
   docsUrls: [
-    'https://github.com/Start9Labs/synapse-startos/docs/instructions.md',
+    'https://github.com/Start9Labs/synapse-startos/blob/master/docs/instructions.md',
     'https://element-hq.github.io/synapse/latest',
     'https://docs.element.io/latest/element-support/understanding-your-element-accounts/#up',
   ],

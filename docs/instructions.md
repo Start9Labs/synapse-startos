@@ -10,13 +10,8 @@
 <p>After installing Synapse, you will be presented with a critical task to <b>Set Server Address/URL</b>. This determines
   the "domain" part of all user IDs on your server (e.g. <code>@user:my.domain.com</code>).</p>
 <ol>
-  <li>Choose your network type:
-    <ul>
-      <li><b>Clearnet</b> (recommended): Use a domain name. Allows federation with any Matrix server, including matrix.org.</li>
-      <li><b>Tor</b>: Use a <code>.onion</code> address. Tor servers can <i>only</i> federate with other <code>.onion</code> servers, and clients must be configured for Tor.</li>
-    </ul>
-  </li>
-  <li>Select an address from the available options for your chosen network type.</li>
+  <li>You must first add a public domain to the Homeserver interface in your StartOS network settings.</li>
+  <li>Run the <b>Set Server Address/URL</b> task and select from the available domains.</li>
 </ol>
 <p style="color: red;"><b>Warning:</b> Your server address is <b>permanent</b> and cannot be changed after the first
   start. Choose carefully.</p>
@@ -26,14 +21,14 @@
 <br />
 
 <h3>Step 2: Create Your Admin User</h3>
-<p>After setting your server address, start the service, then complete the optional task to <b>Create Admin User</b>.
-  Alternatively, find this action in the Actions menu.</p>
+<p>After setting your server address, you will be presented with a critical task to <b>Create Admin User</b>. This
+  task runs while the service is stopped.</p>
 <ol>
-  <li>Run the <b>Create Admin User</b> action (requires the service to be running).</li>
+  <li>Run the <b>Create Admin User</b> task.</li>
   <li>A random password will be generated and displayed. <b>Copy and save it immediately</b> &mdash; it will not be shown
     again.</li>
   <li>If you lose the password, you can reset it later using the <b>Reset Admin Password</b> action (requires the service
-    to be stopped).</li>
+    to be running).</li>
 </ol>
 
 <br />
@@ -69,8 +64,7 @@
 <p>With registration disabled, the way to create accounts is through the Admin Dashboard.</p>
 <ol>
   <li>Open the <b>Admin Dashboard</b> interface from the Synapse service page.</li>
-  <li>Log in with the admin credentials from Step 2. For "Homeserver URL", enter the URL shown in your browser's
-    address bar (minus any path).</li>
+  <li>Log in with the admin credentials from Step 2.</li>
   <li>In the "Users" tab, click "+ Create" to add new accounts.</li>
   <li>Choose a User-ID, display name, and password. It is recommended <i>not</i> to make regular users Server Administrators.</li>
 </ol>
@@ -87,6 +81,27 @@
   <li><a href="https://fluffychat.im" target="_blank" noreferrer>FluffyChat</a></li>
 </ul>
 <p>When configuring your client, use the address you chose in Step 1 as your homeserver URL.</p>
+
+<br />
+<hr style="border: 1px dashed #bbb;" />
+<br />
+
+<h2><u>Actions</u></h2>
+
+<h3>Get Access Token</h3>
+<p>Use the <b>Get Access Token</b> action (requires the service to be running) to obtain a Matrix access token for
+  any user by providing their username and password. This is useful for programmatic access or third-party
+  integrations.</p>
+
+<h3>Appservice Management</h3>
+<p>Synapse supports Matrix bridges (appservices) for connecting to other messaging platforms. Three actions are
+  available for managing them:</p>
+<ul>
+  <li><b>Register Appservice</b>: Register a new bridge. This is typically triggered automatically by bridge
+    services.</li>
+  <li><b>List Appservices</b>: View all registered bridges and their details.</li>
+  <li><b>Delete Appservice</b>: Remove a registered bridge.</li>
+</ul>
 
 <br />
 <hr style="border: 1px dashed #bbb;" />
@@ -126,9 +141,6 @@
 <p>If federation is enabled, you can join rooms on other Matrix servers.</p>
 <ol>
   <li>In your client, select <b>Explore Public Rooms</b>.</li>
-  <li>Enter the room alias, including the server domain. For example: <code>#room-name:matrix.example.com</code>
-    or <code>#room-name:abc...xyz.onion</code>.</li>
+  <li>Enter the room alias, including the server domain. For example: <code>#room-name:matrix.example.com</code>.</li>
   <li>Joining a room may take a while depending on its size. If it fails, try again.</li>
 </ol>
-<p><b>Note:</b> Tor-based servers can only federate with other Tor-based servers. Clearnet servers can federate with
-  any server.</p>
