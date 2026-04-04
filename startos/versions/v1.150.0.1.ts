@@ -1,7 +1,7 @@
-import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
+import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
-export const v_1_150_0_0 = VersionInfo.of({
-  version: '1.150.0:0',
+export const v_1_150_0_1 = VersionInfo.of({
+  version: '1.150.0:1',
   releaseNotes: {
     en_US: 'Initial release for StartOS 0.4.0',
     es_ES: 'Versión inicial para StartOS 0.4.0',
