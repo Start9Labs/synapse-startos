@@ -85,7 +85,7 @@ export const createAdminUser = sdk.Action.withoutInput(
         },
         requires: ['postgres'],
       })
-      .runUntilSuccess(59_000)
+      .runUntilSuccess(300_000)
 
     return {
       version: '1',

@@ -1,3 +1,3 @@
 ## How the upstream version is pulled
-- Git submodule `synapse/` → checkout new tag (e.g. `cd synapse && git fetch --tags && git checkout v<version>`)
-- Image `synapse` is `dockerBuild` from the submodule (no dockerTag to update)
+- dockerTag in `startos/manifest/index.ts`: `ghcr.io/element-hq/synapse:v<version>`
+- Sidecar synapse-admin (rebranded "Ketesa" at v1.0.0, Apr 2025) is downloaded as a static-asset tarball in the `Makefile` via `SYNAPSE_ADMIN_VERSION`. Source: `etkecc/ketesa` (formerly `etkecc/synapse-admin`), asset `ketesa.tar.gz`. Files land in `assets/synapse-admin/` and are served by the package's own nginx sidecar on `adminPort` (8080). The docker-image port change (80 -> 8080 at etke53) is not relevant here because we don't run the ketesa container — we serve the unpacked static assets ourselves.
