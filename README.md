@@ -69,9 +69,9 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 |------|----------|---------|
 | Generate config | `python -m synapse.app.homeserver --generate-config` | Automatic via `setupOnInit` |
 | Set server name | Edit `homeserver.yaml` | "Set Server Address/URL" action (critical task) |
-| Create admin user | `register_new_matrix_user` CLI | "Create Admin User" action (optional task) |
+| Create admin user | `register_new_matrix_user` CLI | "Create Admin User" action (critical task) |
 
-**Key difference:** On first install, StartOS generates the initial Synapse config automatically. You must run the "Set Server Address/URL" action (created as a critical task) to choose your permanent domain before starting. The "Create Admin User" action is created as an optional task.
+**Key difference:** On first install, StartOS generates the initial Synapse config automatically. You must run the "Set Server Address/URL" action (created as a critical task) to choose your permanent domain before starting. Completing it surfaces "Create Admin User" as a second critical task.
 
 **Warning:** The server address/URL is permanent and cannot be changed after the first start.
 
@@ -123,16 +123,27 @@ Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, ha
 
 Presents available hostnames from the homeserver interface. Sets `server_name` and `public_baseurl` in `homeserver.yaml`. **Cannot be changed after first start.**
 
-### Create Admin User / Reset Admin Password
+### Create Admin User
+
+| Property | Value |
+|----------|-------|
+| ID | `create-admin-user` |
+| Visibility | Hidden (surfaced as a critical task by "Set Server Address/URL") |
+| Availability | Only when stopped |
+| Purpose | Bootstrap the admin account on first install |
+
+Spins up a temporary Synapse + PostgreSQL daemon chain, generates a random 22-character password, and runs `register_new_matrix_user`. Runs exactly once; if the admin already exists in the database, use "Reset Admin Password" instead.
+
+### Reset Admin Password
 
 | Property | Value |
 |----------|-------|
 | ID | `reset-admin` |
 | Visibility | Enabled |
 | Availability | Only when running |
-| Purpose | Create or reset the admin account |
+| Purpose | Reset the admin account password |
 
-Generates a random 22-character password. On first use, creates the admin user via `register_new_matrix_user`. On subsequent uses, updates the password hash directly in PostgreSQL.
+Generates a random 22-character password and updates the password hash directly in PostgreSQL for the first-registered user.
 
 ### Config
 

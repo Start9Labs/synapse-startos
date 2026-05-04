@@ -6,6 +6,7 @@ import {
   checkPostgresReady,
   getPostgresEnv,
   getPostgresSub,
+  homeserverPort,
   mount,
 } from '../../utils'
 
@@ -35,18 +36,21 @@ export const createAdminUser = sdk.Action.withoutInput(
     const postgresPassword = await homeserverYaml
       .read((c) => c.database.args.password)
       .once()
-    if (!postgresPassword) {
-      throw new Error('No Postgres password')
-    }
+    if (!postgresPassword) throw new Error('No Postgres password')
 
     const postgresSub = await getPostgresSub(effects, 'bootstrap-postgres')
-
     const synapseSub = await sdk.SubContainer.of(
       effects,
       { imageId: 'synapse' },
       mount,
       'bootstrap-synapse',
     )
+
+    // Tight polling so this bootstrap completes within the action's RPC
+    // timeout. The default trigger sleeps 30 s after seeing `loading`, which
+    // adds tens of seconds of dead wait while postgres initializes and synapse
+    // applies schema migrations.
+    const fastTrigger = sdk.trigger.cooldownTrigger(1_000)
 
     await sdk.Daemons.of(effects)
       .addDaemon('postgres', {
@@ -57,6 +61,7 @@ export const createAdminUser = sdk.Action.withoutInput(
         },
         ready: {
           display: null,
+          trigger: fastTrigger,
           fn: () => checkPostgresReady(postgresSub),
         },
         requires: [],
@@ -66,24 +71,38 @@ export const createAdminUser = sdk.Action.withoutInput(
         exec: { command: ['/start.py'] },
         ready: {
           display: null,
-          fn: async () => {
-            const { exitCode } = await synapseSub.exec([
-              'register_new_matrix_user',
-              '--config',
-              '/data/homeserver.yaml',
-              '--user',
-              'admin',
-              '--password',
-              adminPassword,
-              '--admin',
-            ])
-            if (exitCode !== 0) {
-              return { result: 'loading', message: null }
-            }
-            return { result: 'success', message: null }
-          },
+          // Generous slack for slow disks: schema migration on a fresh
+          // install reads/writes ~100 SQL deltas, which can take a while
+          // on an HDD.
+          gracePeriod: 60_000,
+          trigger: fastTrigger,
+          fn: () =>
+            sdk.healthCheck.checkWebUrl(
+              effects,
+              `http://localhost:${homeserverPort}/health`,
+              {
+                successMessage: 'Synapse is ready',
+                errorMessage: 'Synapse is not ready',
+              },
+            ),
         },
         requires: ['postgres'],
+      })
+      .addOneshot('register-admin', {
+        subcontainer: synapseSub,
+        exec: {
+          command: [
+            'register_new_matrix_user',
+            '--config',
+            '/data/homeserver.yaml',
+            '--user',
+            'admin',
+            '--password',
+            adminPassword,
+            '--admin',
+          ],
+        },
+        requires: ['synapse'],
       })
       .runUntilSuccess(300_000)
 
