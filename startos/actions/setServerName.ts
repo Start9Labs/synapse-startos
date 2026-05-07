@@ -1,8 +1,8 @@
 import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
-import { homeserverYaml } from '../../fileModels/homeserver.yml'
-import { i18n } from '../../i18n'
-import { sdk } from '../../sdk'
-import { createAdminUser } from './createAdminUser'
+import { homeserverYaml } from '../fileModels/homeserver.yml'
+import { i18n } from '../i18n'
+import { sdk } from '../sdk'
+import { setAdminPassword } from './setAdminPassword'
 
 const { InputSpec, Value } = sdk
 
@@ -43,7 +43,7 @@ export const setServerName = sdk.Action.withInput(
       public_baseurl: `https://${input.server_name}`,
     })
 
-    await sdk.action.createOwnTask(effects, createAdminUser, 'critical', {
+    await sdk.action.createOwnTask(effects, setAdminPassword, 'critical', {
       reason: i18n(
         'Create a root admin user for your Synapse Matrix homeserver',
       ),

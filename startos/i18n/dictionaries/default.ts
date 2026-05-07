@@ -63,12 +63,7 @@ const dict = {
   'Regex pattern for user IDs managed by this appservice (e.g. "@signal_.*:.*"). Leave empty if the appservice does not manage user namespaces.': 59,
   'Register Appservice': 60,
   'Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.': 61,
-  'Reset Admin Password': 62,
-  'Create Admin User': 63,
-  'Reset your admin user password': 64,
-  'Create the admin user for your Synapse homeserver and display the credentials.': 65,
   Success: 66,
-  'Your admin user credentials are below': 67,
   'Address/URL': 68,
   'Your server address/URL determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.': 69,
   'Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.': 70,
@@ -88,6 +83,8 @@ const dict = {
   'Get Access Token': 84,
   'Get a Matrix access token for a user by providing their username and password.': 85,
   'Access Token': 86,
+  'Set Admin Password': 87,
+  'Set the admin user password for your Synapse Matrix homeserver.': 88,
 } as const
 
 export type I18nKey = keyof typeof dict

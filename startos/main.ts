@@ -5,12 +5,11 @@ import { i18n } from './i18n'
 import { sdk } from './sdk'
 import {
   adminPort,
-  checkPostgresReady,
-  getPostgresEnv,
-  getPostgresSub,
   homeserverPort,
   mount,
   nginxPort,
+  postgresDb,
+  postgresUser,
 } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
@@ -24,13 +23,15 @@ export const main = sdk.setupMain(async ({ effects }) => {
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
   const config = await homeserverYaml.read().const(effects)
   if (!config) {
-    throw new Error(i18n('homeserver.yaml not found'))
+    throw new Error('homeserver.yaml not found')
   }
+  const store = await storeJson.read().once()
+  if (!store) {
+    throw new Error('store.json not found')
+  }
+  const { smtp, pendingAdminPassword } = store
 
-  await storeJson.merge(effects, { serverStarted: true })
-
-  const smtp = await storeJson.read((s) => s.smtp).const(effects)
-  if (smtp && smtp.selection !== 'disabled') {
+  if (smtp.selection !== 'disabled') {
     if (smtp.selection === 'system') {
       const creds = await sdk.getSystemSmtp(effects).const()
       if (creds) {
@@ -47,16 +48,18 @@ export const main = sdk.setupMain(async ({ effects }) => {
         })
       }
     } else {
-      const p = smtp.value.provider.value
+      const { from, host, security, username, password } =
+        smtp.value.provider.value
+
       await homeserverYaml.merge(effects, {
         email: {
           enable_notifs: true,
           require_transport_security: true,
-          notif_from: p.from,
-          smtp_host: p.host,
-          smtp_port: Number(p.security.value.port),
-          smtp_user: p.username,
-          smtp_pass: p.password || undefined,
+          notif_from: from,
+          smtp_host: host,
+          smtp_port: Number(security.value.port),
+          smtp_user: username,
+          smtp_pass: password || undefined,
         },
       })
     }
@@ -154,7 +157,17 @@ server {
     'synapse-sub',
   )
 
-  const postgresSub = await getPostgresSub(effects, 'postgres-sub')
+  const postgresSub = await sdk.SubContainer.of(
+    effects,
+    { imageId: 'postgres' },
+    sdk.Mounts.of().mountVolume({
+      volumeId: 'db',
+      subpath: null,
+      mountpoint: '/var/lib/postgresql',
+      readonly: false,
+    }),
+    'postgres-sub',
+  )
 
   return sdk.Daemons.of(effects)
     .addOneshot('chown', {
@@ -166,11 +179,33 @@ server {
       subcontainer: postgresSub,
       exec: {
         command: sdk.useEntrypoint(['-c', 'listen_addresses=127.0.0.1']),
-        env: getPostgresEnv(config.database.args.password),
+        env: {
+          POSTGRES_USER: postgresUser,
+          POSTGRES_PASSWORD: config.database.args.password,
+          POSTGRES_DB: postgresDb,
+          POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C',
+        },
       },
       ready: {
         display: i18n('Database'),
-        fn: () => checkPostgresReady(postgresSub),
+        fn: async () => {
+          const { exitCode } = await postgresSub.exec([
+            'pg_isready',
+            '-U',
+            postgresUser,
+            '-d',
+            postgresDb,
+            '-h',
+            '127.0.0.1',
+          ])
+          if (exitCode !== 0) {
+            return {
+              result: 'loading' as const,
+              message: i18n('Initializing Postgres'),
+            }
+          }
+          return { result: 'success' as const, message: null }
+        },
       },
       requires: [],
     })
@@ -192,6 +227,95 @@ server {
       },
       requires: ['chown', 'postgres'],
     })
+    .addOneshot('apply-admin-password', {
+      subcontainer: synapseSub,
+      exec: {
+        fn: async (subc) => {
+          if (!pendingAdminPassword) return null
+
+          const PGPASSWORD = config.database.args.password
+          const userCount = parseInt(
+            (
+              await sdk.SubContainer.withTemp(
+                effects,
+                { imageId: 'postgres' },
+                sdk.Mounts.of(),
+                'count-users',
+                (psql) =>
+                  psql.execFail(
+                    [
+                      'psql',
+                      '-h',
+                      '127.0.0.1',
+                      '-U',
+                      postgresUser,
+                      '-d',
+                      postgresDb,
+                      '-tAc',
+                      'SELECT COUNT(*) FROM users',
+                    ],
+                    { env: { PGPASSWORD } },
+                  ),
+              )
+            ).stdout
+              .toString()
+              .trim(),
+            10,
+          )
+
+          if (userCount > 0) {
+            const hash = (
+              await subc.execFail([
+                'hash_password',
+                '-p',
+                pendingAdminPassword,
+                '-c',
+                '/data/homeserver.yaml',
+              ])
+            ).stdout
+              .toString()
+              .trim()
+            await sdk.SubContainer.withTemp(
+              effects,
+              { imageId: 'postgres' },
+              sdk.Mounts.of(),
+              'apply-admin-password-update',
+              (psql) =>
+                psql.execFail(
+                  [
+                    'psql',
+                    '-h',
+                    '127.0.0.1',
+                    '-U',
+                    postgresUser,
+                    '-d',
+                    postgresDb,
+                    '-c',
+                    `UPDATE users SET password_hash = '${sqlLiteral(hash)}' WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
+                  ],
+                  { env: { PGPASSWORD } },
+                ),
+            )
+          } else {
+            await subc.execFail([
+              'register_new_matrix_user',
+              '--config',
+              '/data/homeserver.yaml',
+              '--user',
+              'admin',
+              '--password',
+              pendingAdminPassword,
+              '--admin',
+            ])
+          }
+
+          await storeJson.merge(effects, { pendingAdminPassword: null })
+          await storeJson.read().const(effects)
+          return null
+        },
+      },
+      requires: ['synapse'],
+    })
     .addDaemon('nginx', {
       subcontainer: nginxSub,
       exec: { command: sdk.useEntrypoint() },
@@ -203,7 +327,7 @@ server {
             successMessage: i18n('Web Server is running'),
           }),
       },
-      requires: ['synapse'],
+      requires: ['synapse', 'apply-admin-password'],
     })
     .addHealthCheck('admin-interface', {
       ready: {
@@ -221,3 +345,7 @@ server {
       requires: ['nginx'],
     })
 })
+
+function sqlLiteral(s: string): string {
+  return s.replace(/'/g, "''")
+}

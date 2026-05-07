@@ -69,9 +69,9 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 |------|----------|---------|
 | Generate config | `python -m synapse.app.homeserver --generate-config` | Automatic via `setupOnInit` |
 | Set server name | Edit `homeserver.yaml` | "Set Server Address/URL" action (critical task) |
-| Create admin user | `register_new_matrix_user` CLI | "Create Admin User" action (critical task) |
+| Create admin user | `register_new_matrix_user` CLI | "Set Admin Password" action (critical task) -- generates a password; the actual user is registered when the service first starts |
 
-**Key difference:** On first install, StartOS generates the initial Synapse config automatically. You must run the "Set Server Address/URL" action (created as a critical task) to choose your permanent domain before starting. Completing it surfaces "Create Admin User" as a second critical task.
+**Key difference:** On first install, StartOS generates the initial Synapse config automatically. You must run the "Set Server Address/URL" action (created as a critical task) to choose your permanent domain before starting. Completing it surfaces "Set Admin Password" as a second critical task; running that generates and shows the credentials. Starting the service then registers the admin user with the chosen password.
 
 **Warning:** The server address/URL is permanent and cannot be changed after the first start.
 
@@ -86,7 +86,7 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 | Federation | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist) |
 | `max_upload_size` | `homeserver.yaml` | "Config" action (1-2000 MB) |
 | SMTP/email | `homeserver.yaml` | "Config" action (disabled/system/custom) |
-| Admin password | `register_new_matrix_user` | "Reset Admin Password" action |
+| Admin password | `register_new_matrix_user` | "Set Admin Password" action |
 | Appservices | Manual YAML files | Register/List/Delete Appservice actions |
 
 **Configuration NOT exposed on StartOS:**
@@ -123,27 +123,16 @@ Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, ha
 
 Presents available hostnames from the homeserver interface. Sets `server_name` and `public_baseurl` in `homeserver.yaml`. **Cannot be changed after first start.**
 
-### Create Admin User
+### Set Admin Password
 
 | Property | Value |
 |----------|-------|
-| ID | `create-admin-user` |
-| Visibility | Hidden (surfaced as a critical task by "Set Server Address/URL") |
-| Availability | Only when stopped |
-| Purpose | Bootstrap the admin account on first install |
-
-Spins up a temporary Synapse + PostgreSQL daemon chain, generates a random 22-character password, and runs `register_new_matrix_user`. Runs exactly once; if the admin already exists in the database, use "Reset Admin Password" instead.
-
-### Reset Admin Password
-
-| Property | Value |
-|----------|-------|
-| ID | `reset-admin` |
+| ID | `set-admin-password` |
 | Visibility | Enabled |
-| Availability | Only when running |
-| Purpose | Reset the admin account password |
+| Availability | Any status |
+| Purpose | Set or reset the admin account password |
 
-Generates a random 22-character password and updates the password hash directly in PostgreSQL for the first-registered user.
+Generates a random 22-character password, stores it in `store.json` as `pendingAdminPassword`, and displays it. The next time the service starts, an `apply-admin-password` oneshot in the daemon chain consumes the pending password: if no users exist in PostgreSQL it runs `register_new_matrix_user` to create the admin; otherwise it hashes the password with `hash_password` and `UPDATE`s the first-registered user's `password_hash`. The pending field is cleared on success.
 
 ### Config
 
@@ -290,7 +279,7 @@ startos_managed_config:
   - smtp
 actions:
   - set-server-name (enabled/hidden, only-stopped)
-  - reset-admin (enabled, only-running)
+  - set-admin-password (enabled, any)
   - config (enabled, any)
   - register-appservice (enabled, any)
   - list-appservices (enabled, any)

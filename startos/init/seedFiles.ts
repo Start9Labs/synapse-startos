@@ -1,5 +1,5 @@
 import { utils } from '@start9labs/start-sdk'
-import { setServerName } from '../actions/setup/setServerName'
+import { setServerName } from '../actions/setServerName'
 import { homeserverLogConfig } from '../fileModels/homeserver.log.config'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
@@ -31,10 +31,6 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
           },
         }),
     )
-
-    await storeJson.merge(effects, {
-      serverStarted: false,
-    })
 
     // Must run after synapse generate, which creates signing_key_path, server_name
     await homeserverYaml.merge(effects, {

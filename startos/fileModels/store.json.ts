@@ -2,8 +2,8 @@ import { FileHelper, smtpShape, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
 const shape = z.object({
-  serverStarted: z.boolean().catch(true),
   smtp: smtpShape,
+  pendingAdminPassword: z.string().nullable().catch(null).default(null),
 })
 
 export const storeJson = FileHelper.json(
