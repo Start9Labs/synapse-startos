@@ -36,7 +36,7 @@
 
 | Property | Value |
 |----------|-------|
-| Synapse image | Custom `dockerBuild` from upstream source (workdir `./synapse`) |
+| Synapse image | `ghcr.io/element-hq/synapse` (upstream pre-built image) |
 | Nginx image | `nginx` Alpine (upstream unmodified) |
 | PostgreSQL image | `postgres` Alpine (database sidecar) |
 | Architectures | x86_64, aarch64 |
@@ -259,7 +259,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 ```yaml
 package_id: synapse
 images:
-  synapse: dockerBuild (./synapse/Dockerfile)
+  synapse: dockerTag (ghcr.io/element-hq/synapse)
   nginx: nginx (Alpine)
   postgres: postgres (Alpine)
 architectures: [x86_64, aarch64]
