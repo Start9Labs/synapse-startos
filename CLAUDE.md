@@ -1,3 +1,3 @@
-## How the upstream version is pulled
-- dockerTag in `startos/manifest/index.ts`: `ghcr.io/element-hq/synapse:v<version>`
-- Sidecar synapse-admin (rebranded "Ketesa" at v1.0.0, Apr 2025) is downloaded as a static-asset tarball in the `Makefile` via `SYNAPSE_ADMIN_VERSION`. Source: `etkecc/ketesa` (formerly `etkecc/synapse-admin`), asset `ketesa.tar.gz`. Files land in `assets/synapse-admin/` and are served by the package's own nginx sidecar on `adminPort` (8080). The docker-image port change (80 -> 8080 at etke53) is not relevant here because we don't run the ketesa container — we serve the unpacked static assets ourselves.
+# CLAUDE.md
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the doc map and contribution workflow.

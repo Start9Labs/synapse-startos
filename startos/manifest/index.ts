@@ -9,11 +9,6 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://github.com/element-hq/synapse',
   marketingUrl: 'https://matrix.org/',
   donationUrl: null,
-  docsUrls: [
-    'https://github.com/Start9Labs/synapse-startos/blob/master/docs/instructions.md',
-    'https://element-hq.github.io/synapse/latest',
-    'https://docs.element.io/latest/element-support/*', // * means all children of element-support/, since this itself is a 404
-  ],
   description: { short, long },
   volumes: ['main', 'db'],
   images: {
