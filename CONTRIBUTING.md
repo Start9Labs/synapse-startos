@@ -1,42 +1,40 @@
 # Contributing
 
-This repo packages [Synapse](https://github.com/element-hq/synapse) for StartOS, with [Ketesa](https://github.com/etkecc/ketesa) (a Synapse-admin fork) as the bundled admin dashboard.
+## Keep these in sync
 
-## Documentation — keep it in sync
+- **[`README.md`](./README.md)** — what this package is and how it's built (image, volumes, interfaces). Technical reference for developers and AI assistants.
+- **[`instructions.md`](./instructions.md)** — the user-facing instructions packed into the `.s9pk` and shown on the **Instructions** tab in StartOS, for the person running the service.
+- **[`TODO.md`](./TODO.md)** — pending work on this package.
 
-- **`README.md`** — what this package is and how it's built (image, volumes, interfaces). For developers and AI assistants.
-- **`instructions.md`** — the user-facing instructions packed into the `.s9pk` and shown on the **Instructions** tab in StartOS, for the person running the service.
-- **`CONTRIBUTING.md`** — this file.
-- **`CLAUDE.md`** — operating rules for AI developers working in this repo.
+**Read all three before starting any work.** Any code change that affects user-visible behavior must update `README.md` and `instructions.md` in the same change; add to `TODO.md` when you defer work, and remove items when complete. Content rules: [Writing READMEs](https://docs.start9.com/packaging/writing-readmes.html), [Writing Instructions](https://docs.start9.com/packaging/writing-instructions.html).
 
-**Any code change that warrants it must update `README.md` and `instructions.md` in the same change** — a new or renamed action, an added or removed volume / port / interface / dependency, a changed default, a new limitation, any altered user-visible behavior. Don't defer: a package that ships with a stale README or stale instructions is not done, even if the code is perfect. Content rules live in the packaging guide: [Writing READMEs](https://docs.start9.com/packaging/writing-readmes.html) and [Writing Service Instructions](https://docs.start9.com/packaging/writing-instructions.html).
+## Environment setup
+
+See [Environment Setup](https://docs.start9.com/packaging/environment-setup.html)
 
 ## Building
-
-See the [StartOS Packaging Guide](https://docs.start9.com/packaging/) for environment setup, then:
 
 ```bash
 npm ci    # install dependencies
 make      # build the universal .s9pk
 ```
 
+For a complete list of build options, see [Makefile](https://docs.start9.com/packaging/makefile.html).
+
 ## Updating the upstream version
 
-Synapse and Ketesa are versioned independently and bump separately.
+1. Apply the upstream bump per [UPDATING.md](./UPDATING.md).
+2. Update `version` and `releaseNotes` in the file under `startos/versions/`, renaming it to the new version string. A _new_ version file is only needed when the bump requires a migration, or when you want the old release notes preserved in git history — see [Versions](https://docs.start9.com/packaging/versions.html).
 
-**Synapse** runs from `ghcr.io/element-hq/synapse:v<version>`. To bump it:
+## CI/CD
 
-1. Update `dockerTag` in `startos/manifest/index.ts` to the new `v<version>`.
-2. Update `version` and `releaseNotes` in the file under `startos/versions/`, renaming it to the new version string. A *new* version file is only needed when the bump carries an `up`/`down` migration, or when you want the old release notes preserved in git history — see [Versions](https://docs.start9.com/packaging/versions.html).
-3. Rebuild (`make`), sideload the `.s9pk`, and confirm it starts.
-4. Review `README.md` and `instructions.md` for anything the bump changed.
+Three workflows under `.github/workflows/` wrap reusable workflows in [`start9labs/shared-workflows`](https://github.com/Start9Labs/shared-workflows):
 
-**Ketesa** (the admin dashboard, formerly called synapse-admin) is *not* run as a container — its release tarball is downloaded by the `Makefile` via `SYNAPSE_ADMIN_VERSION` and the unpacked static assets are served by the package's own nginx sidecar on `adminPort`. To bump it:
+- **`build.yml`** — on PR, builds the `.s9pk` and uploads per-arch artifacts for sideload testing.
+- **`release.yml`** — on `v*` tag, builds per arch and publishes to the test registry.
+- **`tagAndRelease.yml`** — on push to `master`, tags `v<version>` and runs `release.yml`, skipping if already in production.
 
-1. Update `SYNAPSE_ADMIN_VERSION` in the `Makefile` to the new Ketesa release tag from `etkecc/ketesa`.
-2. Rebuild and verify the **Admin Dashboard** interface still loads.
-
-The container-port change Ketesa made at v53 (80 → 8080) does not apply here, because the static assets are served by our nginx, not the upstream container.
+Promotion to `beta` and `prod` is a separate, manual step.
 
 ## How to contribute
 
