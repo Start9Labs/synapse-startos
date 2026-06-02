@@ -1,7 +1,7 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-export const v_1_153_0_0 = VersionInfo.of({
+export const current = VersionInfo.of({
   version: '1.153.0:0',
   releaseNotes: {
     en_US: 'Bumps Synapse → 1.153.0.',
