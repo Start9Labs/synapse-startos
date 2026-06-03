@@ -3,7 +3,7 @@
 ## Documentation
 
 - [Synapse operator documentation](https://element-hq.github.io/synapse/latest) — upstream admin guide covering configuration, federation, modules, and tuning.
-- [Element support documentation](https://docs.element.io/latest/element-support/) — guides for the Element client you'll most likely use to connect.
+- [Element documentation](https://docs.element.io/latest/) — guides for the Element client you'll most likely use to connect.
 
 ## What you get on StartOS
 
