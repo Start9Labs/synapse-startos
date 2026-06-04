@@ -2,13 +2,13 @@ import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
 export const current = VersionInfo.of({
-  version: '1.153.0:0',
+  version: '1.154.0:0',
   releaseNotes: {
-    en_US: 'Bumps Synapse → 1.153.0.',
-    es_ES: 'Actualiza Synapse → 1.153.0.',
-    de_DE: 'Aktualisiert Synapse → 1.153.0.',
-    pl_PL: 'Aktualizuje Synapse → 1.153.0.',
-    fr_FR: 'Met à jour Synapse → 1.153.0.',
+    en_US: 'Bumps Synapse → 1.154.0.',
+    es_ES: 'Actualiza Synapse → 1.154.0.',
+    de_DE: 'Aktualisiert Synapse → 1.154.0.',
+    pl_PL: 'Aktualizuje Synapse → 1.154.0.',
+    fr_FR: 'Met à jour Synapse → 1.154.0.',
   },
   migrations: {
     up: async ({ effects }) => {
