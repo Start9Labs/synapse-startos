@@ -1,6 +1,6 @@
 ARCHES := x86 arm
 # overrides to s9pk.mk must precede the include statement
-include s9pk.mk
+include node_modules/@start9labs/start-sdk/s9pk.mk
 
 SYNAPSE_ADMIN_VERSION = v1.3.0
 SYNAPSE_ADMIN_CHECKSUM = ad241735fe683ff25aa6a46c791024e5df4aedd8e89814e0ee9649f9280801c3

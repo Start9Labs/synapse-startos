@@ -66,7 +66,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   }
 
   // create and configure nginx container
-  const nginxSub = await sdk.SubContainer.of(
+  const nginxSub = sdk.SubContainer.of(
     effects,
     { imageId: 'nginx' },
     sdk.Mounts.of().mountAssets({
@@ -76,8 +76,9 @@ export const main = sdk.setupMain(async ({ effects }) => {
     'nginx',
   )
 
+  const nginxRootfs = await nginxSub.rootfs
   await writeFile(
-    `${nginxSub.rootfs}/etc/nginx/conf.d/default.conf`,
+    `${nginxRootfs}/etc/nginx/conf.d/default.conf`,
     `server {
     listen ${nginxPort} default_server;
     listen [::]:${nginxPort} default_server;
@@ -150,14 +151,14 @@ server {
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
 
-  const synapseSub = await sdk.SubContainer.of(
+  const synapseSub = sdk.SubContainer.of(
     effects,
     { imageId: 'synapse' },
     mount,
     'synapse-sub',
   )
 
-  const postgresSub = await sdk.SubContainer.of(
+  const postgresSub = sdk.SubContainer.of(
     effects,
     { imageId: 'postgres' },
     sdk.Mounts.of().mountVolume({

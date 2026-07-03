@@ -1,6 +1,7 @@
-import { Effects } from '@start9labs/start-sdk/base/lib/Effects'
+import { T } from '@start9labs/start-sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { i18n } from '../i18n'
+import { homeserverHostId, homeserverInterfaceId } from '../interfaces'
 import { sdk } from '../sdk'
 import { setAdminPassword } from './setAdminPassword'
 
@@ -51,7 +52,7 @@ export const setServerName = sdk.Action.withInput(
   },
 )
 
-async function getClearnetHostnames(effects: Effects): Promise<{
+async function getClearnetHostnames(effects: T.Effects): Promise<{
   name: string
   description?: string | null
   warning?: string | null
@@ -59,16 +60,19 @@ async function getClearnetHostnames(effects: Effects): Promise<{
   values: Record<string, string>
 }> {
   const hostnames =
-    (await sdk.serviceInterface
-      .getOwn(effects, 'homeserver', (i) =>
-        i?.addressInfo?.hostnames
-          .filter(
-            (h) =>
-              h.metadata.kind === 'public-domain' ||
-              h.metadata.kind === 'private-domain',
-          )
-          .map((h) => h.hostname),
-      )
+    (await sdk.host
+      .getOwn(effects, homeserverHostId, (host) => {
+        const iface =
+          host &&
+          Object.values(host.bindings)
+            .flatMap((b) => Object.values(b.interfaces))
+            .find((i) => i.id === homeserverInterfaceId)
+        return iface
+          ? iface.addressInfo
+              .filter({ kind: 'domain' })
+              .hostnames.map((h) => h.hostname)
+          : []
+      })
       .once()) || []
 
   return {
