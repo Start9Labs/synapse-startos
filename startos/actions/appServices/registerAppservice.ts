@@ -53,7 +53,7 @@ export const inputSpec = InputSpec.of({
     ),
     required: true,
     default: null,
-    placeholder: 'http://mautrix-signal.startos:29328',
+    placeholder: 'http://127.0.0.1:29328',
     masked: false,
   }),
   rateLimited: Value.toggle({
