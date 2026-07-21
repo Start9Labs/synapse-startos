@@ -71,7 +71,18 @@ export const ensureAppserviceRegistration = async (
       {
         input: {
           kind: 'partial',
-          value: {
+          accept: [
+            {
+              id: params.id,
+              asToken: params.asToken,
+              hsToken: params.hsToken,
+              senderLocalpart: params.senderLocalpart,
+              url: params.url,
+              rateLimited: params.rateLimited,
+              userNamespaceRegex: params.userNamespaceRegex,
+            },
+          ],
+          set: {
             id: params.id,
             asToken: params.asToken,
             hsToken: params.hsToken,
