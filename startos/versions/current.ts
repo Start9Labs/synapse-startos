@@ -1,53 +1,78 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.156.0:3',
+  version: '1.157.1:0',
   releaseNotes: {
-    en_US: `Updated Synapse to 1.156.0.
+    en_US: `Updated Synapse to 1.157.1 and the Ketesa admin dashboard to 1.4.0.
 
-- Fixes a long-standing bug where a room's unread notification badge could stay permanently inflated, and a related inflation after purging a room's history.
-- Fixes dehydrated devices being deleted when a user's device list was synced from Matrix Authentication Service, which broke offline key delivery.
-- Fixes the Purge History admin API deleting local events even when delete_local_events was set to false.
-- Fixes /sync briefly caching transient errors instead of retrying.
-- Adds sticky events over Sliding Sync, and stabilizes sending ephemeral events to application services.
+Synapse:
+- Fixes a 1.156.0 regression where application services using the legacy ephemeral-events registration flag stopped receiving ephemeral events, including the to-device messages used for encryption.
+- Fixes reactivating a deactivated-and-erased user not restoring their profile, which had broken login, display-name changes, and invitations.
+- Adds an exclude_rooms_from_presence option and new presence-tuning settings, and tightens Sliding Sync locking to prevent repeated deadlocks.
+- Removes experimental MSC3861 auth delegation in favor of the stable Matrix Authentication Service integration.
+- 1.157.1 fixes a config regression that rejected falsy experimental_features values.
 
-Full release notes: https://github.com/element-hq/synapse/releases/tag/v1.156.0`,
-    es_ES: `Actualiza Synapse a 1.156.0.
+Ketesa:
+- The login and discovery screens now honor wellKnownDiscovery: false and no longer rewrite the server URL you enter.
+- User-list filters moved behind a Filter button for a tidier toolbar, and Matrix Authentication Service mode now shows the admin flag and user type correctly.
 
-- Corrige un error antiguo por el que el contador de notificaciones sin leer de una sala podía quedar permanentemente inflado, así como un aumento similar tras purgar el historial de una sala.
-- Corrige la eliminación de los dispositivos deshidratados al sincronizar la lista de dispositivos de un usuario desde Matrix Authentication Service, lo que impedía la entrega de claves sin conexión.
-- Corrige la API de administración «Purge History», que eliminaba eventos locales aunque delete_local_events estuviera desactivado.
-- Corrige que /sync almacenara brevemente en caché errores transitorios en lugar de reintentar.
-- Añade los eventos persistentes (sticky events) a Sliding Sync y estabiliza el envío de eventos efímeros a los servicios de aplicación.
+Full release notes: https://github.com/element-hq/synapse/releases/tag/v1.157.1 and https://github.com/etkecc/ketesa/releases/tag/v1.4.0`,
+    es_ES: `Actualiza Synapse a 1.157.1 y el panel de administración Ketesa a 1.4.0.
 
-Notas de la versión completas: https://github.com/element-hq/synapse/releases/tag/v1.156.0`,
-    de_DE: `Aktualisiert Synapse auf 1.156.0.
+Synapse:
+- Corrige una regresión de la versión 1.156.0 por la que los servicios de aplicación que usaban el antiguo indicador de registro de eventos efímeros dejaban de recibirlos, incluidos los mensajes «to-device» usados para el cifrado.
+- Corrige que reactivar a un usuario desactivado y borrado no restaurara su perfil, lo que había roto el inicio de sesión, los cambios de nombre y las invitaciones.
+- Añade la opción exclude_rooms_from_presence y nuevos ajustes de presencia, y refuerza el bloqueo de Sliding Sync para evitar bloqueos repetidos.
+- Elimina la delegación de autenticación experimental MSC3861 en favor de la integración estable con Matrix Authentication Service.
+- La versión 1.157.1 corrige una regresión de configuración que rechazaba los valores «falsy» de experimental_features.
 
-- Behebt einen langjährigen Fehler, durch den die Benachrichtigungsanzahl eines Raums dauerhaft zu hoch bleiben konnte, sowie einen ähnlichen Fehler nach dem Bereinigen des Raumverlaufs.
-- Behebt das Löschen dehydrierter Geräte beim Synchronisieren der Geräteliste eines Benutzers vom Matrix Authentication Service, was die Offline-Schlüsselzustellung unterbrach.
-- Behebt, dass die Purge-History-Admin-API lokale Ereignisse selbst dann löschte, wenn delete_local_events deaktiviert war.
-- Behebt, dass /sync vorübergehende Fehler kurzzeitig zwischenspeicherte, statt es erneut zu versuchen.
-- Fügt Sticky Events über Sliding Sync hinzu und stabilisiert das Senden ephemerer Ereignisse an Application Services.
+Ketesa:
+- Las pantallas de inicio de sesión y descubrimiento ahora respetan wellKnownDiscovery: false y ya no reescriben la URL del servidor que introduces.
+- Los filtros de la lista de usuarios se han movido tras un botón «Filtrar» para una barra de herramientas más despejada, y el modo Matrix Authentication Service ahora muestra correctamente el indicador de administrador y el tipo de usuario.
 
-Vollständige Versionshinweise: https://github.com/element-hq/synapse/releases/tag/v1.156.0`,
-    pl_PL: `Aktualizuje Synapse do 1.156.0.
+Notas de la versión completas: https://github.com/element-hq/synapse/releases/tag/v1.157.1 y https://github.com/etkecc/ketesa/releases/tag/v1.4.0`,
+    de_DE: `Aktualisiert Synapse auf 1.157.1 und das Ketesa-Administrationsdashboard auf 1.4.0.
 
-- Naprawia długotrwały błąd, przez który licznik nieprzeczytanych powiadomień w pokoju mógł pozostać trwale zawyżony, oraz podobne zawyżenie po wyczyszczeniu historii pokoju.
-- Naprawia usuwanie zdehydratyzowanych urządzeń podczas synchronizacji listy urządzeń użytkownika z Matrix Authentication Service, co uniemożliwiało dostarczanie kluczy w trybie offline.
-- Naprawia administracyjne API Purge History, które usuwało zdarzenia lokalne nawet przy wyłączonym delete_local_events.
-- Naprawia krótkotrwałe zapisywanie w pamięci podręcznej błędów przejściowych przez /sync zamiast ponowienia próby.
-- Dodaje zdarzenia przypięte (sticky events) w Sliding Sync i stabilizuje wysyłanie zdarzeń efemerycznych do usług aplikacyjnych.
+Synapse:
+- Behebt eine Regression aus 1.156.0, durch die Application Services, die das alte Registrierungs-Flag für ephemere Ereignisse nutzten, keine ephemeren Ereignisse mehr erhielten – einschließlich der für die Verschlüsselung verwendeten To-Device-Nachrichten.
+- Behebt, dass beim Reaktivieren eines deaktivierten und gelöschten Benutzers dessen Profil nicht wiederhergestellt wurde, was Anmeldung, Namensänderungen und Einladungen unterbrach.
+- Fügt die Option exclude_rooms_from_presence sowie neue Einstellungen zur Feinabstimmung der Präsenz hinzu und verschärft die Sperren in Sliding Sync, um wiederholte Deadlocks zu verhindern.
+- Entfernt die experimentelle MSC3861-Auth-Delegation zugunsten der stabilen Integration mit dem Matrix Authentication Service.
+- 1.157.1 behebt eine Konfigurationsregression, die „falsy“-Werte von experimental_features ablehnte.
 
-Pełne informacje o wydaniu: https://github.com/element-hq/synapse/releases/tag/v1.156.0`,
-    fr_FR: `Met à jour Synapse vers 1.156.0.
+Ketesa:
+- Die Anmelde- und Discovery-Bildschirme berücksichtigen nun wellKnownDiscovery: false und schreiben die von dir eingegebene Server-URL nicht mehr um.
+- Die Filter der Benutzerliste sind hinter einen „Filter“-Button gewandert, was die Symbolleiste übersichtlicher macht, und der Matrix-Authentication-Service-Modus zeigt Administrator-Flag und Benutzertyp nun korrekt an.
 
-- Corrige un bogue de longue date par lequel le compteur de notifications non lues d'un salon pouvait rester durablement gonflé, ainsi qu'un gonflement similaire après la purge de l'historique d'un salon.
-- Corrige la suppression des appareils déshydratés lors de la synchronisation de la liste des appareils d'un utilisateur depuis Matrix Authentication Service, qui rompait la livraison des clés hors ligne.
-- Corrige l'API d'administration « Purge History » qui supprimait des événements locaux même lorsque delete_local_events était désactivé.
-- Corrige la mise en cache brève des erreurs transitoires par /sync au lieu d'une nouvelle tentative.
-- Ajoute les événements persistants (sticky events) à Sliding Sync et stabilise l'envoi d'événements éphémères aux services applicatifs.
+Vollständige Versionshinweise: https://github.com/element-hq/synapse/releases/tag/v1.157.1 und https://github.com/etkecc/ketesa/releases/tag/v1.4.0`,
+    pl_PL: `Aktualizuje Synapse do 1.157.1 oraz panel administracyjny Ketesa do 1.4.0.
 
-Notes de version complètes : https://github.com/element-hq/synapse/releases/tag/v1.156.0`,
+Synapse:
+- Naprawia regresję z wersji 1.156.0, przez którą usługi aplikacyjne korzystające ze starej flagi rejestracji zdarzeń efemerycznych przestawały je otrzymywać, w tym wiadomości „to-device” używane do szyfrowania.
+- Naprawia sytuację, w której ponowna aktywacja dezaktywowanego i wymazanego użytkownika nie przywracała jego profilu, co uniemożliwiało logowanie, zmianę nazwy i wysyłanie zaproszeń.
+- Dodaje opcję exclude_rooms_from_presence oraz nowe ustawienia dostrajania obecności, a także wzmacnia blokady w Sliding Sync, aby zapobiec powtarzającym się zakleszczeniom.
+- Usuwa eksperymentalną delegację uwierzytelniania MSC3861 na rzecz stabilnej integracji z Matrix Authentication Service.
+- Wersja 1.157.1 naprawia regresję konfiguracji, która odrzucała „fałszywe” wartości experimental_features.
+
+Ketesa:
+- Ekrany logowania i wykrywania respektują teraz wellKnownDiscovery: false i nie przepisują już wpisanego adresu URL serwera.
+- Filtry listy użytkowników przeniesiono za przycisk „Filtruj”, dzięki czemu pasek narzędzi jest bardziej przejrzysty, a tryb Matrix Authentication Service poprawnie pokazuje flagę administratora i typ użytkownika.
+
+Pełne informacje o wydaniu: https://github.com/element-hq/synapse/releases/tag/v1.157.1 oraz https://github.com/etkecc/ketesa/releases/tag/v1.4.0`,
+    fr_FR: `Met à jour Synapse vers 1.157.1 et le tableau de bord d'administration Ketesa vers 1.4.0.
+
+Synapse :
+- Corrige une régression de la version 1.156.0 par laquelle les services applicatifs utilisant l'ancien indicateur d'enregistrement des événements éphémères cessaient d'en recevoir, y compris les messages « to-device » utilisés pour le chiffrement.
+- Corrige le fait que la réactivation d'un utilisateur désactivé et effacé ne restaurait pas son profil, ce qui avait rompu la connexion, les changements de nom et les invitations.
+- Ajoute une option exclude_rooms_from_presence et de nouveaux réglages d'ajustement de la présence, et renforce le verrouillage de Sliding Sync pour éviter les interblocages répétés.
+- Supprime la délégation d'authentification expérimentale MSC3861 au profit de l'intégration stable avec Matrix Authentication Service.
+- La version 1.157.1 corrige une régression de configuration qui rejetait les valeurs « falsy » d'experimental_features.
+
+Ketesa :
+- Les écrans de connexion et de découverte respectent désormais wellKnownDiscovery: false et ne réécrivent plus l'URL du serveur que vous saisissez.
+- Les filtres de la liste des utilisateurs ont été déplacés derrière un bouton « Filtrer » pour une barre d'outils plus épurée, et le mode Matrix Authentication Service affiche désormais correctement l'indicateur d'administrateur et le type d'utilisateur.
+
+Notes de version complètes : https://github.com/element-hq/synapse/releases/tag/v1.157.1 et https://github.com/etkecc/ketesa/releases/tag/v1.4.0`,
   },
   migrations: {},
 })
