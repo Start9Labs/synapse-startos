@@ -34,12 +34,12 @@
 
 ## Image and Container Runtime
 
-| Property | Value |
-|----------|-------|
-| Synapse image | `ghcr.io/element-hq/synapse` (upstream pre-built image) |
-| Nginx image | `nginx` Alpine (upstream unmodified) |
-| PostgreSQL image | `postgres` Alpine (database sidecar) |
-| Architectures | x86_64, aarch64 |
+| Property         | Value                                                   |
+| ---------------- | ------------------------------------------------------- |
+| Synapse image    | `ghcr.io/element-hq/synapse` (upstream pre-built image) |
+| Nginx image      | `nginx` Alpine (upstream unmodified)                    |
+| PostgreSQL image | `postgres` Alpine (database sidecar)                    |
+| Architectures    | x86_64, aarch64                                         |
 
 Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on port 80, proxies Matrix API traffic to Synapse on port 8008, and serves the [Synapse Admin](https://github.com/etkecc/synapse-admin) dashboard on port 8080.
 
@@ -47,10 +47,10 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 ## Volume and Data Layout
 
-| Volume | Mount Point | Purpose |
-|--------|-------------|---------|
-| `main` | `/data` | Synapse config, media, keys, appservices, StartOS state |
-| `db` | `/var/lib/postgresql` | PostgreSQL data |
+| Volume | Mount Point           | Purpose                                                 |
+| ------ | --------------------- | ------------------------------------------------------- |
+| `main` | `/data`               | Synapse config, media, keys, appservices, StartOS state |
+| `db`   | `/var/lib/postgresql` | PostgreSQL data                                         |
 
 **Key files on the `main` volume:**
 
@@ -65,11 +65,11 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 ## Installation and First-Run Flow
 
-| Step | Upstream | StartOS |
-|------|----------|---------|
-| Generate config | `python -m synapse.app.homeserver --generate-config` | Automatic via `setupOnInit` |
-| Set server name | Edit `homeserver.yaml` | "Set Server Address/URL" action (critical task) |
-| Create admin user | `register_new_matrix_user` CLI | "Set Admin Password" action (critical task) -- generates a password; the actual user is registered when the service first starts |
+| Step              | Upstream                                             | StartOS                                                                                                                          |
+| ----------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Generate config   | `python -m synapse.app.homeserver --generate-config` | Automatic via `setupOnInit`                                                                                                      |
+| Set server name   | Edit `homeserver.yaml`                               | "Set Server Address/URL" action (critical task)                                                                                  |
+| Create admin user | `register_new_matrix_user` CLI                       | "Set Admin Password" action (critical task) -- generates a password; the actual user is registered when the service first starts |
 
 **Key difference:** On first install, StartOS generates the initial Synapse config automatically. You must run the "Set Server Address/URL" action (created as a critical task) to choose your permanent domain before starting. Completing it surfaces "Set Admin Password" as a second critical task; running that generates and shows the credentials. Starting the service then registers the admin user with the chosen password.
 
@@ -79,15 +79,15 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 ## Configuration Management
 
-| Setting | Upstream Method | StartOS Method |
-|---------|-----------------|----------------|
-| `server_name` | `homeserver.yaml` | "Set Server Address/URL" action (one-time) |
-| `enable_registration` | `homeserver.yaml` | "Config" action |
-| Federation | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist) |
-| `max_upload_size` | `homeserver.yaml` | "Config" action (1-2000 MB) |
-| SMTP/email | `homeserver.yaml` | "Config" action (disabled/system/custom) |
-| Admin password | `register_new_matrix_user` | "Set Admin Password" action |
-| Appservices | Manual YAML files | Register/List/Delete Appservice actions |
+| Setting               | Upstream Method             | StartOS Method                                      |
+| --------------------- | --------------------------- | --------------------------------------------------- |
+| `server_name`         | `homeserver.yaml`           | "Set Server Address/URL" action (one-time)          |
+| `enable_registration` | `homeserver.yaml`           | "Config" action                                     |
+| Federation            | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist) |
+| `max_upload_size`     | `homeserver.yaml`           | "Config" action (1-2000 MB)                         |
+| SMTP/email            | `homeserver.yaml`           | "Config" action (disabled/system/custom)            |
+| Admin password        | `register_new_matrix_user`  | "Set Admin Password" action                         |
+| Appservices           | Manual YAML files           | Register/List/Delete Appservice actions             |
 
 **Configuration NOT exposed on StartOS:**
 
@@ -101,10 +101,10 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 ## Network Access and Interfaces
 
-| Interface | Port | Protocol | Type | Purpose |
-|-----------|------|----------|------|---------|
-| Homeserver | 80 (nginx) | HTTP | API | Matrix client and federation API |
-| Admin Dashboard | 8080 (nginx) | HTTP | UI | Synapse Admin web interface |
+| Interface       | Port         | Protocol | Type | Purpose                          |
+| --------------- | ------------ | -------- | ---- | -------------------------------- |
+| Homeserver      | 80 (nginx)   | HTTP     | API  | Matrix client and federation API |
+| Admin Dashboard | 8080 (nginx) | HTTP     | UI   | Synapse Admin web interface      |
 
 Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, handles `.well-known/matrix/server` responses, and enforces `max_upload_size` on Matrix API routes.
 
@@ -114,81 +114,81 @@ Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, ha
 
 ### Set Server Address/URL
 
-| Property | Value |
-|----------|-------|
-| ID | `set-server-name` |
-| Visibility | Hidden after first start |
-| Availability | Only when stopped |
-| Purpose | Choose permanent server domain (clearnet or Tor) |
+| Property     | Value                                            |
+| ------------ | ------------------------------------------------ |
+| ID           | `set-server-name`                                |
+| Visibility   | Hidden after first start                         |
+| Availability | Only when stopped                                |
+| Purpose      | Choose permanent server domain (clearnet or Tor) |
 
 Presents available hostnames from the homeserver interface. Sets `server_name` and `public_baseurl` in `homeserver.yaml`. **Cannot be changed after first start.**
 
 ### Set Admin Password
 
-| Property | Value |
-|----------|-------|
-| ID | `set-admin-password` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | Set or reset the admin account password |
+| Property     | Value                                   |
+| ------------ | --------------------------------------- |
+| ID           | `set-admin-password`                    |
+| Visibility   | Enabled                                 |
+| Availability | Any status                              |
+| Purpose      | Set or reset the admin account password |
 
 Generates a random 22-character password, stores it in `store.json` as `pendingAdminPassword`, and displays it. The next time the service starts, an `apply-admin-password` oneshot in the daemon chain consumes the pending password: if no users exist in PostgreSQL it runs `register_new_matrix_user` to create the admin; otherwise it hashes the password with `hash_password` and `UPDATE`s the first-registered user's `password_hash`. The pending field is cleared on success.
 
 ### Config
 
-| Property | Value |
-|----------|-------|
-| ID | `config` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | Configure registration, federation, upload limits, SMTP |
+| Property     | Value                                                   |
+| ------------ | ------------------------------------------------------- |
+| ID           | `config`                                                |
+| Visibility   | Enabled                                                 |
+| Availability | Any status                                              |
+| Purpose      | Configure registration, federation, upload limits, SMTP |
 
 **Settings:**
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Registration | Disabled | Allow public account creation |
-| Federation | Disabled | Enable/disable with optional domain whitelist |
-| Max Upload Size | 50 MB | File upload limit (1-2000 MB) |
-| SMTP | Disabled | Email notifications (disabled/system/custom) |
+| Setting         | Default  | Description                                   |
+| --------------- | -------- | --------------------------------------------- |
+| Registration    | Disabled | Allow public account creation                 |
+| Federation      | Disabled | Enable/disable with optional domain whitelist |
+| Max Upload Size | 50 MB    | File upload limit (1-2000 MB)                 |
+| SMTP            | Disabled | Email notifications (disabled/system/custom)  |
 
 ### Register Appservice
 
-| Property | Value |
-|----------|-------|
-| ID | `register-appservice` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | Register a Matrix bridge with the homeserver |
+| Property     | Value                                        |
+| ------------ | -------------------------------------------- |
+| ID           | `register-appservice`                        |
+| Visibility   | Enabled                                      |
+| Availability | Any status                                   |
+| Purpose      | Register a Matrix bridge with the homeserver |
 
 Accepts appservice credentials (ID, tokens, URL, namespace regex) and writes the registration YAML. Typically triggered automatically by bridge services via the exported `ensureAppserviceRegistration` API.
 
 ### List Appservices
 
-| Property | Value |
-|----------|-------|
-| ID | `list-appservices` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | View all registered bridges |
+| Property     | Value                       |
+| ------------ | --------------------------- |
+| ID           | `list-appservices`          |
+| Visibility   | Enabled                     |
+| Availability | Any status                  |
+| Purpose      | View all registered bridges |
 
 ### Delete Appservice
 
-| Property | Value |
-|----------|-------|
-| ID | `delete-appservice` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | Remove a registered bridge |
+| Property     | Value                      |
+| ------------ | -------------------------- |
+| ID           | `delete-appservice`        |
+| Visibility   | Enabled                    |
+| Availability | Any status                 |
+| Purpose      | Remove a registered bridge |
 
 ### Create Bot User
 
-| Property | Value |
-|----------|-------|
-| ID | `create-bot-user` |
-| Visibility | Hidden |
-| Availability | Only when running |
-| Purpose | Create non-admin bot accounts for bridge services |
+| Property     | Value                                             |
+| ------------ | ------------------------------------------------- |
+| ID           | `create-bot-user`                                 |
+| Visibility   | Hidden                                            |
+| Availability | Only when running                                 |
+| Purpose      | Create non-admin bot accounts for bridge services |
 
 ---
 
@@ -208,12 +208,12 @@ Accepts appservice credentials (ID, tokens, URL, namespace regex) and writes the
 
 ## Health Checks
 
-| Check | Method | Grace Period | Display |
-|-------|--------|--------------|---------|
-| Database | `pg_isready` | Default | "Database" |
-| Homeserver | HTTP GET `http://localhost:8008/health` | 15 seconds | "Homeserver" |
-| Nginx | Port listening on 80 | Default | Hidden |
-| Admin Dashboard | HTTP GET `http://localhost:8080` | Default | "Admin Dashboard" |
+| Check           | Method                                  | Grace Period | Display           |
+| --------------- | --------------------------------------- | ------------ | ----------------- |
+| Database        | `pg_isready`                            | Default      | "Database"        |
+| Homeserver      | HTTP GET `http://localhost:8008/health` | 15 seconds   | "Homeserver"      |
+| Nginx           | Port listening on 80                    | Default      | Hidden            |
+| Admin Dashboard | HTTP GET `http://localhost:8080`        | Default      | "Admin Dashboard" |
 
 ---
 
@@ -250,7 +250,7 @@ None.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development workflow.
+Build and development workflow follow the StartOS packaging guide: <https://docs.start9.com/packaging>. Keep `README.md`, `instructions.md`, and `AGENTS.md` in sync with any change to user-visible behavior or package structure.
 
 ---
 
