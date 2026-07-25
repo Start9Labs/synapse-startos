@@ -1,7 +1,7 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.156.0:3',
+  version: '1.156.0:4',
   releaseNotes: {
     en_US: `Updated Synapse to 1.156.0.
 
