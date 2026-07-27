@@ -1,3 +1,4 @@
+import { T } from '@start9labs/start-sdk'
 import { writeFile } from 'fs/promises'
 import { homeserverYaml } from './fileModels/homeserver.yml'
 import { storeJson } from './fileModels/store.json'
@@ -20,50 +21,53 @@ export const main = sdk.setupMain(async ({ effects }) => {
    */
   console.info(i18n('Starting Synapse!'))
 
+  // Watched scoped rather than whole-store: the apply-admin-password oneshot
+  // below clears pendingAdminPassword, which a whole-store watch would treat
+  // as a change and restart on.
+  const smtp = await storeJson.read((s) => s.smtp).const(effects)
+  if (!smtp) {
+    throw new Error('store.json not found')
+  }
+
+  let smtpCredentials: T.SmtpValue | null = null
+  if (smtp.selection === 'system') {
+    smtpCredentials = await sdk.getSystemSmtp(effects).const()
+    const customFrom = smtp.value.customFrom
+    if (smtpCredentials && customFrom) smtpCredentials.from = customFrom
+  } else if (smtp.selection === 'custom') {
+    const { from, host, security, username, password } =
+      smtp.value.provider.value
+    smtpCredentials = {
+      from,
+      host,
+      port: Number(security.value.port),
+      username,
+      password,
+      security: security.selection === 'tls' ? 'tls' : 'starttls',
+    }
+  }
+
+  await homeserverYaml.merge(effects, {
+    email: smtpCredentials && {
+      enable_notifs: true,
+      require_transport_security: true,
+      notif_from: smtpCredentials.from,
+      smtp_host: smtpCredentials.host,
+      smtp_port: smtpCredentials.port,
+      smtp_user: smtpCredentials.username,
+      smtp_pass: smtpCredentials.password || undefined,
+    },
+  })
+
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
   const config = await homeserverYaml.read().const(effects)
   if (!config) {
     throw new Error('homeserver.yaml not found')
   }
-  const store = await storeJson.read().once()
-  if (!store) {
-    throw new Error('store.json not found')
-  }
-  const { smtp, pendingAdminPassword } = store
 
-  if (smtp.selection !== 'disabled') {
-    if (smtp.selection === 'system') {
-      const creds = await sdk.getSystemSmtp(effects).const()
-      if (creds) {
-        await homeserverYaml.merge(effects, {
-          email: {
-            enable_notifs: true,
-            require_transport_security: true,
-            notif_from: smtp.value.customFrom || creds.from,
-            smtp_host: creds.host,
-            smtp_port: creds.port,
-            smtp_user: creds.username,
-            smtp_pass: creds.password || undefined,
-          },
-        })
-      }
-    } else {
-      const { from, host, security, username, password } =
-        smtp.value.provider.value
-
-      await homeserverYaml.merge(effects, {
-        email: {
-          enable_notifs: true,
-          require_transport_security: true,
-          notif_from: from,
-          smtp_host: host,
-          smtp_port: Number(security.value.port),
-          smtp_user: username,
-          smtp_pass: password || undefined,
-        },
-      })
-    }
-  }
+  const pendingAdminPassword = await storeJson
+    .read((s) => s.pendingAdminPassword)
+    .once()
 
   // create and configure nginx container
   const nginxSub = sdk.SubContainer.of(
@@ -311,7 +315,6 @@ server {
           }
 
           await storeJson.merge(effects, { pendingAdminPassword: null })
-          await storeJson.read().const(effects)
           return null
         },
       },

@@ -27,6 +27,7 @@ export const setAdminPassword = sdk.Action.withoutInput(
     })
 
     await storeJson.merge(effects, { pendingAdminPassword: adminPassword })
+    await sdk.restart(effects)
 
     return {
       version: '1',
