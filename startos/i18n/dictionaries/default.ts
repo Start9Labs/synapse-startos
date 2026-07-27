@@ -27,13 +27,7 @@ const dict = {
   Config: 23,
   'Configure your Synapse homeserver.': 24,
   Username: 25,
-  'The localpart for the bot user (e.g. "mybot" creates @mybot:your.domain)': 26,
-  'Provided by the bridge service': 27,
   Password: 28,
-  'The password for the bot user': 29,
-  'Provided by the bot service': 30,
-  'Create Bot User': 31,
-  'Create a new bot (non-admin) user account on the homeserver.': 32,
   Appservice: 33,
   'Select the appservice to remove': 34,
   'Delete Appservice': 35,
@@ -85,6 +79,8 @@ const dict = {
   'Access Token': 86,
   'Set Admin Password': 87,
   'Set the admin user password for your Synapse Matrix homeserver.': 88,
+  'Configure SMTP': 89,
+  'Add SMTP credentials so your homeserver can send email notifications.': 90,
 } as const
 
 export type I18nKey = keyof typeof dict

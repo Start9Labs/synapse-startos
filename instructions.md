@@ -34,10 +34,11 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 
 ### Actions
 
-- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it.
-- **Config** — registration on/off, federation on/off (with optional whitelist of allowed server domains), max upload size, and SMTP (system SMTP or custom credentials).
+- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
+- **Config** — registration on/off, federation on/off (with optional whitelist of allowed server domains), and max upload size.
+- **Configure SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
-- **Register / List / Delete Appservice** and **Create Bot User** — manage Matrix bridges (appservices) and the bot users they own.
+- **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard.
 
 ### Federation
 

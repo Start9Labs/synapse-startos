@@ -1,6 +1,4 @@
-import { smtpPrefill } from '@start9labs/start-sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 
@@ -59,7 +57,6 @@ export const inputSpec = InputSpec.of({
     min: 1,
     max: 2000,
   }),
-  smtp: sdk.inputSpecConstants.smtpInputSpec,
 })
 
 export const config = sdk.Action.withInput(
@@ -103,9 +100,6 @@ export const config = sdk.Action.withInput(
           }
         : { selection: 'disabled' as const, value: {} },
       max_upload_size: toMB(max_upload_size),
-      smtp: smtpPrefill(
-        await storeJson.read((s) => s.smtp).const(effects),
-      ),
     }
   },
 
@@ -122,8 +116,6 @@ export const config = sdk.Action.withInput(
       input.federation.selection === 'disabled'
         ? ['client']
         : ['client', 'federation']
-
-    await storeJson.merge(effects, { smtp: input.smtp })
 
     await homeserverYaml.merge(effects, {
       enable_registration: input.registration === 'enabled',
