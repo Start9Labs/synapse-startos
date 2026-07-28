@@ -41,7 +41,7 @@
 | PostgreSQL image | `postgres` Alpine (database sidecar)                    |
 | Architectures    | x86_64, aarch64                                         |
 
-Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on port 80, proxies Matrix API traffic to Synapse on port 8008, and serves the [Synapse Admin](https://github.com/etkecc/synapse-admin) dashboard on port 8080.
+Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on port 80, proxies Matrix API traffic to Synapse on port 8008, and serves the [Ketesa](https://github.com/etkecc/ketesa) admin dashboard on port 8080.
 
 ---
 

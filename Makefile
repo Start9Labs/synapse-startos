@@ -2,8 +2,8 @@ ARCHES := x86 arm
 # overrides to s9pk.mk must precede the include statement
 include node_modules/@start9labs/start-sdk/s9pk.mk
 
-SYNAPSE_ADMIN_VERSION = v1.3.0
-SYNAPSE_ADMIN_CHECKSUM = ad241735fe683ff25aa6a46c791024e5df4aedd8e89814e0ee9649f9280801c3
+SYNAPSE_ADMIN_VERSION = v1.4.0
+SYNAPSE_ADMIN_CHECKSUM = 34351c13293e66ed3c024598ce48bbc7b347784b9e618b0ceaf1cb42a7a730b7
 
 # Ensure synapse-admin is built as part of 'ingredients' (which the s9pk
 # recipe runs before packing). A prerequisite-only pattern rule like
