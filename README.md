@@ -85,8 +85,10 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 | Setting                                 | Upstream Method             | StartOS Method                                                      |
 | --------------------------------------- | --------------------------- | ------------------------------------------------------------------- |
 | `server_name`                           | `homeserver.yaml`           | "Set Server Address/URL" action (one-time)                          |
-| `enable_registration`                   | `homeserver.yaml`           | "Config" action                                                     |
+| Registration                            | `homeserver.yaml`           | "Config" action, three-state (see below)                            |
 | Federation                              | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist)                 |
+| `limit_remote_rooms`                    | `homeserver.yaml`           | "Config" action (off, or a complexity ceiling)                      |
+| `root.level`                            | `homeserver.log.config`     | "Config" action (DEBUG/INFO/WARNING/ERROR)                          |
 | `presence.enabled`                      | `homeserver.yaml`           | "Config" action (default on, matching upstream)                     |
 | `max_upload_size`                       | `homeserver.yaml`           | "Config" action (1-2000 MB)                                         |
 | `media_retention.remote_media_lifetime` | `homeserver.yaml`           | "Config" action, in days (default absent = keep forever)            |
@@ -97,11 +99,12 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 **Configuration NOT exposed on StartOS:**
 
-- `log_config` -- fixed logging configuration
+- `homeserver.log.config` beyond the level -- handlers, formatters and rotation are fixed
 - `database` -- always PostgreSQL via sidecar container
 - `trusted_key_servers` -- defaults to `matrix.org`
 - `report_stats` -- always disabled
 - Listener bind addresses and ports
+- `experimental_features.msc3266_enabled` -- forced on. Element X cannot talk to a homeserver without the room summary API and the upstream playbook enables it by default, so it isn't worth a user choice. A hand-set `false` is still honoured.
 
 ### Hand-editing `homeserver.yaml`
 
@@ -186,25 +189,46 @@ The restart is what makes the new password take effect immediately. `pendingAdmi
 
 ### Config
 
-| Property     | Value                                             |
-| ------------ | ------------------------------------------------- |
-| ID           | `config`                                          |
-| Visibility   | Enabled                                           |
-| Availability | Any status                                        |
-| Purpose      | Configure registration, federation, upload limits |
+| Property     | Value                                            |
+| ------------ | ------------------------------------------------ |
+| ID           | `config`                                         |
+| Visibility   | Enabled                                          |
+| Availability | Any status                                       |
+| Purpose      | Registration, federation, calls, limits, logging |
 
 **Settings:**
 
 | Setting                | Default      | Description                                                         |
 | ---------------------- | ------------ | ------------------------------------------------------------------- |
-| Registration           | Disabled     | Allow public account creation                                       |
+| Registration           | Disabled     | Disabled / Invite Only / Open -- see below                          |
 | Federation             | Disabled     | Enable/disable with optional domain whitelist                       |
 | Voice and Video Calls  | Off          | Opt in to TURN relay via the `coturn` package                       |
 | Presence               | On           | `presence.enabled`; upstream default, exposed as a performance knob |
 | Max Upload Size        | 50 MB        | File upload limit (1-2000 MB)                                       |
+| Large Room Protection  | Join any     | `limit_remote_rooms`; off, or a complexity ceiling                  |
+| Log Level              | INFO         | `root.level` in `homeserver.log.config`                             |
 | Remote Media Retention | Keep forever | `media_retention.remote_media_lifetime`, in days                    |
 
-All but "Voice and Video Calls" write `homeserver.yaml` directly, which `main` holds a `.const()` watch on, so the service restarts itself to pick them up. "Voice and Video Calls" writes `store.json.turn`, which `main` also watches -- the `turn_*` keys themselves are rendered by `main` from the resolved coturn endpoint, before it const-reads `homeserver.yaml`, so the write is not a write-after-const.
+Most of these write `homeserver.yaml` directly, which `main` holds a `.const()` watch on, so the service restarts itself to pick them up. Two don't:
+
+- **Voice and Video Calls** writes `store.json.turn`, which `main` also watches. The `turn_*` keys themselves are rendered by `main` from the resolved coturn endpoint, before it const-reads `homeserver.yaml`, so the write is not a write-after-const.
+- **Log Level** writes `homeserver.log.config`. Synapse reads that file once at startup, so `main` const-reads `root.level` purely to force the restart that makes a change take effect.
+
+#### Registration is three-state
+
+| Value           | `enable_registration` | `registration_requires_token` | `enable_registration_without_verification` |
+| --------------- | --------------------- | ----------------------------- | ------------------------------------------ |
+| **Disabled**    | `false`               | `false`                       | `false`                                    |
+| **Invite Only** | `true`                | `true`                        | `false`                                    |
+| **Open**        | `true`                | `false`                       | `true`                                     |
+
+The third column is load-bearing rather than incidental. Synapse's `validate_config` **refuses to start** when `enable_registration` is on and none of captcha, 3PID, or `registration_requires_token` is set, unless `enable_registration_without_verification` overrides that check. A token requirement satisfies it, which is why only **Open** needs the override -- and why this package no longer pins the key permanently `true` as it used to. Leaving it true under Invite Only would silently disarm the guard, so a later hand-edit clearing `registration_requires_token` would open the server to the world instead of refusing to boot.
+
+**Invite Only needs no custom code.** `m.login.registration_token` is a stable Matrix UIA stage, so users sign up through the ordinary client flow and enter the token as the final step, and the bundled Ketesa dashboard already ships the management UI for them -- mint, `uses_allowed`, `expiry_time`, revoke -- under **Registration Tokens**.
+
+#### Large Room Protection
+
+`limit_remote_rooms.complexity` is `current_state_events / 500`, evaluated the first time anyone on this server joins a given room. The form defaults to Synapse's own `1.0`, which is strict enough to refuse many ordinary rooms; that is deliberately not second-guessed here, since the workable ceiling depends on the box. `admins_can_join` is forced **on** whenever the limit is enabled -- without it an over-limit room is unjoinable by anyone on the server, whereas with it an admin can join first, after which the room is known locally and everyone else can follow.
 
 "Remote Media Retention" is written as `<n>d` and read back through a converter that understands `d`, `w` and `y`. A hand-written value in any other unit reads back as empty, and re-saving the form would clear it; use the [hand-edit escape hatch](#hand-editing-homeserveryaml) for sub-day precision.
 
@@ -300,7 +324,7 @@ Declared `optional: true` in the manifest and returned from `setupDependencies` 
 1. **Server name is permanent** -- once set and started, the server address/URL cannot be changed
 2. **Admin username fixed** -- always `admin`; only password can be changed. On an imported homeserver, "Set Admin Password" rewrites the **first-registered** user's password, which is not necessarily the account the operator thinks of as the admin
 3. **No workers** -- runs as a single monolith process (no worker-based scaling)
-4. **Fixed logging** -- log configuration is not user-configurable (INFO level, 100 MB rotation), and unlike `homeserver.yaml` a hand-edit does not survive
+4. **Logging is fixed apart from the level** -- handlers, formatters and 100 MB rotation are rebuilt on every init, so unlike `homeserver.yaml` a hand-edit to `homeserver.log.config` does not survive. Only `root.level` is carried back through, which is what makes the Config action's choice stick
 5. **`homeserver.yaml` is managed, not owned** -- configuration is normally done through StartOS actions, but keys outside the package's schema do survive a hand-edit; see [Hand-editing `homeserver.yaml`](#hand-editing-homeserveryaml)
 6. **Tor federation limitations** -- `.onion` servers can only federate with other `.onion` servers
 7. **Import is pre-first-start only** -- there is no path to merge an external homeserver into a running one
@@ -348,7 +372,9 @@ dependencies:
 database: PostgreSQL (sidecar, localhost-only, password auth, locale=C)
 startos_managed_config:
   - server_name (one-time, permanent)
-  - enable_registration
+  - registration (disabled | invite-only | open)
+  - limit_remote_rooms (large room protection)
+  - homeserver.log.config root.level
   - federation (listeners + domain whitelist)
   - presence.enabled
   - max_upload_size

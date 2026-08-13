@@ -1,3 +1,7 @@
+import {
+  defaultLogLevel,
+  homeserverLogConfig,
+} from '../fileModels/homeserver.log.config'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
@@ -9,12 +13,13 @@ export const inputSpec = InputSpec.of({
   registration: Value.select({
     name: i18n('Registration'),
     description: i18n(
-      "Allow outsiders to create their own accounts on your homeserver. This is not recommended, as it leaves your server vulnerable to attack. It is preferable for you to create accounts on their behalf using your server's admin portal.",
+      'Who may create an account on your homeserver. Invite only lets people sign up with a registration token you hand out, which you create and revoke under Registration Tokens in the Admin Dashboard. Open means anyone on the internet who can reach your server can create an account, which is a standing invitation to spam and abuse.',
     ),
     default: 'disabled',
     values: {
       disabled: i18n('Disabled'),
-      enabled: i18n('Enabled'),
+      'invite-only': i18n('Invite Only'),
+      open: i18n('Open'),
     },
   }),
   federation: Value.union({
@@ -72,6 +77,45 @@ export const inputSpec = InputSpec.of({
     min: 1,
     max: 2000,
   }),
+  large_rooms: Value.union({
+    name: i18n('Large Room Protection'),
+    default: 'unlimited',
+    description: i18n(
+      'Refuse to join rooms above a size your server can handle. Joining a very large room — a public one with tens of thousands of members — makes your homeserver download and keep its entire history, which on a home server can take hours and fill the disk. This limit applies only the first time anyone here joins a given room.',
+    ),
+    variants: Variants.of({
+      unlimited: { name: i18n('Join Any Room'), spec: InputSpec.of({}) },
+      limited: {
+        name: i18n('Limit by Size'),
+        spec: InputSpec.of({
+          complexity: Value.number({
+            name: i18n('Complexity Limit'),
+            description: i18n(
+              "A room's complexity is its number of state events divided by 500, so 1 is roughly a 500-event room and 20 is roughly a 10,000-event room. Synapse's own default is 1, which is strict enough to refuse many ordinary rooms — raise it until joins succeed. Server admins are exempt, so you can always join a room yourself and let everyone else in behind you.",
+            ),
+            required: true,
+            default: 1,
+            integer: false,
+            step: 0.5,
+            min: 0.5,
+          }),
+        }),
+      },
+    }),
+  }),
+  log_level: Value.select({
+    name: i18n('Log Level'),
+    description: i18n(
+      'How much detail Synapse writes to its logs. Info records every request and is useful while setting things up; Warning is quieter and is what most servers should sit on day to day. Debug is very noisy and should only be turned on while chasing a specific problem.',
+    ),
+    default: defaultLogLevel,
+    values: {
+      DEBUG: i18n('Debug'),
+      INFO: i18n('Info'),
+      WARNING: i18n('Warning'),
+      ERROR: i18n('Error'),
+    },
+  }),
   remote_media_lifetime: Value.number({
     name: i18n('Remote Media Retention'),
     description: i18n(
@@ -105,23 +149,37 @@ export const config = sdk.Action.withInput(
   // optionally pre-fill the input form
   async ({ effects }) => {
     const turn = (await storeJson.read((s) => s.turn).const(effects)) ?? false
+    const logLevel =
+      (await homeserverLogConfig.read((c) => c.root.level).const(effects)) ??
+      defaultLogLevel
     const yaml = await homeserverYaml.read().const(effects)
     if (!yaml) {
-      return { turn }
+      return { turn, log_level: logLevel }
     }
     const {
       enable_registration,
       listeners,
       federation_domain_whitelist,
+      limit_remote_rooms,
       media_retention,
       max_upload_size,
       presence,
+      registration_requires_token,
     } = yaml
 
     return {
-      registration: enable_registration
-        ? ('enabled' as const)
-        : ('disabled' as const),
+      registration: !enable_registration
+        ? ('disabled' as const)
+        : registration_requires_token
+          ? ('invite-only' as const)
+          : ('open' as const),
+      large_rooms: limit_remote_rooms.enabled
+        ? {
+            selection: 'limited' as const,
+            value: { complexity: limit_remote_rooms.complexity },
+          }
+        : { selection: 'unlimited' as const, value: {} },
+      log_level: logLevel,
       federation: listeners[0].resources[0].names.includes('federation')
         ? {
             selection: 'enabled' as const,
@@ -152,9 +210,27 @@ export const config = sdk.Action.withInput(
     // `main` reads this, resolves the Coturn endpoint and renders the turn_*
     // keys, so nothing here writes them directly.
     await storeJson.merge(effects, { turn: input.turn })
+    await homeserverLogConfig.merge(effects, {
+      root: { level: input.log_level },
+    })
 
     await homeserverYaml.merge(effects, {
-      enable_registration: input.registration === 'enabled',
+      enable_registration: input.registration !== 'disabled',
+      registration_requires_token: input.registration === 'invite-only',
+      // Synapse refuses to start on open registration with no verification of
+      // any kind; a token requirement counts, so only Open needs the override.
+      enable_registration_without_verification: input.registration === 'open',
+      limit_remote_rooms: {
+        enabled: input.large_rooms.selection === 'limited',
+        complexity:
+          input.large_rooms.selection === 'limited'
+            ? input.large_rooms.value.complexity
+            : 1,
+        // Without this an over-limit room is unjoinable by anyone here; with
+        // it an admin can join first, after which the room is already known
+        // and everyone else can follow.
+        admins_can_join: true,
+      },
       listeners,
       federation_domain_whitelist:
         input.federation.selection === 'disabled'

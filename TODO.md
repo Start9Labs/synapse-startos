@@ -1,32 +1,18 @@
 # TODO
 
 Deferred from the Synapse feature review (`synapse-startos-migration-feature-gaps.md`),
-which shipped its Phase 1 as `1.158.0:1`. Roughly in priority order.
+whose phases 1 and 2 shipped together as `1.158.0:1`. Roughly in priority order.
 
-## Safe registration and resource protection
+## Resource protection
 
-- [ ] **`registration_requires_token`.** Replace the Registration boolean with a three-state
-      enum — Disabled / Invite only (`enable_registration: true` + `registration_requires_token: true`)
-      / Open. Today "enabled" means fully open, unverified signup, because
-      `enable_registration_without_verification` sits at `true` with no middle ground.
-      `m.login.registration_token` is a stable Matrix UIA stage and the bundled Ketesa
-      dashboard already ships the token-management UI, so this needs no custom code
-      beyond the enum.
-- [ ] **`msc3266`** (room summary API). The upstream playbook enables it by default and
-      calls it mandatory for Element X. Not MatrixRTC — don't defer it with that bundle.
-- [ ] **Log-level select.** `homeserver.log.config` is hardcoded to `INFO` and rewritten on
-      every init, so unlike `homeserver.yaml` a hand-edit does not survive. The playbook
-      defaults to `WARNING`.
-- [ ] **`limit_remote_rooms`** (`enabled`, `complexity`, `complexity_error`,
-      `admins_can_join`). Stops one user joining a room like Matrix HQ and flattening a
-      home server. Complexity is `current_state_events / 500`.
 - [ ] **Cache autotuning derived from box RAM** — `caches.global_factor`,
       `cache_autotuning.{max,target}_cache_memory_usage`, `min_cache_ttl`,
       `event_cache_size`. The playbook computes these from total RAM (`memtotal/8` capped
       at 2 GB max, `memtotal/16` capped at 1 GB target); StartOS knows the box's RAM, so
       derive rather than expose a knob.
-- [ ] **Message / redaction / user-IP retention** — `retention.*` + `purge_jobs`,
-      `redaction_retention_period`, `forgotten_room_retention_period`, `user_ips_max_age`.
+- [ ] **`user_ips_max_age` and `forgotten_room_retention_period`** — privacy and database
+      hygiene. Low urgency: `user_ips_max_age` already defaults to a reasonable `28d`
+      upstream, and only its privacy angle argues for a knob.
 
 ## Polish
 
@@ -68,6 +54,11 @@ which shipped its Phase 1 as `1.158.0:1`. Roughly in priority order.
 - **`enable_authenticated_media` toggle** — withdrawn. Upstream defaults it on and so do we;
   building a first-class toggle to keep an outdated client working is the wrong trade. The
   `homeserver.yaml` hand-edit path covers a genuine transition window.
+- **Server-wide message retention** (`retention.*` + `purge_jobs`) — grouped with the
+  hygiene settings in the review, but it does not belong with them. It deletes room history
+  on a schedule for everyone on the server, upstream still labels it experimental, and the
+  purge jobs are expensive. A home server's users generally want their history kept. If it
+  is ever built it needs its own action with a warning, not a field in Config.
 - **Encryption-disabling stack, custom Python `modules:`, workers/Redis, SSO/OIDC,
   CAPTCHA registration, S3 media storage, delegation (`server_name` ≠ served host)** — all
   deliberately out of scope; see the review document for the reasoning on each.

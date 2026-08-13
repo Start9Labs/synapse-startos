@@ -1,7 +1,11 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const staticConfig = {
+export const logLevels = ['DEBUG', 'INFO', 'WARNING', 'ERROR'] as const
+export type LogLevel = (typeof logLevels)[number]
+export const defaultLogLevel: LogLevel = 'INFO'
+
+const staticConfig = (level: LogLevel) => ({
   version: 1,
   formatters: {
     fmt: {
@@ -32,18 +36,24 @@ const staticConfig = {
     },
   },
   root: {
-    level: 'INFO',
+    level,
     handlers: ['console', 'file'] as const,
   },
   loggers: {
-    synapse: { level: 'INFO' },
-    'synapse.storage.SQL': { level: 'INFO' },
+    synapse: { level },
+    'synapse.storage.SQL': { level },
   },
-}
+})
 
-const shape = z.any().transform(() => staticConfig)
+// Everything but the level is rebuilt from scratch on every read, so a
+// hand-edit to this file does not survive the way one to homeserver.yaml does.
+// The level is carried back through so the Config action's choice sticks.
+const shape = z.any().transform((a) => {
+  const level = logLevels.find((l) => l === a?.root?.level) ?? defaultLogLevel
+  return staticConfig(level)
+})
 
-export type HomeserverLogConfig = typeof staticConfig
+export type HomeserverLogConfig = ReturnType<typeof staticConfig>
 
 export const homeserverLogConfig = FileHelper.yaml(
   {

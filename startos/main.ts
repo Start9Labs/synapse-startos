@@ -1,5 +1,6 @@
 import { T } from '@start9labs/start-sdk'
 import { writeFile } from 'fs/promises'
+import { homeserverLogConfig } from './fileModels/homeserver.log.config'
 import { homeserverYaml } from './fileModels/homeserver.yml'
 import { storeJson } from './fileModels/store.json'
 import { i18n } from './i18n'
@@ -146,6 +147,10 @@ export const main = sdk.setupMain(async ({ effects }) => {
     turn_shared_secret: turn?.secret,
     turn_allow_guests: turn ? false : undefined,
   })
+
+  // Synapse reads its log config once at startup, so the level only takes
+  // effect on a restart — which this const watch is what triggers.
+  await homeserverLogConfig.read((c) => c.root.level).const(effects)
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
   const config = await homeserverYaml.read().const(effects)

@@ -102,7 +102,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 ### Actions
 
 - **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
-- **Config** — registration, federation, voice and video calls, presence, max upload size, and how long to keep other servers' media.
+- **Config** — registration, federation, voice and video calls, presence, upload and room-size limits, log level, and how long to keep other servers' media.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
 - **Configure SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
@@ -113,6 +113,22 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 Federation is off by default. Turn it on through the **Config** action, optionally restricting it to a whitelist of allowed server domains. With federation on, your client's **Explore Public Rooms** can join rooms hosted on other Matrix servers (e.g. `#room:matrix.example.com`).
 
 Other homeservers reach yours over the **Homeserver** interface on port 443. Your server publishes an address delegation telling them to use it, so there is no second port to open and nothing extra to forward.
+
+### Letting other people sign up
+
+**Registration** in the **Config** action has three settings.
+
+**Disabled** is the default and is right for most servers — you create accounts yourself from the **Users** tab of the Admin Dashboard.
+
+**Invite Only** lets people register themselves, but only with a token you give them. Create tokens under **Registration Tokens** in the Admin Dashboard, where you can cap how many times each one may be used and give it an expiry date. Your invitee signs up through their normal Matrix client and pastes the token as the last step. Revoking a token stops any further signups with it.
+
+**Open** lets anyone on the internet who can reach your server create an account. Expect spam and abuse accounts; on a home server there is rarely a good reason to choose it.
+
+### Staying out of trouble with very large rooms
+
+Joining a huge public room makes your server download and keep its whole history, which on home hardware can take hours and fill the disk. **Large Room Protection** in the **Config** action refuses joins above a size you choose.
+
+The limit is a "complexity" number — roughly the room's size in units of 500 events, so 1 is a small room and 20 is a fairly large one. It starts at Synapse's own default of 1, which will turn away plenty of ordinary rooms, so raise it until the rooms you actually want work. It only applies the first time someone here joins a given room, and you as the admin are exempt: you can always join a room yourself and everyone else can then follow you in.
 
 ### Voice and video calls
 

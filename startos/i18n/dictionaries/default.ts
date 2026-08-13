@@ -97,6 +97,21 @@ const dict = {
   'No file at ${path}. Stage the old homeserver first.': 105,
   'Add ${server_name} as a public domain on the Homeserver interface before importing. It has to match the old server exactly, or every imported user ID is wrong.': 106,
   'Identity imported. The database is restored the next time you start Synapse, which will take a while for a large homeserver — watch the logs. Sign in with the accounts and passwords from the old server; no one is logged out.': 107,
+  'Who may create an account on your homeserver. Invite only lets people sign up with a registration token you hand out, which you create and revoke under Registration Tokens in the Admin Dashboard. Open means anyone on the internet who can reach your server can create an account, which is a standing invitation to spam and abuse.': 108,
+  'Invite Only': 109,
+  Open: 110,
+  'Large Room Protection': 111,
+  'Refuse to join rooms above a size your server can handle. Joining a very large room — a public one with tens of thousands of members — makes your homeserver download and keep its entire history, which on a home server can take hours and fill the disk. This limit applies only the first time anyone here joins a given room.': 112,
+  'Join Any Room': 113,
+  'Limit by Size': 114,
+  'Complexity Limit': 115,
+  "A room's complexity is its number of state events divided by 500, so 1 is roughly a 500-event room and 20 is roughly a 10,000-event room. Synapse's own default is 1, which is strict enough to refuse many ordinary rooms — raise it until joins succeed. Server admins are exempt, so you can always join a room yourself and let everyone else in behind you.": 116,
+  'Log Level': 117,
+  'How much detail Synapse writes to its logs. Info records every request and is useful while setting things up; Warning is quieter and is what most servers should sit on day to day. Debug is very noisy and should only be turned on while chasing a specific problem.': 118,
+  Debug: 119,
+  Info: 120,
+  Warning: 121,
+  Error: 122,
 } as const
 
 export type I18nKey = keyof typeof dict

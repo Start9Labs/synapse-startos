@@ -112,7 +112,24 @@ const shape = z.object({
   turn_shared_secret: z.string().optional().catch(undefined),
   turn_allow_guests: z.boolean().optional().catch(undefined),
   enable_registration: z.boolean().catch(false),
-  enable_registration_without_verification: z.boolean().catch(true),
+  // Synapse refuses to start with registration on and no verification of any
+  // kind, so this tracks the registration mode rather than sitting permanently
+  // true: a token requirement satisfies the same check.
+  enable_registration_without_verification: z.boolean().catch(false),
+  registration_requires_token: z.boolean().catch(false),
+  // Room summary API. Element X cannot talk to a homeserver without it and the
+  // upstream playbook enables it by default, so it isn't worth a user choice —
+  // though a hand-set `false` is still honoured.
+  experimental_features: z
+    .object({ msc3266_enabled: z.boolean().catch(true) })
+    .catch({ msc3266_enabled: true }),
+  limit_remote_rooms: z
+    .object({
+      enabled: z.boolean().catch(false),
+      complexity: z.number().catch(1),
+      admins_can_join: z.boolean().catch(true),
+    })
+    .catch({ enabled: false, complexity: 1, admins_can_join: true }),
   federation_certificate_verification_whitelist: z.array(z.string()).catch([]),
   federation_domain_whitelist: z.array(z.string()).optional(),
   presence: z.object({ enabled: z.boolean().catch(true) }).catch({
