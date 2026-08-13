@@ -1,7 +1,11 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const defaultNamespaces = { users: [] as { regex: string; exclusive: boolean }[], aliases: [] as string[], rooms: [] as string[] }
+const defaultNamespaces = {
+  users: [] as { regex: string; exclusive: boolean }[],
+  aliases: [] as string[],
+  rooms: [] as string[],
+}
 
 const namespacesShape = z
   .object({

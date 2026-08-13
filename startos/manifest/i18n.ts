@@ -1,14 +1,14 @@
 export const short = {
   en_US:
-    'Synapse is a battle-tested implementation of the Matrix protocol, the killer of all messaging apps.',
+    'A battle-tested implementation of Matrix, the killer of all messaging apps.',
   es_ES:
-    'Synapse es una implementación probada en batalla del protocolo Matrix, el asesino de todas las aplicaciones de mensajería.',
+    'Implementación probada en batalla de Matrix, el asesino de la mensajería.',
   de_DE:
-    'Synapse ist eine kampferprobte Implementierung des Matrix-Protokolls, der Killer aller Messaging-Apps.',
+    'Eine kampferprobte Implementierung von Matrix, dem Killer aller Messaging-Apps.',
   pl_PL:
-    'Synapse to sprawdzona w boju implementacja protokołu Matrix, pogromca wszystkich aplikacji do przesyłania wiadomości.',
+    'Sprawdzona w boju implementacja Matriksa, pogromcy wszystkich komunikatorów.',
   fr_FR:
-    'Synapse est une implémentation éprouvée du protocole Matrix, le tueur de toutes les applications de messagerie.',
+    'Implémentation éprouvée de Matrix, le tueur de toutes les applis de messagerie.',
 }
 
 export const long = {
@@ -21,5 +21,5 @@ export const long = {
   pl_PL:
     'Synapse to sprawdzona w boju, referencyjna implementacja protokołu Matrix. Matrix to system przesyłania wiadomości nowej generacji: sfederowany, w pełni funkcjonalny, szyfrowany i niezależny. Nie ma zaangażowanych zaufanych stron trzecich. (szczegóły na matrix.org).',
   fr_FR:
-    'Synapse est l\'implémentation de référence éprouvée du protocole Matrix. Matrix est un système de messagerie de nouvelle génération, fédéré, complet, chiffré et indépendant. Aucun tiers de confiance n\'est impliqué. (voir matrix.org pour les détails).',
+    "Synapse est l'implémentation de référence éprouvée du protocole Matrix. Matrix est un système de messagerie de nouvelle génération, fédéré, complet, chiffré et indépendant. Aucun tiers de confiance n'est impliqué. (voir matrix.org pour les détails).",
 }

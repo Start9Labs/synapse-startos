@@ -301,7 +301,7 @@ export default {
     56: "L'URL où le serveur peut atteindre le service d'application pont",
     57: "Si les requêtes de ce service d'application doivent être limitées en débit",
     58: "Regex d'espace de noms utilisateur",
-    59: 'Motif regex pour les IDs utilisateur gérés par ce service d\'application (ex. "@signal_.*:.*"). Laissez vide si le service d\'application ne gère pas d\'espaces de noms utilisateur.',
+    59: "Motif regex pour les IDs utilisateur gérés par ce service d'application (ex. \"@signal_.*:.*\"). Laissez vide si le service d'application ne gère pas d'espaces de noms utilisateur.",
     60: "Enregistrer le service d'application",
     61: "Enregistrer un service d'application Matrix (pont) auprès du serveur. Ceci est généralement déclenché automatiquement par les services de pont.",
     66: 'Succès',

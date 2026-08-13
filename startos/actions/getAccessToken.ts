@@ -53,18 +53,21 @@ export const getAccessToken = sdk.Action.withInput(
 
   // the execution function
   async ({ input }) => {
-    const res = await fetch(`http://localhost:${homeserverPort}/_matrix/client/v3/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'm.login.password',
-        identifier: {
-          type: 'm.id.user',
-          user: input.username,
-        },
-        password: input.password,
-      }),
-    })
+    const res = await fetch(
+      `http://localhost:${homeserverPort}/_matrix/client/v3/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'm.login.password',
+          identifier: {
+            type: 'm.id.user',
+            user: input.username,
+          },
+          password: input.password,
+        }),
+      },
+    )
 
     const body = await res.json()
 
