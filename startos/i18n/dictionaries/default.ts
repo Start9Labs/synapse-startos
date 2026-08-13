@@ -81,6 +81,22 @@ const dict = {
   'Set the admin user password for your Synapse Matrix homeserver.': 88,
   'Configure SMTP': 89,
   'Add SMTP credentials so your homeserver can send email notifications.': 90,
+  'Voice and Video Calls': 92,
+  'Relay calls through the Coturn service so they connect when both parties are behind NAT or a restrictive firewall. Requires Coturn to be installed and running with a public domain of its own; until it is, calls fall back to a direct connection.': 93,
+  Presence: 94,
+  'Share online/offline status and "last seen" times between users, including with users on other homeservers. Turning this off reduces CPU, database, and federation traffic.': 95,
+  'Remote Media Retention': 96,
+  'How long to keep a cached copy of media uploaded to other homeservers. Purged files are re-downloaded on demand, so the only cost is a little bandwidth. Leave empty to keep them forever, which is the default and can grow your disk usage and your backups without limit.': 97,
+  days: 98,
+  'Restoring the imported database': 99,
+  'Import Existing Homeserver': 100,
+  'Adopt the identity, database and media of a Matrix homeserver you run elsewhere, so its users keep their accounts, their logins and their history.': 101,
+  'Stage the old server\'s files on this volume first — see "Importing an existing homeserver" in the instructions. This replaces the empty homeserver created on install and cannot be undone.': 102,
+  'This homeserver already has an address, so there is nothing to import into. Importing is only possible before the first start.': 103,
+  '${path} is missing server_name, macaroon_secret_key or form_secret.': 104,
+  'No file at ${path}. Stage the old homeserver first.': 105,
+  'Add ${server_name} as a public domain on the Homeserver interface before importing. It has to match the old server exactly, or every imported user ID is wrong.': 106,
+  'Identity imported. The database is restored the next time you start Synapse, which will take a while for a large homeserver — watch the logs. Sign in with the accounts and passwords from the old server; no one is logged out.': 107,
 } as const
 
 export type I18nKey = keyof typeof dict

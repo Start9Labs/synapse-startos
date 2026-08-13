@@ -5,7 +5,7 @@ import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { mount } from '../utils'
+import { mount, placeholderServerName } from '../utils'
 
 export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
   await homeserverLogConfig.merge(effects, {})
@@ -25,7 +25,7 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
       (subc) =>
         subc.execFail(['/start.py', 'generate'], {
           env: {
-            SYNAPSE_SERVER_NAME: 'placeholder.com',
+            SYNAPSE_SERVER_NAME: placeholderServerName,
             SYNAPSE_REPORT_STATS: 'no',
             SYNAPSE_CONFIG_DIR: '/data',
           },

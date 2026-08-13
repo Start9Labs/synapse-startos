@@ -1,6 +1,6 @@
 import { homeserverYaml } from './fileModels/homeserver.yml'
 import { sdk } from './sdk'
-import { postgresDb, postgresUser } from './utils'
+import { importSubpath, postgresDb, postgresUser } from './utils'
 
 export const { createBackup, restoreInit } = sdk.setupBackups(async () =>
   sdk.Backups.withPgDump({
@@ -15,5 +15,10 @@ export const { createBackup, restoreInit } = sdk.setupBackups(async () =>
       if (!config) throw new Error('homeserver.yaml not found')
       return config.database.args.password
     },
-  }).addVolume('main'),
+  })
+    .addVolume('main')
+    // A staged migration is input to the import action, not homeserver data,
+    // and its pg_dump is the size of the database — leaving it in would grow
+    // every backup until the operator clears the directory out.
+    .setOptions({ exclude: [`/${importSubpath}`] }),
 )

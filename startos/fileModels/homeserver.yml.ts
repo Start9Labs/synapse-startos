@@ -1,6 +1,11 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-import { homeserverPort, postgresDb, postgresUser } from '../utils'
+import {
+  homeserverPort,
+  placeholderServerName,
+  postgresDb,
+  postgresUser,
+} from '../utils'
 
 // shared constants
 const defaultMaxUpload = '50M'
@@ -73,15 +78,18 @@ const shape = z.object({
   report_stats: z.boolean().catch(false),
   suppress_key_server_warning: z.boolean().catch(true),
 
-  // set by synapse generate
+  // set by synapse generate, or carried over by the import action
   signing_key_path: z.string(),
   form_secret: z.string().optional(),
   macaroon_secret_key: z.string().optional(),
   registration_shared_secret: z.string().optional(),
+  old_signing_keys: z
+    .record(z.string(), z.object({ key: z.string(), expired_ts: z.number() }))
+    .optional(),
 
   // set by actions
   server_name: z.string(),
-  public_baseurl: z.string().catch('https://placeholder.com'),
+  public_baseurl: z.string().catch(`https://${placeholderServerName}`),
 
   // configurable
   email: z
@@ -98,10 +106,23 @@ const shape = z.object({
     })
     .nullable()
     .catch(null),
+  // Rendered by `main` from the coturn dependency; absent when it can't be
+  // resolved, which Synapse reads as "advertise no relay".
+  turn_uris: z.array(z.string()).optional().catch(undefined),
+  turn_shared_secret: z.string().optional().catch(undefined),
+  turn_allow_guests: z.boolean().optional().catch(undefined),
   enable_registration: z.boolean().catch(false),
   enable_registration_without_verification: z.boolean().catch(true),
   federation_certificate_verification_whitelist: z.array(z.string()).catch([]),
   federation_domain_whitelist: z.array(z.string()).optional(),
+  presence: z.object({ enabled: z.boolean().catch(true) }).catch({
+    enabled: true,
+  }),
+  // Absent means "keep remote media forever", which is Synapse's default.
+  media_retention: z
+    .object({ remote_media_lifetime: z.string() })
+    .optional()
+    .catch(undefined),
   trusted_key_servers: z.array(z.object({ server_name: z.string() })).catch([]),
   max_upload_size: z
     .string()

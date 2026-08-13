@@ -1,3 +1,4 @@
+import { T } from '@start9labs/start-sdk'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
 import { nginxPort, adminPort } from './utils'
@@ -49,3 +50,25 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
 
   return [homeserverReceipt, adminReceipt]
 })
+
+/** The domains the user has added to the Homeserver interface. */
+export async function homeserverHostnames(
+  effects: T.Effects,
+): Promise<string[]> {
+  return (
+    (await sdk.host
+      .getOwn(effects, homeserverHostId, (host) => {
+        const iface =
+          host &&
+          Object.values(host.bindings)
+            .flatMap((b) => Object.values(b.interfaces))
+            .find((i) => i.id === homeserverInterfaceId)
+        return iface
+          ? iface.addressInfo
+              .filter({ kind: 'domain' })
+              .hostnames.map((h) => h.hostname)
+          : []
+      })
+      .once()) || []
+  )
+}

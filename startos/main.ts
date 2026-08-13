@@ -6,8 +6,15 @@ import { i18n } from './i18n'
 import { sdk } from './sdk'
 import {
   adminPort,
+  coturnHostId,
+  coturnId,
+  coturnInterfaceId,
+  coturnMountpoint,
+  coturnSecretPath,
   homeserverPort,
+  importDumpSubpath,
   mount,
+  mountpoint,
   nginxPort,
   postgresDb,
   postgresUser,
@@ -47,6 +54,84 @@ export const main = sdk.setupMain(async ({ effects }) => {
     }
   }
 
+  // Coturn's public TURN endpoint plus its shared secret. Its single `turn`
+  // interface carries the plain `turn:` address (ssl:false) and the
+  // edge-terminated `turns:` address (ssl:true) on one domain, each selected by
+  // its `ssl` flag. Null until the user gives Coturn a public domain.
+  async function resolveTurn() {
+    const endpoint = await sdk.host
+      .get(effects, { hostId: coturnHostId, packageId: coturnId }, (host) => {
+        const iface =
+          host &&
+          Object.values(host.bindings)
+            .flatMap((b) => Object.values(b.interfaces))
+            .find((i) => i.id === coturnInterfaceId)
+        const hostnames = iface
+          ? iface.addressInfo
+              .filter({ visibility: 'public', kind: 'domain' })
+              .hostnames.filter((h) => h.port != null)
+          : []
+        const domain = hostnames[0]?.hostname
+        if (!domain) return null
+
+        const forDomain = hostnames.filter((h) => h.hostname === domain)
+        return {
+          domain,
+          turnPort: forDomain.find((h) => !h.ssl)?.port ?? null,
+          turnsPort: forDomain.find((h) => h.ssl)?.port ?? null,
+        }
+      })
+      .const()
+    if (!endpoint) return null
+
+    const secret = await readCoturnSecret()
+    if (!secret) return null
+
+    const { domain, turnPort, turnsPort } = endpoint
+    return {
+      secret,
+      uris: [
+        ...(turnPort
+          ? [
+              `turn:${domain}:${turnPort}?transport=udp`,
+              `turn:${domain}:${turnPort}?transport=tcp`,
+            ]
+          : []),
+        // Coturn serves TURN over TLS on TCP only.
+        ...(turnsPort ? [`turns:${domain}:${turnsPort}?transport=tcp`] : []),
+      ],
+    }
+  }
+
+  // Read through a throwaway container so a missing Coturn can never break
+  // Synapse's own daemons, and we only ever see the `shared` subpath.
+  async function readCoturnSecret() {
+    const reader = sdk.SubContainer.of(
+      effects,
+      { imageId: 'nginx' },
+      sdk.Mounts.of().mountDependency({
+        dependencyId: coturnId,
+        volumeId: 'main',
+        subpath: 'shared',
+        mountpoint: coturnMountpoint,
+        readonly: true,
+      }),
+      'coturn-secret-read',
+    )
+    try {
+      const { stdout } = await reader.execFail(['cat', coturnSecretPath])
+      return stdout.toString().trim() || null
+    } catch {
+      return null
+    } finally {
+      await reader.destroy().catch(() => {})
+    }
+  }
+
+  const turn = (await storeJson.read((s) => s.turn).const(effects))
+    ? await resolveTurn()
+    : null
+
   await homeserverYaml.merge(effects, {
     email: smtpCredentials && {
       enable_notifs: true,
@@ -57,6 +142,9 @@ export const main = sdk.setupMain(async ({ effects }) => {
       smtp_user: smtpCredentials.username,
       smtp_pass: smtpCredentials.password || undefined,
     },
+    turn_uris: turn?.uris,
+    turn_shared_secret: turn?.secret,
+    turn_allow_guests: turn ? false : undefined,
   })
 
   // Read from homeserver.yaml with const() to ensure service restart if the file changes
@@ -68,6 +156,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const pendingAdminPassword = await storeJson
     .read((s) => s.pendingAdminPassword)
     .once()
+
+  const pendingImport = await storeJson.read((s) => s.pendingImport).once()
 
   // create and configure nginx container
   const nginxSub = sdk.SubContainer.of(
@@ -214,6 +304,52 @@ server {
       },
       requires: [],
     })
+    .addOneshot('restore-import', {
+      subcontainer: postgresSub,
+      exec: {
+        fn: async () => {
+          if (!pendingImport) return null
+
+          console.info(i18n('Restoring the imported database'))
+          await sdk.SubContainer.withTemp(
+            effects,
+            { imageId: 'postgres' },
+            mount,
+            'pg-restore',
+            (pg) =>
+              pg.execFail(
+                [
+                  'pg_restore',
+                  '-h',
+                  '127.0.0.1',
+                  '-U',
+                  postgresUser,
+                  '-d',
+                  postgresDb,
+                  // The dump's owner role doesn't exist here, and its grants
+                  // are meaningless against this package's single role.
+                  '--no-owner',
+                  '--no-acl',
+                  // A half-restored database is unrecoverable without manual
+                  // surgery; rolling back leaves the next start free to retry.
+                  '--single-transaction',
+                  `${mountpoint}/${importDumpSubpath}`,
+                ],
+                {
+                  env: { PGPASSWORD: config.database.args.password },
+                  // The staged dump's owner and mode are whatever the
+                  // operator's copy left behind; root reads it either way.
+                  user: 'root',
+                },
+              ),
+          )
+
+          await storeJson.merge(effects, { pendingImport: false })
+          return null
+        },
+      },
+      requires: ['chown', 'postgres'],
+    })
     .addDaemon('synapse', {
       subcontainer: synapseSub,
       exec: { command: ['/start.py'] },
@@ -230,7 +366,7 @@ server {
             },
           ),
       },
-      requires: ['chown', 'postgres'],
+      requires: ['chown', 'postgres', 'restore-import'],
     })
     .addOneshot('apply-admin-password', {
       subcontainer: synapseSub,
