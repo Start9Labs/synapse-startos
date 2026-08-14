@@ -85,7 +85,8 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 | Setting                                 | Upstream Method             | StartOS Method                                                      |
 | --------------------------------------- | --------------------------- | ------------------------------------------------------------------- |
 | `server_name`                           | `homeserver.yaml`           | "Set Server Address/URL" action (one-time)                          |
-| Registration                            | `homeserver.yaml`           | "Config" action, three-state (see below)                            |
+| Registration                            | `homeserver.yaml`           | "Registration" action, three-state                                  |
+| `admin_contact`                         | `homeserver.yaml`           | "Config" action                                                     |
 | Federation                              | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist)                 |
 | `limit_remote_rooms`                    | `homeserver.yaml`           | "Config" action (off, or a complexity ceiling)                      |
 | `url_preview_enabled`                   | `homeserver.yaml`           | "Config" action; the IP blocklist is always written                 |
@@ -238,7 +239,6 @@ The restart is what makes the new password take effect immediately. `pendingAdmi
 
 | Setting                       | Default      | Description                                                         |
 | ----------------------------- | ------------ | ------------------------------------------------------------------- |
-| Registration                  | Disabled     | Disabled / Invite Only / Open -- see below                          |
 | Federation                    | Disabled     | Enable/disable with optional domain whitelist                       |
 | Voice and Video Calls         | Off          | Opt in to TURN relay via the `coturn` package                       |
 | Presence                      | On           | `presence.enabled`; upstream default, exposed as a performance knob |
@@ -246,6 +246,7 @@ The restart is what makes the new password take effect immediately. `pendingAdmi
 | Large Room Protection         | Join any     | `limit_remote_rooms`; off, or a complexity ceiling                  |
 | Link Previews                 | Off          | `url_preview_enabled`; upstream default, playbook differs           |
 | Message Text in Notifications | On           | `push.include_content`                                              |
+| Admin Contact                 | unset        | `admin_contact`, shown on resource-limit errors                     |
 | Log Level                     | INFO         | `root.level` in `homeserver.log.config`                             |
 | Remote Media Retention        | Keep forever | `media_retention.remote_media_lifetime`, in days                    |
 
@@ -254,7 +255,24 @@ Most of these write `homeserver.yaml` directly, which `main` holds a `.const()` 
 - **Voice and Video Calls** writes `store.json.turn`, which `main` also watches. The `turn_*` keys themselves are rendered by `main` from the resolved coturn endpoint, before it const-reads `homeserver.yaml`, so the write is not a write-after-const.
 - **Log Level** writes `homeserver.log.config`. Synapse reads that file once at startup, so `main` const-reads `root.level` purely to force the restart that makes a change take effect.
 
-#### Registration is three-state
+#### Large Room Protection
+
+`limit_remote_rooms.complexity` is `current_state_events / 500`, evaluated the first time anyone on this server joins a given room. The form defaults to Synapse's own `1.0`, which is strict enough to refuse many ordinary rooms; that is deliberately not second-guessed here, since the workable ceiling depends on the box. `admins_can_join` is forced **on** whenever the limit is enabled -- without it an over-limit room is unjoinable by anyone on the server, whereas with it an admin can join first, after which the room is known locally and everyone else can follow.
+
+"Remote Media Retention" is written as `<n>d` and read back through a converter that understands `d`, `w` and `y`. A hand-written value in any other unit reads back as empty, and re-saving the form would clear it; use the [hand-edit escape hatch](#hand-editing-homeserveryaml) for sub-day precision.
+
+### Registration
+
+| Property     | Value                                                            |
+| ------------ | ---------------------------------------------------------------- |
+| ID           | `registration`                                                   |
+| Visibility   | Enabled                                                          |
+| Availability | Any status                                                       |
+| Purpose      | Who may sign up, where they land, and whether guests may look in |
+
+Its own action rather than a field on Config, because the mode drags two related settings along with it: which rooms a new account is put into, and whether people without an account may look around at all.
+
+#### The mode is three-state
 
 | Value           | `enable_registration` | `registration_requires_token` | `enable_registration_without_verification` |
 | --------------- | --------------------- | ----------------------------- | ------------------------------------------ |
@@ -266,11 +284,9 @@ The third column is load-bearing rather than incidental. Synapse's `validate_con
 
 **Invite Only needs no custom code.** `m.login.registration_token` is a stable Matrix UIA stage, so users sign up through the ordinary client flow and enter the token as the final step, and the bundled Ketesa dashboard already ships the management UI for them -- mint, `uses_allowed`, `expiry_time`, revoke -- under **Registration Tokens**.
 
-#### Large Room Protection
+**Auto-join rooms are pattern-checked before they are written.** Synapse validates each entry with `RoomAlias.is_valid` and **refuses to start** on a malformed one, so a typo in this field would otherwise take the server down rather than be ignored. `autocreate_auto_join_rooms` is left at its upstream `true`, which means a room named here that does not exist yet is created by the first person to sign up.
 
-`limit_remote_rooms.complexity` is `current_state_events / 500`, evaluated the first time anyone on this server joins a given room. The form defaults to Synapse's own `1.0`, which is strict enough to refuse many ordinary rooms; that is deliberately not second-guessed here, since the workable ceiling depends on the box. `admins_can_join` is forced **on** whenever the limit is enabled -- without it an over-limit room is unjoinable by anyone on the server, whereas with it an admin can join first, after which the room is known locally and everyone else can follow.
-
-"Remote Media Retention" is written as `<n>d` and read back through a converter that understands `d`, `w` and `y`. A hand-written value in any other unit reads back as empty, and re-saving the form would clear it; use the [hand-edit escape hatch](#hand-editing-homeserveryaml) for sub-day precision.
+**Guest access** is `allow_guest_access`, upstream default `false`. Guests get a passwordless temporary account they cannot recover and the admin cannot easily moderate.
 
 ### Rate Limits
 
@@ -457,7 +473,6 @@ dependencies:
 database: PostgreSQL (sidecar, localhost-only, password auth, locale=C)
 startos_managed_config:
   - server_name (one-time, permanent)
-  - registration (disabled | invite-only | open)
   - limit_remote_rooms (large room protection)
   - homeserver.log.config root.level
   - caches.cache_autotuning (derived from os.totalmem(), not user-facing)
@@ -476,6 +491,7 @@ actions:
   - set-admin-password (enabled, any)
   - config (enabled, any)
   - manage-smtp (enabled, any)
+  - registration (enabled, any)
   - rate-limits (enabled, any)
   - discoverability (enabled, any)
   - register-appservice (enabled, any)

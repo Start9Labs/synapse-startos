@@ -161,6 +161,14 @@ const dict = {
   'Attach Profiles to Invitations': 170,
   "Include the inviter's display name and avatar in an invitation, so the recipient sees who it is from before accepting.": 171,
   'What a stranger can find out about your server: which rooms it hosts, who has an account, and what they look like.': 172,
+  'Rooms to Join Automatically': 173,
+  'Rooms every new account is put into as soon as it is created — a welcome room, an announcements room. Give the full alias including your server, such as #welcome:matrix.example.com. A room named here that does not exist yet is created by the first person to sign up.': 174,
+  'Must be a full room alias: a #, a name, a colon, then a server — for example #welcome:matrix.example.com. Synapse refuses to start if this is malformed.': 175,
+  'Guest Access': 176,
+  'Let people look around without an account at all. Guests get a temporary account with no password, which they cannot recover and you cannot easily moderate. Off is the right answer for almost every server.': 177,
+  'Who may create an account here, what rooms they land in, and whether people without an account may look around.': 178,
+  'Admin Contact': 179,
+  'How to reach you, shown to your users if the server ever refuses an action because it has hit a resource limit. A mailto: link is the usual form.': 180,
 } as const
 
 export type I18nKey = keyof typeof dict

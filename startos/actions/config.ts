@@ -10,18 +10,6 @@ import { sdk } from '../sdk'
 const { InputSpec, Value, Variants, List } = sdk
 
 export const inputSpec = InputSpec.of({
-  registration: Value.select({
-    name: i18n('Registration'),
-    description: i18n(
-      'Who may create an account on your homeserver. Invite only lets people sign up with a registration token you hand out, which you create and revoke under Registration Tokens in the Admin Dashboard. Open means anyone on the internet who can reach your server can create an account, which is a standing invitation to spam and abuse.',
-    ),
-    default: 'disabled',
-    values: {
-      disabled: i18n('Disabled'),
-      'invite-only': i18n('Invite Only'),
-      open: i18n('Open'),
-    },
-  }),
   federation: Value.union({
     name: i18n('Federation'),
     default: 'disabled',
@@ -117,6 +105,15 @@ export const inputSpec = InputSpec.of({
     ),
     default: true,
   }),
+  admin_contact: Value.text({
+    name: i18n('Admin Contact'),
+    description: i18n(
+      'How to reach you, shown to your users if the server ever refuses an action because it has hit a resource limit. A mailto: link is the usual form.',
+    ),
+    required: false,
+    default: null,
+    placeholder: 'mailto:admin@example.com',
+  }),
   log_level: Value.select({
     name: i18n('Log Level'),
     description: i18n(
@@ -171,7 +168,7 @@ export const config = sdk.Action.withInput(
       return { turn, log_level: logLevel }
     }
     const {
-      enable_registration,
+      admin_contact,
       listeners,
       federation_domain_whitelist,
       limit_remote_rooms,
@@ -179,16 +176,11 @@ export const config = sdk.Action.withInput(
       max_upload_size,
       presence,
       push,
-      registration_requires_token,
       url_preview_enabled,
     } = yaml
 
     return {
-      registration: !enable_registration
-        ? ('disabled' as const)
-        : registration_requires_token
-          ? ('invite-only' as const)
-          : ('open' as const),
+      admin_contact: admin_contact ?? null,
       large_rooms: limit_remote_rooms.enabled
         ? {
             selection: 'limited' as const,
@@ -233,11 +225,7 @@ export const config = sdk.Action.withInput(
     })
 
     await homeserverYaml.merge(effects, {
-      enable_registration: input.registration !== 'disabled',
-      registration_requires_token: input.registration === 'invite-only',
-      // Synapse refuses to start on open registration with no verification of
-      // any kind; a token requirement counts, so only Open needs the override.
-      enable_registration_without_verification: input.registration === 'open',
+      admin_contact: input.admin_contact ?? undefined,
       limit_remote_rooms: {
         enabled: input.large_rooms.selection === 'limited',
         complexity:

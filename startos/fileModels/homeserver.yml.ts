@@ -201,6 +201,11 @@ const shape = z.object({
   // true: a token requirement satisfies the same check.
   enable_registration_without_verification: z.boolean().catch(false),
   registration_requires_token: z.boolean().catch(false),
+  // Synapse validates these as room aliases and refuses to start on a
+  // malformed one, so the action pattern-checks before they land here.
+  auto_join_rooms: z.array(z.string()).catch([]),
+  allow_guest_access: z.boolean().catch(false),
+  admin_contact: z.string().optional().catch(undefined),
   experimental_features: experimentalShape,
   push: z.object({ include_content: z.boolean().catch(true) }).catch({
     include_content: true,

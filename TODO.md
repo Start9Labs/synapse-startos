@@ -15,16 +15,26 @@ whose phases 1 and 2 shipped together as `1.158.0:1`. Roughly in priority order.
       (`window_size`, `sleep_limit`, `sleep_delay`, `reject_limit`, `concurrent`). Shaped
       unlike the others, and inbound-federation tuning is a different problem from user
       rate limiting; give it its own variant or leave it to the hand-edit path.
-- [ ] **`admin_contact`**, **`server_notices`**, **`auto_join_rooms`** (+ `auto_join_mxid_localpart`,
-      `autocreate_auto_join_rooms`), **`allow_guest_access`**.
+- [ ] **`server_notices`** — an unleavable room the admin can announce into. The config
+      block is small (`system_mxid_localpart` is the only required key), but notices are
+      sent through the admin API, so it is only worth shipping alongside a way to send
+      one. Check whether the bundled Ketesa exposes it before building the config half.
+      `auto_join_mxid_localpart` is also still unexposed: without it the first user to
+      register owns any auto-created room.
 - [ ] **Appservice registration schema** — aliases and rooms namespaces, multiple regexes,
       `protocols`. For future bridges.
 
 ## Known rough edges
 
-- [ ] **`chown -R 991:991 /data` runs on every start.** Harmless on a fresh install,
-      minutes-long on a homeserver with tens of gigabytes of media. Worth narrowing to the
-      paths that actually need it, or making it conditional.
+- [ ] **`chown -R 991:991 /data` runs on every start.** It only actually needs to run
+      after install, after a restore, and after an import — StartOS mounts volumes
+      root-owned, but Synapse's own writes are already correct once fixed. On a media
+      store of tens of gigabytes it is a full recursive walk every boot: seconds on an
+      SSD, considerably worse cold or on spinning disk. (An earlier note here said
+      "minutes-long" unqualified; that was not measured.) The fix is a `pendingChown`
+      flag in `store.json` set by init and by the import action, mirroring
+      `pendingImport` — but it is startup-critical, so get the service on a real box
+      before changing it.
 - [ ] **"Set Admin Password" targets the first-registered user.** On an imported homeserver
       that is the oldest account, which is not necessarily the operator's admin. Consider
       taking a username, or reading the first user with `admin = true`.

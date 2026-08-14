@@ -8,6 +8,7 @@ import { getAccessToken } from './getAccessToken'
 import { importHomeserver } from './importHomeserver'
 import { manageSmtp } from './manageSmtp'
 import { rateLimits } from './rateLimits'
+import { registration } from './registration'
 import { setAdminPassword } from './setAdminPassword'
 import { setServerName } from './setServerName'
 
@@ -17,6 +18,7 @@ export const actions = sdk.Actions.of()
   .addAction(setAdminPassword)
   .addAction(getAccessToken)
   .addAction(config)
+  .addAction(registration)
   .addAction(manageSmtp)
   .addAction(rateLimits)
   .addAction(discoverability)

@@ -100,7 +100,8 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 ### Actions
 
 - **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
-- **Config** — registration, federation, voice and video calls, presence, link previews, notification content, upload and room-size limits, log level, and how long to keep other servers' media.
+- **Config** — federation, voice and video calls, presence, link previews, notification content, upload and room-size limits, log level, and how long to keep other servers' media.
+- **Registration** — who may create an account, which rooms they join automatically, and whether guests may look around.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
 - **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
 - **Discoverability** — what someone without an account can find out about your server. Pick Private, Normal or Public; pick Custom to decide each setting.
@@ -116,13 +117,15 @@ Other homeservers reach yours over the **Homeserver** interface on port 443. You
 
 ### Letting other people sign up
 
-**Registration** in the **Config** action has three settings.
+The **Registration** action has three settings for who may sign up.
 
 **Disabled** is the default and is right for most servers — you create accounts yourself from the **Users** tab of the Admin Dashboard.
 
 **Invite Only** lets people register themselves, but only with a token you give them. Create tokens under **Registration Tokens** in the Admin Dashboard, where you can cap how many times each one may be used and give it an expiry date. Your invitee signs up through their normal Matrix client and pastes the token as the last step. Revoking a token stops any further signups with it.
 
 **Open** lets anyone on the internet who can reach your server create an account. Expect spam and abuse accounts; on a home server there is rarely a good reason to choose it.
+
+The same action sets which rooms a new account joins automatically — give the full alias, like `#welcome:matrix.example.com` — and whether guests may look around without an account, which is off and should almost always stay off.
 
 ### Staying out of trouble with very large rooms
 
