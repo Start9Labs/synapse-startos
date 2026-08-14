@@ -131,6 +131,13 @@ const cacheAutotuningShape = z
   })
   .catch(cacheAutotuningDefault)
 
+// Absent means upstream applies, which is what the Rate Limits action's Normal
+// preset writes — so these stay optional rather than carrying defaults.
+const rateShape = z
+  .object({ per_second: z.number(), burst_count: z.number() })
+  .optional()
+  .catch(undefined)
+
 const listenerShape = z
   .object({
     bind_addresses: z.array(z.string()).catch(listenerDefault.bind_addresses),
@@ -204,6 +211,28 @@ const shape = z.object({
   url_preview_ip_range_blacklist: z
     .array(z.string())
     .catch(urlPreviewIpRangeBlacklist),
+  rc_message: rateShape,
+  rc_registration: rateShape,
+  rc_joins: z
+    .object({ local: rateShape, remote: rateShape })
+    .optional()
+    .catch(undefined),
+  rc_invites: z
+    .object({
+      per_room: rateShape,
+      per_user: rateShape,
+      per_issuer: rateShape,
+    })
+    .optional()
+    .catch(undefined),
+  rc_login: z
+    .object({
+      address: rateShape,
+      account: rateShape,
+      failed_attempts: rateShape,
+    })
+    .optional()
+    .catch(undefined),
   caches: z
     .object({ cache_autotuning: cacheAutotuningShape })
     .catch({ cache_autotuning: cacheAutotuningDefault }),

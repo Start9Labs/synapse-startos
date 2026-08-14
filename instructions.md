@@ -102,6 +102,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 - **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
 - **Config** — registration, federation, voice and video calls, presence, link previews, notification content, upload and room-size limits, log level, and how long to keep other servers' media.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
+- **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Strict, Normal or Relaxed; pick Custom if you want to set any of them yourself.
 - **Configure SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
 - **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard.
@@ -141,6 +142,14 @@ Two settings in the **Config** action decide how much your server does on your b
 **Link Previews** is off to begin with. Turn it on and a title, summary and thumbnail appear under links posted in chat. Your server fetches the page to build that, which means the site sees one request from your server rather than one from each person who saw the link. Your server will not follow links into private address ranges or to itself, so the fetcher cannot be pointed at anything else running on your network.
 
 **Message Text in Notifications** is on. It puts the message itself in the push notification instead of just who sent it and where. Turn it off if you would rather nothing showed on a locked screen. Encrypted messages never include their text either way — only that something arrived.
+
+### When people hit rate limits
+
+Synapse deliberately slows anyone down who sends, joins, invites or signs in too fast. The stock settings assume a server open to strangers, and they are easy to trip: inviting a dozen people at once, or running a bot, will hit them.
+
+The **Rate Limits** action has three ready-made choices. **Normal** is Synapse's own. **Relaxed** raises sending and joining to the values Start9 runs on its own server, which is usually the right pick for a server among people you know. **Strict** tightens account creation, invitations and failed sign-ins for a server open to the public, and leaves everyday messaging alone.
+
+If none of those fit, **Custom** exposes every limit individually, starting from Synapse's values. Each has a _per second_ rate and a _burst_ — the burst is how many are allowed in quick succession before the slower sustained rate takes over.
 
 ### Keeping disk use down
 

@@ -6,6 +6,7 @@ import { config } from './config'
 import { getAccessToken } from './getAccessToken'
 import { importHomeserver } from './importHomeserver'
 import { manageSmtp } from './manageSmtp'
+import { rateLimits } from './rateLimits'
 import { setAdminPassword } from './setAdminPassword'
 import { setServerName } from './setServerName'
 
@@ -16,6 +17,7 @@ export const actions = sdk.Actions.of()
   .addAction(getAccessToken)
   .addAction(config)
   .addAction(manageSmtp)
+  .addAction(rateLimits)
   .addAction(registerAppservice)
   .addAction(listAppservices)
   .addAction(deleteAppservice)

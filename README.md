@@ -272,6 +272,28 @@ The third column is load-bearing rather than incidental. Synapse's `validate_con
 
 "Remote Media Retention" is written as `<n>d` and read back through a converter that understands `d`, `w` and `y`. A hand-written value in any other unit reads back as empty, and re-saving the form would clear it; use the [hand-edit escape hatch](#hand-editing-homeserveryaml) for sub-day precision.
 
+### Rate Limits
+
+| Property     | Value                                             |
+| ------------ | ------------------------------------------------- |
+| ID           | `rate-limits`                                     |
+| Visibility   | Enabled                                           |
+| Availability | Any status                                        |
+| Purpose      | How fast users may send, join, invite and sign in |
+
+A preset union -- **Strict / Normal / Relaxed / Custom** -- rather than ten pairs of numbers on the Config form. Custom expands to every knob individually, pre-filled with Synapse's own values, so the simple choice and the full one live in the same place.
+
+**Normal writes nothing.** It clears `rc_message`, `rc_registration`, `rc_joins`, `rc_invites` and `rc_login` from `homeserver.yaml`, so Synapse's own defaults apply. Absence is the representation, which is why those keys are `.optional()` in the file model rather than carrying `.catch()` defaults like everything else here.
+
+| Preset      | Basis                                                                                                                                                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Normal**  | Upstream. Keys removed.                                                                                                                                                                                                 |
+| **Relaxed** | The values Start9 runs on `start9.me`: `rc_message` 5/s burst 30, `rc_joins` local and remote 5/s burst 20. Nothing else is touched -- those are the two that were actually hit.                                        |
+| **Strict**  | Upstream with the abuse-facing limits at half the rate and half the burst rounded up: registration, all three invite limits, and failed sign-ins. Messaging and joining stay at upstream so ordinary use is unaffected. |
+| **Custom**  | Whatever you set.                                                                                                                                                                                                       |
+
+Strict is the only one without an upstream reference -- it is a rule chosen here, stated so it can be audited, and Custom exists for anyone who disagrees with it. The prefill reports Custom whenever any of those keys is present, even if the values happen to match a preset, because matching values are not evidence the user picked that preset.
+
 ### Configure SMTP
 
 | Property     | Value                                        |
@@ -431,6 +453,7 @@ actions:
   - set-admin-password (enabled, any)
   - config (enabled, any)
   - manage-smtp (enabled, any)
+  - rate-limits (enabled, any)
   - register-appservice (enabled, any)
   - list-appservices (enabled, any)
   - delete-appservice (enabled, any)

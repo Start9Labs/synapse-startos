@@ -11,10 +11,13 @@ whose phases 1 and 2 shipped together as `1.158.0:1`. Roughly in priority order.
 
 ## Polish
 
-- [ ] **Rate-limit presets.** `rc_message`, `rc_joins`, `rc_invites`, `rc_login`,
-      `rc_registration`, `rc_federation`. Bots and bulk operations hit the stock limits
-      immediately. Prefer a Normal / Relaxed preset over nine number fields.
-- [ ] **Room- and user-directory privacy** — `allow_public_rooms_over_federation`,
+- [ ] **`rc_federation`** — the one rate limit the Rate Limits action does not cover
+      (`window_size`, `sleep_limit`, `sleep_delay`, `reject_limit`, `concurrent`). Shaped
+      unlike the others, and inbound-federation tuning is a different problem from user
+      rate limiting; give it its own variant or leave it to the hand-edit path.
+- [ ] **Room- and user-directory privacy** — its own action, following the Rate Limits
+      pattern: a Private / Normal / Public / Custom union rather than seven loose booleans.
+      Keys: `allow_public_rooms_over_federation`,
       `allow_public_rooms_without_auth`, `enable_room_list_search`,
       `user_directory.{search_all_users,prefer_local_users,exclude_remote_users}`,
       `require_auth_for_profile_requests`, `limit_profile_requests_to_users_who_share_rooms`,
