@@ -5,11 +5,6 @@ whose phases 1 and 2 shipped together as `1.158.0:1`. Roughly in priority order.
 
 ## Resource protection
 
-- [ ] **Cache autotuning derived from box RAM** — `caches.global_factor`,
-      `cache_autotuning.{max,target}_cache_memory_usage`, `min_cache_ttl`,
-      `event_cache_size`. The playbook computes these from total RAM (`memtotal/8` capped
-      at 2 GB max, `memtotal/16` capped at 1 GB target); StartOS knows the box's RAM, so
-      derive rather than expose a knob.
 - [ ] **`user_ips_max_age` and `forgotten_room_retention_period`** — privacy and database
       hygiene. Low urgency: `user_ips_max_age` already defaults to a reasonable `28d`
       upstream, and only its privacy angle argues for a knob.

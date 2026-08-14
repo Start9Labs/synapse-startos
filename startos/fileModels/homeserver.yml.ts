@@ -1,4 +1,5 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
+import { totalmem } from 'os'
 import { sdk } from '../sdk'
 import {
   homeserverPort,
@@ -56,6 +57,36 @@ const resourceShape = z
       .catch(resourceDefault.names),
   })
   .catch(resourceDefault)
+
+// Autotuning evicts on the whole Synapse process's allocated memory, not on
+// cache size, so this is an out-of-memory guard rather than a performance knob.
+// It has to clear ordinary use — a real ten-user homeserver holds ~815 MiB, and
+// the upstream playbook's memtotal/16 target sits below that on an 8 GiB box —
+// while staying low enough to still catch runaway growth on a large one, where
+// a pure fraction of RAM would put the threshold out of reach. Hence a floor
+// and the playbook's own ceiling rather than its divisor.
+const maxCacheBytes = Math.min(
+  Math.max(totalmem() / 4, 1024 ** 3),
+  2 * 1024 ** 3,
+)
+const mib = (bytes: number) => `${Math.round(bytes / 1024 ** 2)}M`
+
+const cacheAutotuningDefault = {
+  max_cache_memory_usage: mib(maxCacheBytes),
+  target_cache_memory_usage: mib(maxCacheBytes / 2),
+  min_cache_ttl: '5m',
+}
+const cacheAutotuningShape = z
+  .object({
+    max_cache_memory_usage: z
+      .string()
+      .catch(cacheAutotuningDefault.max_cache_memory_usage),
+    target_cache_memory_usage: z
+      .string()
+      .catch(cacheAutotuningDefault.target_cache_memory_usage),
+    min_cache_ttl: z.string().catch(cacheAutotuningDefault.min_cache_ttl),
+  })
+  .catch(cacheAutotuningDefault)
 
 const listenerShape = z
   .object({
@@ -123,6 +154,9 @@ const shape = z.object({
   experimental_features: z
     .object({ msc3266_enabled: z.boolean().catch(true) })
     .catch({ msc3266_enabled: true }),
+  caches: z
+    .object({ cache_autotuning: cacheAutotuningShape })
+    .catch({ cache_autotuning: cacheAutotuningDefault }),
   limit_remote_rooms: z
     .object({
       enabled: z.boolean().catch(false),

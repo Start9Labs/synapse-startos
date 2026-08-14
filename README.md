@@ -104,7 +104,32 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 - `trusted_key_servers` -- defaults to `matrix.org`
 - `report_stats` -- always disabled
 - Listener bind addresses and ports
+- `caches.cache_autotuning` -- derived from box RAM, see below
 - `experimental_features.msc3266_enabled` -- forced on. Element X cannot talk to a homeserver without the room summary API and the upstream playbook enables it by default, so it isn't worth a user choice. A hand-set `false` is still honoured.
+
+### Cache autotuning (derived, not configured)
+
+`caches.cache_autotuning` is filled from a `.catch()` default computed once from the box's RAM, so it lands on the next `merge()` and a hand-edited value is preserved rather than overwritten.
+
+It is **an out-of-memory guard, not a performance knob**, and that drives the sizing. Synapse's autotuner evicts on `jemalloc.get_stat("allocated")` -- the whole Synapse process's memory, not the size of its caches -- so the threshold has to clear ordinary usage or it evicts continuously and never settles below target. Measured against the real `matrix.start9labs.com` workload (ten users, ~100 rooms, 7.75 GiB box), Synapse holds **~815 MiB** steady, while the upstream playbook's `memtotal/16` target for that box is **496 MiB** -- below the floor it would have to reach. The playbook's divisors are therefore not portable here; its ceilings are.
+
+```
+max_cache_memory_usage    = clamp(totalmem / 4, 1 GiB, 2 GiB)
+target_cache_memory_usage = max_cache_memory_usage / 2
+min_cache_ttl             = 5m
+```
+
+| Box RAM  | max      | target   | vs. a ten-user workload |
+| -------- | -------- | -------- | ----------------------- |
+| 2--4 GiB | 1024 MiB | 512 MiB  | below it -- evicts      |
+| 8 GiB    | 2048 MiB | 1024 MiB | 1.26x -- settles        |
+| 16 GiB+  | 2048 MiB | 1024 MiB | 1.26x -- settles        |
+
+Both bounds are load-bearing. Without the **floor**, a small box gets a threshold under Synapse's own baseline and thrashes. Without the **ceiling**, a large box gets a threshold Synapse would never reach -- on a 32 GiB box a plain `memtotal/4` is 8 GiB, roughly ten times a ten-user server's steady state, so the guard would be inert exactly where it is cheapest to have.
+
+The 2--4 GiB row is the guard working, not failing: a ten-user homeserver alongside other services genuinely does not fit in that box, and evicting is the correct response to it. A smaller install on the same hardware sits well below 815 MiB and never triggers. Anything whose workload falls outside these assumptions can set its own values by hand, and because these are `.catch()` defaults rather than a `main` rewrite, they stick.
+
+Two mechanics worth knowing. The autotuner is a no-op without jemalloc, which the upstream image's `/start.py` supplies by setting `LD_PRELOAD` before it `execve`s -- verified present in the shipped image, so this works. And the box's RAM comes from Node's `os.totalmem()`, because the SDK exposes no effect for it; that reports host RAM rather than a cgroup limit, which is the number the formula wants.
 
 ### Hand-editing `homeserver.yaml`
 
@@ -375,6 +400,7 @@ startos_managed_config:
   - registration (disabled | invite-only | open)
   - limit_remote_rooms (large room protection)
   - homeserver.log.config root.level
+  - caches.cache_autotuning (derived from os.totalmem(), not user-facing)
   - federation (listeners + domain whitelist)
   - presence.enabled
   - max_upload_size
