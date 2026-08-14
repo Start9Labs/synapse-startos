@@ -19,25 +19,20 @@ const staticConfig = (level: LogLevel) => ({
       request: '',
     },
   },
+  // Console only. StartOS captures the container's stdout, which is what
+  // `start-cli package logs` serves, so a rotating file handler would put up to
+  // 400 MB on the `main` volume — and therefore in every backup — to duplicate
+  // logs the platform already has.
   handlers: {
     console: {
       class: 'logging.StreamHandler',
       formatter: 'fmt',
       filters: ['context'] as const,
     },
-    file: {
-      class: 'logging.handlers.RotatingFileHandler',
-      formatter: 'fmt',
-      filename: '/data/homeserver.log',
-      maxBytes: 100000000,
-      backupCount: 3,
-      filters: ['context'] as const,
-      encoding: 'utf8',
-    },
   },
   root: {
     level,
-    handlers: ['console', 'file'] as const,
+    handlers: ['console'] as const,
   },
   loggers: {
     synapse: { level },

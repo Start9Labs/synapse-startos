@@ -102,7 +102,7 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 
 **Configuration NOT exposed on StartOS:**
 
-- `homeserver.log.config` beyond the level -- handlers, formatters and rotation are fixed
+- `homeserver.log.config` beyond the level -- handlers and formatters are fixed
 - `database` -- always PostgreSQL via sidecar container
 - `trusted_key_servers` -- defaults to `matrix.org`
 - `report_stats` -- always disabled
@@ -254,6 +254,8 @@ Most of these write `homeserver.yaml` directly, which `main` holds a `.const()` 
 
 - **Voice and Video Calls** writes `store.json.turn`, which `main` also watches. The `turn_*` keys themselves are rendered by `main` from the resolved coturn endpoint, before it const-reads `homeserver.yaml`, so the write is not a write-after-const.
 - **Log Level** writes `homeserver.log.config`. Synapse reads that file once at startup, so `main` const-reads `root.level` purely to force the restart that makes a change take effect.
+
+> **`log_config` is an enforced literal, and that is load-bearing.** `synapse generate` writes its own `<server_name>.log.config` on install and points `log_config` at it. That is a perfectly valid string, so a `.catch()` default never fires — which meant the package wrote `homeserver.log.config` and Synapse read a different file entirely. The log level was inert, and the rotating file handler the package declared had never once run. `log_config` is now `z.literal('/data/homeserver.log.config')`, so `merge()` corrects it on every init, including on existing installs. Verified on a real box: before the fix `log_config` read `/data/placeholder.com.log.config`; after it reads the package's, and switching the level to `WARNING` visibly silences Synapse's INFO output.
 
 #### Large Room Protection
 
@@ -425,7 +427,7 @@ Declared `optional: true` in the manifest and returned from `setupDependencies` 
 1. **Server name is permanent** -- once set and started, the server address/URL cannot be changed
 2. **Admin username fixed** -- always `admin`; only password can be changed. On an imported homeserver, "Set Admin Password" rewrites the **first-registered** user's password, which is not necessarily the account the operator thinks of as the admin
 3. **No workers** -- runs as a single monolith process (no worker-based scaling)
-4. **Logging is fixed apart from the level** -- handlers, formatters and 100 MB rotation are rebuilt on every init, so unlike `homeserver.yaml` a hand-edit to `homeserver.log.config` does not survive. Only `root.level` is carried back through, which is what makes the Config action's choice stick
+4. **Logging is fixed apart from the level** -- handlers and formatters are rebuilt on every init, so unlike `homeserver.yaml` a hand-edit to `homeserver.log.config` does not survive. Only `root.level` is carried back through, which is what makes the Config action's choice stick. Synapse logs to the console only; StartOS captures that stream, so `start-cli package logs synapse` is where the logs are
 5. **`homeserver.yaml` is managed, not owned** -- configuration is normally done through StartOS actions, but keys outside the package's schema do survive a hand-edit; see [Hand-editing `homeserver.yaml`](#hand-editing-homeserveryaml)
 6. **Tor federation limitations** -- `.onion` servers can only federate with other `.onion` servers
 7. **Import is pre-first-start only** -- there is no path to merge an external homeserver into a running one

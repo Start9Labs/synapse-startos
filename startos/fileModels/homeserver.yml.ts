@@ -156,7 +156,13 @@ const shape = z.object({
   // enforced
   database: dbShape,
   listeners: z.array(listenerShape).catch([listenerDefault]),
-  log_config: z.string().catch('/data/homeserver.log.config'),
+  // Enforced, not defaulted. `synapse generate` writes its own
+  // <server_name>.log.config and points here at it, which is a valid string, so
+  // a .catch() never fires and the package's log config is never read — the
+  // Config action's log level would write a file Synapse ignores.
+  log_config: z
+    .literal('/data/homeserver.log.config')
+    .catch('/data/homeserver.log.config'),
   media_store_path: z.string().catch('/data/media_store'),
   pid_file: z.string().catch('/data/homeserver.pid'),
   report_stats: z.boolean().catch(false),
