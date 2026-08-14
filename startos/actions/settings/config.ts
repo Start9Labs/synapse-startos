@@ -1,11 +1,11 @@
 import {
   defaultLogLevel,
   homeserverLogConfig,
-} from '../fileModels/homeserver.log.config'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+} from '../../fileModels/homeserver.log.config'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 const { InputSpec, Value, Variants, List } = sdk
 
@@ -150,7 +150,7 @@ export const config = sdk.Action.withInput(
     description: i18n('Configure your Synapse homeserver.'),
     warning: null,
     allowedStatuses: 'any',
-    group: null,
+    group: i18n('Settings'),
     visibility: 'enabled',
   }),
 

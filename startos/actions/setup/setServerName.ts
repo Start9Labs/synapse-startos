@@ -1,9 +1,9 @@
 import { T } from '@start9labs/start-sdk'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { i18n } from '../i18n'
-import { homeserverHostnames } from '../interfaces'
-import { sdk } from '../sdk'
-import { setAdminPassword } from './setAdminPassword'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { homeserverHostnames } from '../../interfaces'
+import { sdk } from '../../sdk'
+import { setAdminPassword } from '../accounts/setAdminPassword'
 
 const { InputSpec, Value } = sdk
 
@@ -27,7 +27,7 @@ export const setServerName = sdk.Action.withInput(
       'This can never be changed. You must first add a public domain to the Homeserver interface.',
     ),
     allowedStatuses: 'only-stopped',
-    group: null,
+    group: i18n('Setup'),
     visibility: 'hidden',
   }),
 

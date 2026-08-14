@@ -174,6 +174,17 @@ Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, ha
 
 ## Actions (StartOS UI)
 
+Actions are grouped in the UI by the `group` field on their metadata, and the source mirrors that: one directory per group under `startos/actions/`.
+
+| Group            | Directory              | Actions                                                            |
+| ---------------- | ---------------------- | ------------------------------------------------------------------ |
+| **Setup**        | `actions/setup/`       | Set Server Address/URL, Import Existing Homeserver                 |
+| **Accounts**     | `actions/accounts/`    | Set Admin Password, Get Access Token                               |
+| **Settings**     | `actions/settings/`    | Config, Registration, Rate Limits, Discoverability, Configure SMTP |
+| **App Services** | `actions/appServices/` | Register / List / Delete Appservice                                |
+
+Setup holds the two one-time, `only-stopped` actions that establish the server's identity; everything in Settings edits a running server.
+
 ### Set Server Address/URL
 
 | Property     | Value                                            |

@@ -1,17 +1,17 @@
 import { access, copyFile } from 'fs/promises'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { importedHomeserverYaml } from '../fileModels/importedHomeserver.yml'
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { homeserverHostnames } from '../interfaces'
-import { sdk } from '../sdk'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { importedHomeserverYaml } from '../../fileModels/importedHomeserver.yml'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { homeserverHostnames } from '../../interfaces'
+import { sdk } from '../../sdk'
 import {
   importConfigSubpath,
   importDumpSubpath,
   importKeySubpath,
   mountpoint,
   placeholderServerName,
-} from '../utils'
+} from '../../utils'
 import { setServerName } from './setServerName'
 
 export const importHomeserver = sdk.Action.withoutInput(
@@ -33,7 +33,7 @@ export const importHomeserver = sdk.Action.withoutInput(
         'Stage the old server\'s files on this volume first — see "Importing an existing homeserver" in the instructions. This replaces the empty homeserver created on install and cannot be undone.',
       ),
       allowedStatuses: 'only-stopped',
-      group: null,
+      group: i18n('Setup'),
       visibility:
         !claimed || claimed === placeholderServerName
           ? 'enabled'

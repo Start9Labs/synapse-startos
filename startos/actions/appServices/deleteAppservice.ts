@@ -42,7 +42,7 @@ export const deleteAppservice = sdk.Action.withInput(
       'This will remove the appservice registration. The bridge service will no longer be able to communicate with Synapse until re-registered.',
     ),
     allowedStatuses: 'any',
-    group: 'App Services',
+    group: i18n('App Services'),
     visibility: 'enabled',
   }),
 

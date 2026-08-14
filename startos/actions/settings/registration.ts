@@ -1,6 +1,6 @@
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 const { InputSpec, Value, List } = sdk
 
@@ -60,7 +60,7 @@ export const registration = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: null,
+    group: i18n('Settings'),
     visibility: 'enabled',
   }),
 

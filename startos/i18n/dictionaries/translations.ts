@@ -170,6 +170,10 @@ export default {
     178: 'Quién puede crear una cuenta aquí, en qué salas aterriza y si quien no tiene cuenta puede echar un vistazo.',
     179: 'Contacto del administrador',
     180: 'Cómo localizarle, se muestra a sus usuarios si el servidor llega a rechazar una acción por haber alcanzado un límite de recursos. Lo habitual es un enlace mailto:.',
+    181: 'Configuración inicial',
+    182: 'Ajustes',
+    183: 'Cuentas',
+    184: 'Servicios de aplicación',
   },
   de_DE: {
     0: '[i] Synapse wird gestartet!',
@@ -340,6 +344,10 @@ export default {
     178: 'Wer hier ein Konto anlegen darf, in welchen Räumen er landet und ob sich Personen ohne Konto umsehen dürfen.',
     179: 'Administrator-Kontakt',
     180: 'Wie man Sie erreicht; wird Ihren Nutzern angezeigt, falls der Server je eine Aktion ablehnt, weil er an eine Ressourcengrenze gestoßen ist. Üblich ist ein mailto:-Link.',
+    181: 'Einrichtung',
+    182: 'Einstellungen',
+    183: 'Konten',
+    184: 'App-Services',
   },
   pl_PL: {
     0: '[i] Uruchamianie Synapse!',
@@ -510,6 +518,10 @@ export default {
     178: 'Kto może założyć tu konto, w jakich pokojach ląduje i czy osoby bez konta mogą się rozejrzeć.',
     179: 'Kontakt do administratora',
     180: 'Jak się z Tobą skontaktować; pokazywane użytkownikom, jeśli serwer odmówi wykonania czynności z powodu osiągnięcia limitu zasobów. Zwykle stosuje się odnośnik mailto:.',
+    181: 'Konfiguracja początkowa',
+    182: 'Ustawienia',
+    183: 'Konta',
+    184: 'Serwisy aplikacji',
   },
   fr_FR: {
     0: '[i] Démarrage de Synapse !',
@@ -680,5 +692,9 @@ export default {
     178: 'Qui peut créer un compte ici, dans quels salons il arrive, et si les personnes sans compte peuvent regarder.',
     179: "Contact de l'administrateur",
     180: 'Comment vous joindre ; affiché à vos utilisateurs si le serveur refuse un jour une action pour cause de limite de ressources atteinte. Un lien mailto: est la forme habituelle.',
+    181: 'Installation',
+    182: 'Réglages',
+    183: 'Comptes',
+    184: 'Services applicatifs',
   },
 } satisfies Record<string, LangDict>

@@ -169,6 +169,10 @@ const dict = {
   'Who may create an account here, what rooms they land in, and whether people without an account may look around.': 178,
   'Admin Contact': 179,
   'How to reach you, shown to your users if the server ever refuses an action because it has hit a resource limit. A mailto: link is the usual form.': 180,
+  Setup: 181,
+  Settings: 182,
+  Accounts: 183,
+  'App Services': 184,
 } as const
 
 export type I18nKey = keyof typeof dict

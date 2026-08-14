@@ -1,6 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { homeserverPort } from '../utils'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { homeserverPort } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -41,7 +41,7 @@ export const getAccessToken = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: i18n('Accounts'),
     visibility: 'enabled',
   }),
 

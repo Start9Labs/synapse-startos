@@ -1,5 +1,5 @@
 import { utils } from '@start9labs/start-sdk'
-import { setServerName } from '../actions/setServerName'
+import { setServerName } from '../actions/setup/setServerName'
 import { homeserverLogConfig } from '../fileModels/homeserver.log.config'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
