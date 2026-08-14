@@ -39,28 +39,6 @@ const relaxed = {
   },
 }
 
-// Half the rate, burst halved and rounded up, applied only where abuse happens:
-// registration, invitations and failed sign-ins. Messaging and joining are left
-// at upstream so ordinary use is untouched. Unlike the other two presets this
-// has no upstream reference — it is a rule we chose, which is why Custom exists.
-const half = ({ per_second, burst_count }: Rate): Rate => ({
-  per_second: per_second / 2,
-  burst_count: Math.ceil(burst_count / 2),
-})
-const strict = {
-  rc_registration: half(upstream.rc_registration),
-  rc_invites: {
-    per_room: half(upstream.rc_invites.per_room),
-    per_user: half(upstream.rc_invites.per_user),
-    per_issuer: half(upstream.rc_invites.per_issuer),
-  },
-  rc_login: {
-    address: upstream.rc_login.address,
-    account: upstream.rc_login.account,
-    failed_attempts: half(upstream.rc_login.failed_attempts),
-  },
-}
-
 const rate = (name: string, d: Rate) =>
   Value.object(
     { name },
@@ -96,7 +74,6 @@ export const inputSpec = InputSpec.of({
       "Synapse slows down anyone who sends, joins, invites or signs in too quickly. The stock limits suit a server open to strangers; a private server among people you know can afford to be looser, and bots and bulk operations hit the stock limits almost immediately. Choose Custom to set any of them yourself — it starts pre-filled with Synapse's own values.",
     ),
     variants: Variants.of({
-      strict: { name: i18n('Strict'), spec: InputSpec.of({}) },
       normal: { name: i18n('Normal'), spec: InputSpec.of({}) },
       relaxed: { name: i18n('Relaxed'), spec: InputSpec.of({}) },
       custom: {
@@ -224,11 +201,6 @@ export const rateLimits = sdk.Action.withInput(
         return void (await homeserverYaml.merge(effects, {
           ...blank,
           ...relaxed,
-        }))
-      case 'strict':
-        return void (await homeserverYaml.merge(effects, {
-          ...blank,
-          ...strict,
         }))
       case 'custom': {
         const v = input.preset.value

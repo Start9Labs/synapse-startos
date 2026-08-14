@@ -281,18 +281,41 @@ The third column is load-bearing rather than incidental. Synapse's `validate_con
 | Availability | Any status                                        |
 | Purpose      | How fast users may send, join, invite and sign in |
 
-A preset union -- **Strict / Normal / Relaxed / Custom** -- rather than ten pairs of numbers on the Config form. Custom expands to every knob individually, pre-filled with Synapse's own values, so the simple choice and the full one live in the same place.
+A preset union -- **Normal / Relaxed / Custom** -- rather than ten pairs of numbers on the Config form. Custom expands to every knob individually, pre-filled with Synapse's own values, so the simple choice and the full one live in the same place.
 
 **Normal writes nothing.** It clears `rc_message`, `rc_registration`, `rc_joins`, `rc_invites` and `rc_login` from `homeserver.yaml`, so Synapse's own defaults apply. Absence is the representation, which is why those keys are `.optional()` in the file model rather than carrying `.catch()` defaults like everything else here.
 
-| Preset      | Basis                                                                                                                                                                                                                   |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Normal**  | Upstream. Keys removed.                                                                                                                                                                                                 |
-| **Relaxed** | The values Start9 runs on `start9.me`: `rc_message` 5/s burst 30, `rc_joins` local and remote 5/s burst 20. Nothing else is touched -- those are the two that were actually hit.                                        |
-| **Strict**  | Upstream with the abuse-facing limits at half the rate and half the burst rounded up: registration, all three invite limits, and failed sign-ins. Messaging and joining stay at upstream so ordinary use is unaffected. |
-| **Custom**  | Whatever you set.                                                                                                                                                                                                       |
+| Preset      | Basis                                                                                                                                                                            |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Normal**  | Upstream. Keys removed.                                                                                                                                                          |
+| **Relaxed** | The values Start9 runs on `start9.me`: `rc_message` 5/s burst 30, `rc_joins` local and remote 5/s burst 20. Nothing else is touched -- those are the two that were actually hit. |
+| **Custom**  | Whatever you set.                                                                                                                                                                |
 
-Strict is the only one without an upstream reference -- it is a rule chosen here, stated so it can be audited, and Custom exists for anyone who disagrees with it. The prefill reports Custom whenever any of those keys is present, even if the values happen to match a preset, because matching values are not evidence the user picked that preset.
+Every preset traces to something real: Normal is upstream, Relaxed is a running production server. There is deliberately no "strict" preset -- tightening these below upstream has no reference to point at, and inventing one would be presenting a guess as advice. Custom covers anyone who wants that. The prefill reports Custom whenever any of those keys is present, even if the values happen to match a preset, because matching values are not evidence the user picked that preset.
+
+### Discoverability
+
+| Property     | Value                                                         |
+| ------------ | ------------------------------------------------------------- |
+| ID           | `discoverability`                                             |
+| Visibility   | Enabled                                                       |
+| Availability | Any status                                                    |
+| Purpose      | What a stranger can learn about the server without an account |
+
+**Private / Normal / Public / Custom**, over seven `homeserver.yaml` keys (ten settings, since `user_directory` holds four).
+
+Unlike the rate-limit presets, these need no external reference. Every setting here is a boolean with an unambiguous privacy direction, so Private and Public are simply "all of them one way" -- there is no magnitude to guess at, which is exactly why a numeric `strict` rate-limit preset was dropped and these two were not.
+
+| Preset      | Writes                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Private** | Room list unsearchable and unpublished, directory local-only, profiles behind auth and limited to shared rooms, no profile data on invites |
+| **Normal**  | Nothing -- the keys are cleared and Synapse's defaults apply                                                                               |
+| **Public**  | Room list published over federation and readable without an account, all local users searchable                                            |
+| **Custom**  | Each of the ten individually                                                                                                               |
+
+Private and Public both write **all seven keys**, so the prefill can match on exact equality and report the preset back. That is safe here in a way it is not for rate limits: those presets are sparse -- Relaxed touches three keys and leaves the rest absent -- so presence carries the signal and matching values prove nothing.
+
+`restrict_public_rooms_to_local_users` is deliberately never written. It is the obsolete spelling of the first two settings, and Synapse raises `ConfigError` if it appears alongside either of them.
 
 ### Configure SMTP
 
@@ -454,6 +477,7 @@ actions:
   - config (enabled, any)
   - manage-smtp (enabled, any)
   - rate-limits (enabled, any)
+  - discoverability (enabled, any)
   - register-appservice (enabled, any)
   - list-appservices (enabled, any)
   - delete-appservice (enabled, any)

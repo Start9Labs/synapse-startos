@@ -102,7 +102,8 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 - **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
 - **Config** — registration, federation, voice and video calls, presence, link previews, notification content, upload and room-size limits, log level, and how long to keep other servers' media.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
-- **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Strict, Normal or Relaxed; pick Custom if you want to set any of them yourself.
+- **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
+- **Discoverability** — what someone without an account can find out about your server. Pick Private, Normal or Public; pick Custom to decide each setting.
 - **Configure SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
 - **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard.
@@ -143,11 +144,19 @@ Two settings in the **Config** action decide how much your server does on your b
 
 **Message Text in Notifications** is on. It puts the message itself in the push notification instead of just who sent it and where. Turn it off if you would rather nothing showed on a locked screen. Encrypted messages never include their text either way — only that something arrived.
 
+### Who can find your server
+
+By default a stranger can learn a certain amount about your homeserver without having an account on it — which public rooms it hosts, and, once they can see a room, who is in it.
+
+The **Discoverability** action collapses that into one choice. **Private** stops your room list being published or searched, keeps the people-search to your own server, and hides display names and avatars from anyone who is not signed in and does not already share a room. **Public** does the opposite, and is what you want if you are running rooms you would like strangers to find and join. **Normal** leaves Synapse's own settings, which sit between the two.
+
+**Custom** exposes all ten settings individually. The one most people go looking for is **Search All Local Users** — without it, searching for someone only finds people you already share a room with, which is rarely what you want on a small server where everyone knows each other.
+
 ### When people hit rate limits
 
 Synapse deliberately slows anyone down who sends, joins, invites or signs in too fast. The stock settings assume a server open to strangers, and they are easy to trip: inviting a dozen people at once, or running a bot, will hit them.
 
-The **Rate Limits** action has three ready-made choices. **Normal** is Synapse's own. **Relaxed** raises sending and joining to the values Start9 runs on its own server, which is usually the right pick for a server among people you know. **Strict** tightens account creation, invitations and failed sign-ins for a server open to the public, and leaves everyday messaging alone.
+The **Rate Limits** action has two ready-made choices. **Normal** is Synapse's own. **Relaxed** raises sending and joining to the values Start9 runs on its own server, which is usually the right pick for a server among people you know.
 
 If none of those fit, **Custom** exposes every limit individually, starting from Synapse's values. Each has a _per second_ rate and a _burst_ — the burst is how many are allowed in quick succession before the slower sustained rate takes over.
 

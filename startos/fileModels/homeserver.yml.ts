@@ -134,7 +134,10 @@ const cacheAutotuningShape = z
 // Absent means upstream applies, which is what the Rate Limits action's Normal
 // preset writes — so these stay optional rather than carrying defaults.
 const rateShape = z
-  .object({ per_second: z.number(), burst_count: z.number() })
+  .object({
+    per_second: z.number().optional(),
+    burst_count: z.number().optional(),
+  })
   .optional()
   .catch(undefined)
 
@@ -233,6 +236,27 @@ const shape = z.object({
     })
     .optional()
     .catch(undefined),
+  // Absent means upstream applies, which is what the Discoverability action's
+  // Normal preset writes. Inner keys are optional for the same reason as the
+  // rate limits: a half-written block on disk must survive rather than vanish.
+  allow_public_rooms_over_federation: z.boolean().optional().catch(undefined),
+  allow_public_rooms_without_auth: z.boolean().optional().catch(undefined),
+  enable_room_list_search: z.boolean().optional().catch(undefined),
+  user_directory: z
+    .object({
+      enabled: z.boolean().optional(),
+      search_all_users: z.boolean().optional(),
+      prefer_local_users: z.boolean().optional(),
+      exclude_remote_users: z.boolean().optional(),
+    })
+    .optional()
+    .catch(undefined),
+  require_auth_for_profile_requests: z.boolean().optional().catch(undefined),
+  limit_profile_requests_to_users_who_share_rooms: z
+    .boolean()
+    .optional()
+    .catch(undefined),
+  include_profile_data_on_invite: z.boolean().optional().catch(undefined),
   caches: z
     .object({ cache_autotuning: cacheAutotuningShape })
     .catch({ cache_autotuning: cacheAutotuningDefault }),

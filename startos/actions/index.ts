@@ -3,6 +3,7 @@ import { deleteAppservice } from './appServices/deleteAppservice'
 import { listAppservices } from './appServices/listAppservices'
 import { registerAppservice } from './appServices/registerAppservice'
 import { config } from './config'
+import { discoverability } from './discoverability'
 import { getAccessToken } from './getAccessToken'
 import { importHomeserver } from './importHomeserver'
 import { manageSmtp } from './manageSmtp'
@@ -18,6 +19,7 @@ export const actions = sdk.Actions.of()
   .addAction(config)
   .addAction(manageSmtp)
   .addAction(rateLimits)
+  .addAction(discoverability)
   .addAction(registerAppservice)
   .addAction(listAppservices)
   .addAction(deleteAppservice)
