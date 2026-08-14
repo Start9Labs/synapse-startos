@@ -105,7 +105,7 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 - `report_stats` -- always disabled
 - Listener bind addresses and ports
 - `caches.cache_autotuning` -- derived from box RAM, see below
-- `experimental_features.msc3266_enabled` -- forced on. Element X cannot talk to a homeserver without the room summary API and the upstream playbook enables it by default, so it isn't worth a user choice. A hand-set `false` is still honoured.
+- `experimental_features.msc3266_enabled` -- forced on. It was the last server-side gap for Element X; sliding sync (`msc3575_enabled`, MSC4186) has defaulted to on upstream since it replaced the sliding-sync proxy, so with MSC3266 the package supports Element X out of the box. The playbook enables it by default too, so it isn't worth a user choice. A hand-set `false` is still honoured.
 
 ### Cache autotuning (derived, not configured)
 

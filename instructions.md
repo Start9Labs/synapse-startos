@@ -91,9 +91,7 @@ Two things worth knowing:
 
 ### Connecting a client
 
-Open a Matrix client and use the address you set during setup as your homeserver URL. Recommended clients: [Element](https://element.io), [SchildiChat](https://schildi.chat), [FluffyChat](https://fluffychat.im).
-
-> **Do not use Element X.** Despite the name it is a separate, immature application from Element and is not recommended for use against your homeserver.
+Open a Matrix client and use the address you set during setup as your homeserver URL. Recommended clients: [Element](https://element.io), [Element X](https://element.io/app-for-productivity), [SchildiChat](https://schildi.chat), [FluffyChat](https://fluffychat.im).
 
 ### Admin Dashboard
 
