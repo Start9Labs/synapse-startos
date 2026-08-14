@@ -88,6 +88,8 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 | Registration                            | `homeserver.yaml`           | "Config" action, three-state (see below)                            |
 | Federation                              | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist)                 |
 | `limit_remote_rooms`                    | `homeserver.yaml`           | "Config" action (off, or a complexity ceiling)                      |
+| `url_preview_enabled`                   | `homeserver.yaml`           | "Config" action; the IP blocklist is always written                 |
+| `push.include_content`                  | `homeserver.yaml`           | "Config" action                                                     |
 | `root.level`                            | `homeserver.log.config`     | "Config" action (DEBUG/INFO/WARNING/ERROR)                          |
 | `presence.enabled`                      | `homeserver.yaml`           | "Config" action (default on, matching upstream)                     |
 | `max_upload_size`                       | `homeserver.yaml`           | "Config" action (1-2000 MB)                                         |
@@ -105,7 +107,18 @@ Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on por
 - `report_stats` -- always disabled
 - Listener bind addresses and ports
 - `caches.cache_autotuning` -- derived from box RAM, see below
+- `url_preview_ip_range_blacklist` -- always written, see below
+- `experimental_features.msc4028_push_encrypted_events` -- forced on; without it push notifications never fire for encrypted messages
+- `experimental_features.msc2409_to_device_messages_enabled` / `msc3202_transaction_extensions` -- forced on; they carry the to-device and one-time-key data an encrypted bridge needs, and are inert with no appservice registered
 - `experimental_features.msc3266_enabled` -- forced on. It was the last server-side gap for Element X; sliding sync (`msc3575_enabled`, MSC4186) has defaulted to on upstream since it replaced the sliding-sync proxy, so with MSC3266 the package supports Element X out of the box. The playbook enables it by default too, so it isn't worth a user choice. A hand-set `false` is still honoured.
+
+### The URL preview blocklist is not optional
+
+`url_preview_ip_range_blacklist` is written into `homeserver.yaml` unconditionally -- whether or not previews are enabled -- so the two can never get out of step. That is not belt-and-braces: Synapse's own `read_config` raises `ConfigError` if `url_preview_enabled` is true and the blocklist is absent, so the alternative is a service that refuses to start the moment a user turns previews on.
+
+The list is the upstream playbook's, which is broader than Synapse's own example. It matters more here than on a dedicated host: a preview fetcher is a server-side HTTP client that follows URLs users supply, so on a StartOS box an unrestricted one is an SSRF tool pointed at every other service on the machine and the LAN. `10.0.0.0/8` is the entry that covers StartOS's own container bridge; `127.0.0.0/8`, `169.254.0.0/16` and the IPv6 loopback/link-local ranges cover the rest of the obvious targets. Synapse additionally blocks `0.0.0.0` and `::` on its own.
+
+Enabling previews also requires the `url-preview` extra (lxml) in the image; it is present in the upstream image the package pins, verified via `check_requirements("url-preview")`.
 
 ### Cache autotuning (derived, not configured)
 
@@ -223,16 +236,18 @@ The restart is what makes the new password take effect immediately. `pendingAdmi
 
 **Settings:**
 
-| Setting                | Default      | Description                                                         |
-| ---------------------- | ------------ | ------------------------------------------------------------------- |
-| Registration           | Disabled     | Disabled / Invite Only / Open -- see below                          |
-| Federation             | Disabled     | Enable/disable with optional domain whitelist                       |
-| Voice and Video Calls  | Off          | Opt in to TURN relay via the `coturn` package                       |
-| Presence               | On           | `presence.enabled`; upstream default, exposed as a performance knob |
-| Max Upload Size        | 50 MB        | File upload limit (1-2000 MB)                                       |
-| Large Room Protection  | Join any     | `limit_remote_rooms`; off, or a complexity ceiling                  |
-| Log Level              | INFO         | `root.level` in `homeserver.log.config`                             |
-| Remote Media Retention | Keep forever | `media_retention.remote_media_lifetime`, in days                    |
+| Setting                       | Default      | Description                                                         |
+| ----------------------------- | ------------ | ------------------------------------------------------------------- |
+| Registration                  | Disabled     | Disabled / Invite Only / Open -- see below                          |
+| Federation                    | Disabled     | Enable/disable with optional domain whitelist                       |
+| Voice and Video Calls         | Off          | Opt in to TURN relay via the `coturn` package                       |
+| Presence                      | On           | `presence.enabled`; upstream default, exposed as a performance knob |
+| Max Upload Size               | 50 MB        | File upload limit (1-2000 MB)                                       |
+| Large Room Protection         | Join any     | `limit_remote_rooms`; off, or a complexity ceiling                  |
+| Link Previews                 | Off          | `url_preview_enabled`; upstream default, playbook differs           |
+| Message Text in Notifications | On           | `push.include_content`                                              |
+| Log Level                     | INFO         | `root.level` in `homeserver.log.config`                             |
+| Remote Media Retention        | Keep forever | `media_retention.remote_media_lifetime`, in days                    |
 
 Most of these write `homeserver.yaml` directly, which `main` holds a `.const()` watch on, so the service restarts itself to pick them up. Two don't:
 
@@ -401,6 +416,8 @@ startos_managed_config:
   - limit_remote_rooms (large room protection)
   - homeserver.log.config root.level
   - caches.cache_autotuning (derived from os.totalmem(), not user-facing)
+  - url_preview_enabled + url_preview_ip_range_blacklist (blocklist always written)
+  - push.include_content
   - federation (listeners + domain whitelist)
   - presence.enabled
   - max_upload_size

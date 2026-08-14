@@ -112,6 +112,10 @@ const dict = {
   Info: 120,
   Warning: 121,
   Error: 122,
+  'Link Previews': 123,
+  'Show a title, summary and thumbnail under links posted in chat. Your server fetches the page to build the preview, so it is your server rather than each of your users that contacts the site. Requests to private and loopback address ranges are refused, which keeps the fetcher away from everything else on your network.': 124,
+  'Message Text in Notifications': 125,
+  'Include the message itself in push notifications, rather than only who sent it and where. Turning this off means notifications give nothing away on a locked screen, at the cost of having to open the app to see what was said. Encrypted messages never include their text either way.': 126,
 } as const
 
 export type I18nKey = keyof typeof dict

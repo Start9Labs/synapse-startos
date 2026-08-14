@@ -113,6 +113,10 @@ export default {
     120: 'Info',
     121: 'Advertencia',
     122: 'Error',
+    123: 'Vistas previas de enlaces',
+    124: 'Mostrar un título, un resumen y una miniatura bajo los enlaces publicados en el chat. Es su servidor quien descarga la página para construir la vista previa, así que es él, y no cada uno de sus usuarios, quien contacta con el sitio. Las peticiones a rangos de direcciones privadas y a la interfaz local se rechazan, lo que mantiene al descargador alejado de todo lo demás en su red.',
+    125: 'Texto del mensaje en las notificaciones',
+    126: 'Incluir el propio mensaje en las notificaciones push, en lugar de solo quién lo envió y dónde. Desactivado, las notificaciones no revelan nada en la pantalla de bloqueo, a cambio de tener que abrir la aplicación para ver lo que se dijo. Los mensajes cifrados nunca incluyen su texto en ningún caso.',
   },
   de_DE: {
     0: '[i] Synapse wird gestartet!',
@@ -226,6 +230,10 @@ export default {
     120: 'Info',
     121: 'Warnung',
     122: 'Fehler',
+    123: 'Linkvorschauen',
+    124: 'Titel, Kurzfassung und Vorschaubild unter im Chat geposteten Links anzeigen. Ihr Server ruft die Seite ab, um die Vorschau zu bauen — es ist also Ihr Server und nicht jeder einzelne Ihrer Nutzer, der die Website kontaktiert. Anfragen an private Adressbereiche und an Loopback werden abgewiesen, was den Abrufer von allem anderen in Ihrem Netzwerk fernhält.',
+    125: 'Nachrichtentext in Benachrichtigungen',
+    126: 'Die Nachricht selbst in Push-Benachrichtigungen aufnehmen statt nur Absender und Ort. Ausgeschaltet verraten Benachrichtigungen auf dem Sperrbildschirm nichts — dafür müssen Sie die App öffnen, um zu sehen, was gesagt wurde. Bei verschlüsselten Nachrichten wird der Text ohnehin nie mitgeschickt.',
   },
   pl_PL: {
     0: '[i] Uruchamianie Synapse!',
@@ -339,6 +347,10 @@ export default {
     120: 'Info',
     121: 'Ostrzeżenia',
     122: 'Błędy',
+    123: 'Podglądy linków',
+    124: 'Pokazuj tytuł, streszczenie i miniaturę pod linkami wysyłanymi na czacie. Podgląd buduje Twój serwer, pobierając stronę — to on kontaktuje się z witryną, a nie każdy z Twoich użytkowników z osobna. Żądania do prywatnych zakresów adresów i do pętli zwrotnej są odrzucane, co trzyma pobieracz z dala od wszystkiego innego w Twojej sieci.',
+    125: 'Treść wiadomości w powiadomieniach',
+    126: 'Dołączaj samą wiadomość do powiadomień push, a nie tylko informację, kto i gdzie ją wysłał. Po wyłączeniu powiadomienia niczego nie zdradzą na ekranie blokady, kosztem konieczności otwarcia aplikacji, by zobaczyć treść. Wiadomości zaszyfrowane i tak nigdy nie zawierają swojej treści.',
   },
   fr_FR: {
     0: '[i] Démarrage de Synapse !',
@@ -452,5 +464,9 @@ export default {
     120: 'Info',
     121: 'Avertissement',
     122: 'Erreur',
+    123: 'Aperçus de liens',
+    124: "Afficher un titre, un résumé et une vignette sous les liens publiés dans les conversations. C'est votre serveur qui récupère la page pour construire l'aperçu : c'est donc lui, et non chacun de vos utilisateurs, qui contacte le site. Les requêtes vers les plages d'adresses privées et vers la boucle locale sont refusées, ce qui tient le récupérateur à l'écart de tout le reste de votre réseau.",
+    125: 'Texte du message dans les notifications',
+    126: "Inclure le message lui-même dans les notifications push, plutôt que seulement son auteur et son salon. Désactivé, les notifications ne révèlent rien sur un écran verrouillé, au prix d'avoir à ouvrir l'application pour lire le contenu. Les messages chiffrés n'incluent de toute façon jamais leur texte.",
   },
 } satisfies Record<string, LangDict>

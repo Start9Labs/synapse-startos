@@ -100,7 +100,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 ### Actions
 
 - **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
-- **Config** — registration, federation, voice and video calls, presence, upload and room-size limits, log level, and how long to keep other servers' media.
+- **Config** — registration, federation, voice and video calls, presence, link previews, notification content, upload and room-size limits, log level, and how long to keep other servers' media.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
 - **Configure SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
@@ -133,6 +133,14 @@ The limit is a "complexity" number — roughly the room's size in units of 500 e
 Matrix clients make calls directly between the two participants, which fails when both ends sit behind NAT or a strict firewall. Turning on **Voice and Video Calls** in the **Config** action makes Synapse offer clients a relay to fall back on.
 
 The relay is the separate **Coturn** service — install and start it, and give it a public domain of its own, as its own instructions describe. Until you do, calls still work wherever a direct connection is possible.
+
+### Link previews and notification privacy
+
+Two settings in the **Config** action decide how much your server does on your behalf.
+
+**Link Previews** is off to begin with. Turn it on and a title, summary and thumbnail appear under links posted in chat. Your server fetches the page to build that, which means the site sees one request from your server rather than one from each person who saw the link. Your server will not follow links into private address ranges or to itself, so the fetcher cannot be pointed at anything else running on your network.
+
+**Message Text in Notifications** is on. It puts the message itself in the push notification instead of just who sent it and where. Turn it off if you would rather nothing showed on a locked screen. Encrypted messages never include their text either way — only that something arrived.
 
 ### Keeping disk use down
 

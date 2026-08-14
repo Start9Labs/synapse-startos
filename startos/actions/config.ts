@@ -103,6 +103,20 @@ export const inputSpec = InputSpec.of({
       },
     }),
   }),
+  url_previews: Value.toggle({
+    name: i18n('Link Previews'),
+    description: i18n(
+      'Show a title, summary and thumbnail under links posted in chat. Your server fetches the page to build the preview, so it is your server rather than each of your users that contacts the site. Requests to private and loopback address ranges are refused, which keeps the fetcher away from everything else on your network.',
+    ),
+    default: false,
+  }),
+  push_include_content: Value.toggle({
+    name: i18n('Message Text in Notifications'),
+    description: i18n(
+      'Include the message itself in push notifications, rather than only who sent it and where. Turning this off means notifications give nothing away on a locked screen, at the cost of having to open the app to see what was said. Encrypted messages never include their text either way.',
+    ),
+    default: true,
+  }),
   log_level: Value.select({
     name: i18n('Log Level'),
     description: i18n(
@@ -164,7 +178,9 @@ export const config = sdk.Action.withInput(
       media_retention,
       max_upload_size,
       presence,
+      push,
       registration_requires_token,
+      url_preview_enabled,
     } = yaml
 
     return {
@@ -188,6 +204,8 @@ export const config = sdk.Action.withInput(
         : { selection: 'disabled' as const, value: {} },
       turn,
       presence: presence.enabled,
+      url_previews: url_preview_enabled,
+      push_include_content: push.include_content,
       max_upload_size: toMB(max_upload_size),
       remote_media_lifetime: toDays(media_retention?.remote_media_lifetime),
     }
@@ -239,6 +257,8 @@ export const config = sdk.Action.withInput(
             ? input.federation.value.federation_domain_whitelist
             : undefined,
       presence: { enabled: input.presence },
+      url_preview_enabled: input.url_previews,
+      push: { include_content: input.push_include_content },
       max_upload_size: `${input.max_upload_size}M`,
       media_retention: input.remote_media_lifetime
         ? { remote_media_lifetime: `${input.remote_media_lifetime}d` }

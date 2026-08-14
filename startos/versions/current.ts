@@ -12,6 +12,8 @@ export const current = VersionInfo.of({
 - New **Large Room Protection** refuses joins to rooms bigger than your server can comfortably handle, the first thing that flattens a home homeserver.
 - New **Log Level** setting. Logging was pinned to Info and rewritten on every start; Warning is much quieter for day-to-day running.
 - The room summary API (MSC3266) is now enabled, which current-generation mobile clients require.
+- **Link previews** can now be turned on, with the fetcher blocked from reaching anything on your own network.
+- Push notifications now fire for encrypted messages, and you can choose whether they carry the message text.
 - Synapse now evicts caches before it can eat the box. The ceiling is derived from your server's RAM and sized to stay out of the way in normal use.`,
     es_ES: `Añade una ruta de migración para servidores alojados en otro sitio, además de retransmisión de llamadas y dos controles de configuración nuevos.
 
@@ -22,6 +24,8 @@ export const current = VersionInfo.of({
 - La nueva **Protección frente a salas grandes** rechaza la entrada a salas mayores de lo que su servidor puede manejar con soltura, lo primero que tumba un servidor doméstico.
 - Nueva opción de **Nivel de registro**. El registro estaba fijado en «Info» y se reescribía en cada arranque; «Advertencia» es mucho más silencioso para el día a día.
 - Se habilita la API de resumen de salas (MSC3266), que requieren los clientes móviles de la generación actual.
+- Ya se pueden activar las **vistas previas de enlaces**, con el descargador impedido de alcanzar nada de su propia red.
+- Las notificaciones push ya funcionan con mensajes cifrados, y usted decide si llevan el texto del mensaje.
 - Synapse ahora purga sus cachés antes de poder comerse el servidor. El límite se deriva de la RAM de su máquina y está dimensionado para no estorbar en el uso normal.`,
     de_DE: `Ergänzt einen Migrationsweg für anderswo betriebene Homeserver sowie ein Anruf-Relay und zwei neue Konfigurationsregler.
 
@@ -32,6 +36,8 @@ export const current = VersionInfo.of({
 - Der neue **Schutz vor großen Räumen** lehnt den Beitritt zu Räumen ab, die größer sind, als Ihr Server bequem verkraftet — der erste Grund, an dem ein Heim-Homeserver scheitert.
 - Neue Einstellung **Protokollstufe**. Das Protokoll war auf „Info“ festgenagelt und wurde bei jedem Start überschrieben; „Warnung“ ist im Alltag deutlich ruhiger.
 - Die Raumzusammenfassungs-API (MSC3266) ist nun aktiviert, die aktuelle mobile Clients voraussetzen.
+- **Linkvorschauen** lassen sich nun einschalten, wobei der Abrufer nichts im eigenen Netzwerk erreichen kann.
+- Push-Benachrichtigungen kommen jetzt auch bei verschlüsselten Nachrichten an, und Sie entscheiden, ob sie den Nachrichtentext mitführen.
 - Synapse räumt seine Caches jetzt auf, bevor es den Server auffressen kann. Die Obergrenze wird aus dem Arbeitsspeicher Ihrer Maschine abgeleitet und ist so bemessen, dass sie im Normalbetrieb nicht stört.`,
     pl_PL: `Dodaje ścieżkę migracji dla serwerów prowadzonych gdzie indziej, a także przekazywanie połączeń i dwa nowe ustawienia konfiguracji.
 
@@ -42,6 +48,8 @@ export const current = VersionInfo.of({
 - Nowa **Ochrona przed dużymi pokojami** odrzuca dołączanie do pokoi większych, niż serwer jest w stanie swobodnie obsłużyć — pierwszy problem, na którym przewraca się domowy serwer.
 - Nowe ustawienie **Poziom logowania**. Logi były przypięte do „Info” i nadpisywane przy każdym starcie; „Ostrzeżenia” są znacznie cichsze na co dzień.
 - Włączono API podsumowania pokoi (MSC3266), wymagane przez obecną generację klientów mobilnych.
+- Można już włączyć **podglądy linków**, przy czym pobieracz nie sięgnie niczego w Twojej własnej sieci.
+- Powiadomienia push działają teraz dla wiadomości zaszyfrowanych, a Ty decydujesz, czy niosą treść wiadomości.
 - Synapse czyści teraz pamięci podręczne, zanim zdąży zająć całą maszynę. Limit wyliczany jest z ilości RAM Twojego serwera i dobrany tak, by nie przeszkadzać w normalnej pracy.`,
     fr_FR: `Ajoute un chemin de migration pour les serveurs hébergés ailleurs, ainsi que le relais d'appels et deux nouveaux réglages de configuration.
 
@@ -52,6 +60,8 @@ export const current = VersionInfo.of({
 - La nouvelle **protection contre les grands salons** refuse de rejoindre des salons plus gros que ce que votre serveur encaisse confortablement, la première chose qui met à genoux un serveur domestique.
 - Nouveau réglage **Niveau de journalisation**. Les journaux étaient figés sur « Info » et réécrits à chaque démarrage ; « Avertissement » est bien plus discret au quotidien.
 - L'API de résumé de salon (MSC3266) est désormais activée ; les clients mobiles actuels en dépendent.
+- Les **aperçus de liens** peuvent désormais être activés, le récupérateur étant empêché d'atteindre quoi que ce soit sur votre propre réseau.
+- Les notifications push fonctionnent maintenant pour les messages chiffrés, et vous choisissez si elles transportent le texte du message.
 - Synapse purge désormais ses caches avant de pouvoir dévorer la machine. Le plafond est déduit de la RAM de votre serveur et dimensionné pour ne pas gêner en usage normal.`,
   },
   migrations: {},

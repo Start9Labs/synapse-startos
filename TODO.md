@@ -11,14 +11,6 @@ whose phases 1 and 2 shipped together as `1.158.0:1`. Roughly in priority order.
 
 ## Polish
 
-- [ ] **URL previews** — `url_preview_enabled` **plus** `url_preview_ip_range_blacklist`.
-      Never ship the first without the second: on a StartOS box an open preview spider is
-      an SSRF gun pointed at every other service on the LAN. Use the playbook's list, which
-      is broader than the stock example.
-- [ ] **`experimental_features.msc4028_push_encrypted_events`** — mobile push for encrypted
-      messages.
-- [ ] **`msc2409` + `msc3202`** — required for encrypted appservices (hookshot-style bridges).
-- [ ] **`push.include_content`** — whether message bodies ride along in push notifications.
 - [ ] **Rate-limit presets.** `rc_message`, `rc_joins`, `rc_invites`, `rc_login`,
       `rc_registration`, `rc_federation`. Bots and bulk operations hit the stock limits
       immediately. Prefer a Normal / Relaxed preset over nine number fields.

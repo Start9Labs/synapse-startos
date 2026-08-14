@@ -58,6 +58,49 @@ const resourceShape = z
   })
   .catch(resourceDefault)
 
+// Flags with no user-facing choice, each forced on because getting it wrong has
+// a cost and getting it right has none: msc3266 is the room summary API that
+// Element X requires, msc4028 is what makes push notifications fire for
+// encrypted messages, and msc2409/msc3202 carry the to-device and one-time-key
+// data an encrypted bridge needs. A hand-set `false` is still honoured.
+const experimentalDefault = {
+  msc3266_enabled: true,
+  msc4028_push_encrypted_events: true,
+  msc2409_to_device_messages_enabled: true,
+  msc3202_transaction_extensions: true,
+}
+const experimentalShape = z
+  .object({
+    msc3266_enabled: z.boolean().catch(true),
+    msc4028_push_encrypted_events: z.boolean().catch(true),
+    msc2409_to_device_messages_enabled: z.boolean().catch(true),
+    msc3202_transaction_extensions: z.boolean().catch(true),
+  })
+  .catch(experimentalDefault)
+
+// The upstream playbook's list, which is broader than Synapse's own example.
+const urlPreviewIpRangeBlacklist = [
+  '127.0.0.0/8',
+  '10.0.0.0/8',
+  '172.16.0.0/12',
+  '192.168.0.0/16',
+  '100.64.0.0/10',
+  '192.0.0.0/24',
+  '169.254.0.0/16',
+  '192.88.99.0/24',
+  '198.18.0.0/15',
+  '192.0.2.0/24',
+  '198.51.100.0/24',
+  '203.0.113.0/24',
+  '224.0.0.0/4',
+  '::1/128',
+  'fe80::/10',
+  'fc00::/7',
+  '2001:db8::/32',
+  'ff00::/8',
+  'fec0::/10',
+]
+
 // Autotuning evicts on the whole Synapse process's allocated memory, not on
 // cache size, so this is an out-of-memory guard rather than a performance knob.
 // It has to clear ordinary use — a real ten-user homeserver holds ~815 MiB, and
@@ -148,12 +191,19 @@ const shape = z.object({
   // true: a token requirement satisfies the same check.
   enable_registration_without_verification: z.boolean().catch(false),
   registration_requires_token: z.boolean().catch(false),
-  // Room summary API. Element X cannot talk to a homeserver without it and the
-  // upstream playbook enables it by default, so it isn't worth a user choice —
-  // though a hand-set `false` is still honoured.
-  experimental_features: z
-    .object({ msc3266_enabled: z.boolean().catch(true) })
-    .catch({ msc3266_enabled: true }),
+  experimental_features: experimentalShape,
+  push: z.object({ include_content: z.boolean().catch(true) }).catch({
+    include_content: true,
+  }),
+  url_preview_enabled: z.boolean().catch(false),
+  // Present whether or not previews are on, because Synapse refuses to start
+  // with previews enabled and no blocklist — so the two can never get out of
+  // step. Wider than Synapse's own example: this is the upstream playbook's
+  // list, and 10.0.0.0/8 is what keeps the spider off StartOS's container
+  // bridge and off every other service on the LAN.
+  url_preview_ip_range_blacklist: z
+    .array(z.string())
+    .catch(urlPreviewIpRangeBlacklist),
   caches: z
     .object({ cache_autotuning: cacheAutotuningShape })
     .catch({ cache_autotuning: cacheAutotuningDefault }),
