@@ -4,13 +4,15 @@
 
 # Synapse on StartOS
 
-> **Upstream docs:** <https://element-hq.github.io/synapse/latest>
->
 > Everything not listed in this document should behave the same as upstream
 > Synapse. If a feature, setting, or behavior is not mentioned here, the
-> upstream documentation is accurate and fully applicable.
+> upstream documentation is accurate and fully applicable — see the
+> Documentation section of `instructions.md` for links.
 
-[Synapse](https://github.com/element-hq/synapse) is the battle-tested, reference implementation of the [Matrix](https://matrix.org/) protocol -- a next-generation, federated, full-featured, encrypted, independent messaging system.
+[Synapse](https://github.com/element-hq/synapse) is the reference Matrix homeserver. This package bundles its database and an admin dashboard, wires a TURN relay in when you install one, and can adopt an existing homeserver — identity, accounts and history — rather than only starting an empty one.
+
+- **Upstream repo:** <https://github.com/element-hq/synapse>
+- **Wrapper repo:** <https://github.com/Start9Labs/synapse-startos>
 
 ---
 
@@ -18,450 +20,203 @@
 
 - [Image and Container Runtime](#image-and-container-runtime)
 - [Volume and Data Layout](#volume-and-data-layout)
-- [Installation and First-Run Flow](#installation-and-first-run-flow)
-- [Configuration Management](#configuration-management)
-- [Network Access and Interfaces](#network-access-and-interfaces)
-- [Actions (StartOS UI)](#actions-startos-ui)
-- [Backups and Restore](#backups-and-restore)
-- [Health Checks](#health-checks)
+- [File Models](#file-models)
 - [Dependencies](#dependencies)
+- [Network Access and Interfaces](#network-access-and-interfaces)
+- [Installation and First-Run Flow](#installation-and-first-run-flow)
+- [Actions](#actions)
+- [Tasks](#tasks)
+- [Health Checks](#health-checks)
+- [Backups and Restore](#backups-and-restore)
 - [Limitations and Differences](#limitations-and-differences)
-- [What Is Unchanged from Upstream](#what-is-unchanged-from-upstream)
-- [Contributing](#contributing)
 - [Quick Reference for AI Consumers](#quick-reference-for-ai-consumers)
 
 ---
 
 ## Image and Container Runtime
 
-| Property         | Value                                                   |
-| ---------------- | ------------------------------------------------------- |
-| Synapse image    | `ghcr.io/element-hq/synapse` (upstream pre-built image) |
-| Nginx image      | `nginx` Alpine (upstream unmodified)                    |
-| PostgreSQL image | `postgres` Alpine (database sidecar)                    |
-| Architectures    | x86_64, aarch64                                         |
+Three upstream images, unmodified, plus one asset fetched at build time.
 
-Synapse runs behind an Nginx reverse proxy. Nginx handles client requests on port 80, proxies Matrix API traffic to Synapse on port 8008, and serves the [Ketesa](https://github.com/etkecc/ketesa) admin dashboard on port 8080.
+| Property      | Value                                                               |
+| ------------- | ------------------------------------------------------------------- |
+| Images        | `ghcr.io/element-hq/synapse`, `nginx` (alpine), `postgres` (alpine) |
+| Architectures | x86_64, aarch64                                                     |
 
----
+**The admin dashboard is not an image.** The Makefile downloads a pinned synapse-admin release and verifies it against a committed SHA-256 before packing it as an asset; nginx then serves those static files. A checksum mismatch fails the build rather than shipping an unverified dashboard.
+
+| Subcontainer         | Purpose                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `synapse-sub`        | The homeserver — the one to `attach` to                       |
+| `postgres-sub`       | The bundled database, bound to loopback                       |
+| `nginx`              | Serves both interfaces and proxies the Matrix API             |
+| `gen-config`         | Temporary; the install-time `synapse generate`                |
+| `pg-restore`         | Temporary; restores a staged import                           |
+| `coturn-secret-read` | Temporary; reads Coturn's shared secret through its own mount |
+
+Three oneshots bracket the daemons: `chown` hands `/data` to Synapse's uid, `restore-import` replays a staged database dump, and `apply-admin-password` applies a queued password once the homeserver answers.
+
+**nginx is what the outside world reaches, not Synapse.** Both nginx server blocks are generated into the container's root filesystem at every start — so they track the current upload limit and cannot drift — and they serve the two `.well-known/matrix` documents Matrix federation and client discovery depend on. Synapse's own port is never published.
 
 ## Volume and Data Layout
 
-| Volume | Mount Point           | Purpose                                                 |
-| ------ | --------------------- | ------------------------------------------------------- |
-| `main` | `/data`               | Synapse config, media, keys, appservices, StartOS state |
-| `db`   | `/var/lib/postgresql` | PostgreSQL data                                         |
+Two volumes.
 
-**Key files on the `main` volume:**
+| Volume | Mount Point                      | Purpose                                                                                                                      |
+| ------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `main` | `/data` (synapse)                | `homeserver.yaml`, the signing key, `media_store/`, appservice registrations, `store.json`, and the import staging directory |
+| `db`   | `/var/lib/postgresql` (postgres) | The PostgreSQL data directory                                                                                                |
 
-- `homeserver.yaml` -- primary Synapse configuration (managed by StartOS)
-- `homeserver.signing.key` -- server signing key (auto-generated by Synapse)
-- `homeserver.log.config` -- logging configuration
-- `media_store/` -- uploaded media files
-- `store.json` -- StartOS metadata (admin state, postgres password, SMTP selection, TURN opt-in, pending import)
-- `appservices/*.yaml` -- registered bridge/appservice configurations
-- `import/` -- staging area for a homeserver being migrated in (see [Import Existing Homeserver](#import-existing-homeserver)); excluded from backups
+**The signing key on the `main` volume is the server's identity.** Losing it means other homeservers no longer recognise this one as the same server, and there is no way to regenerate it — federation history, room membership, and every user's identity are all tied to it.
 
----
+`import/` on that volume is a staging area rather than live data — see [Import Existing Homeserver](#actions).
 
-## Installation and First-Run Flow
+## File Models
 
-| Step              | Upstream                                             | StartOS                                                                                                                          |
-| ----------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Generate config   | `python -m synapse.app.homeserver --generate-config` | Automatic via `setupOnInit`                                                                                                      |
-| Set server name   | Edit `homeserver.yaml`                               | "Set Server Address/URL" action (critical task)                                                                                  |
-| Create admin user | `register_new_matrix_user` CLI                       | "Set Admin Password" action (critical task) -- generates a password; the actual user is registered when the service first starts |
+Five models. Only two are ordinary configuration; the rest exist for specific jobs.
 
-**Key difference:** On first install, StartOS generates the initial Synapse config automatically. You must run the "Set Server Address/URL" action (created as a critical task) to choose your permanent domain before starting. Completing it surfaces "Set Admin Password" as a second critical task; running that generates and shows the credentials. Starting the service then registers the admin user with the chosen password.
+| File                     | Format | Modelled                | Written by                                    |
+| ------------------------ | ------ | ----------------------- | --------------------------------------------- |
+| `homeserver.yaml`        | YAML   | Yes — `FileHelper.yaml` | Install, every init, `main`, and most actions |
+| `homeserver.log.config`  | YAML   | Yes                     | Every init, and the Config action             |
+| `store.json`             | JSON   | Yes — `FileHelper.json` | Install, and several actions                  |
+| `appservices/<id>.yaml`  | YAML   | Yes, one per appservice | The appservice actions                        |
+| `import/homeserver.yaml` | YAML   | Read-only               | You, when staging an import                   |
 
-**Warning:** The server address/URL is permanent and cannot be changed after the first start.
+Within `homeserver.yaml`:
 
-**Migrating in instead:** "Import Existing Homeserver" replaces that whole sequence -- it adopts an existing server's identity and clears the `set-server-name` task itself, so "Set Admin Password" is never raised and the imported admin account keeps its own password. `server_name` is still permanent afterwards.
+**Enforced** — rewritten whenever the package writes: the whole database block (the bundled PostgreSQL on loopback), the listeners, the media store and pid paths, telemetry off, the key-server warning suppressed, and `log_config`.
 
----
+**`log_config` is enforced rather than defaulted, and the distinction matters.** `synapse generate` writes its own `<server_name>.log.config` and points at that, which is a perfectly valid string — so a `.catch()` default would never fire, the package's log config would never be read, and the Config action's log level would be writing a file Synapse ignores.
 
-## Configuration Management
+**Generated once** — the signing key path, form secret, macaroon secret, and registration shared secret, all written by `synapse generate` at install or carried over by an import.
 
-| Setting                                 | Upstream Method             | StartOS Method                                                      |
-| --------------------------------------- | --------------------------- | ------------------------------------------------------------------- |
-| `server_name`                           | `homeserver.yaml`           | "Set Server Address/URL" action (one-time)                          |
-| Registration                            | `homeserver.yaml`           | "Registration" action, three-state                                  |
-| `admin_contact`                         | `homeserver.yaml`           | "Config" action                                                     |
-| Federation                              | `homeserver.yaml` listeners | "Config" action (enable/disable + domain whitelist)                 |
-| `limit_remote_rooms`                    | `homeserver.yaml`           | "Config" action (off, or a complexity ceiling)                      |
-| `url_preview_enabled`                   | `homeserver.yaml`           | "Config" action; the IP blocklist is always written                 |
-| `push.include_content`                  | `homeserver.yaml`           | "Config" action                                                     |
-| `root.level`                            | `homeserver.log.config`     | "Config" action (DEBUG/INFO/WARNING/ERROR)                          |
-| `presence.enabled`                      | `homeserver.yaml`           | "Config" action (default on, matching upstream)                     |
-| `max_upload_size`                       | `homeserver.yaml`           | "Config" action (1-2000 MB)                                         |
-| `media_retention.remote_media_lifetime` | `homeserver.yaml`           | "Config" action, in days (default absent = keep forever)            |
-| `turn_uris` / `turn_shared_secret`      | `homeserver.yaml`           | "Config" action opt-in; rendered by `main` from the coturn endpoint |
-| SMTP/email                              | `homeserver.yaml`           | "Configure SMTP" action (disabled/system/custom)                    |
-| Admin password                          | `register_new_matrix_user`  | "Set Admin Password" action                                         |
-| Appservices                             | Manual YAML files           | Register/List/Delete Appservice actions                             |
+**Derived** — `turn_uris` and `turn_shared_secret`, rendered by `main` from the Coturn dependency. Absent when Coturn has no public domain yet, which Synapse reads as "advertise no relay" rather than as an error.
 
-**Configuration NOT exposed on StartOS:**
+**Sized to the machine** — `caches.cache_autotuning`, defaulted to a quarter of system RAM and clamped between 1 and 2 GiB. Synapse evicts on whole-process allocated memory rather than cache size, so the threshold has to clear real usage; the clamp keeps it from being unreachable on a large machine, where an uncapped fraction would mean the guard never fires at all.
 
-- `homeserver.log.config` beyond the level -- handlers and formatters are fixed
-- `database` -- always PostgreSQL via sidecar container
-- `trusted_key_servers` -- defaults to `matrix.org`
-- `report_stats` -- always disabled
-- Listener bind addresses and ports
-- `caches.cache_autotuning` -- derived from box RAM, see below
-- `url_preview_ip_range_blacklist` -- always written, see below
-- `experimental_features.msc4028_push_encrypted_events` -- forced on; without it push notifications never fire for encrypted messages
-- `experimental_features.msc2409_to_device_messages_enabled` / `msc3202_transaction_extensions` -- forced on; they carry the to-device and one-time-key data an encrypted bridge needs, and are inert with no appservice registered
-- `experimental_features.msc3266_enabled` -- forced on. It was the last server-side gap for Element X; sliding sync (`msc3575_enabled`, MSC4186) has defaulted to on upstream since it replaced the sliding-sync proxy, so with MSC3266 the package supports Element X out of the box. The playbook enables it by default too, so it isn't worth a user choice. A hand-set `false` is still honoured.
-
-### The URL preview blocklist is not optional
-
-`url_preview_ip_range_blacklist` is written into `homeserver.yaml` unconditionally -- whether or not previews are enabled -- so the two can never get out of step. That is not belt-and-braces: Synapse's own `read_config` raises `ConfigError` if `url_preview_enabled` is true and the blocklist is absent, so the alternative is a service that refuses to start the moment a user turns previews on.
-
-The list is the upstream playbook's, which is broader than Synapse's own example. It matters more here than on a dedicated host: a preview fetcher is a server-side HTTP client that follows URLs users supply, so on a StartOS box an unrestricted one is an SSRF tool pointed at every other service on the machine and the LAN. `10.0.0.0/8` is the entry that covers StartOS's own container bridge; `127.0.0.0/8`, `169.254.0.0/16` and the IPv6 loopback/link-local ranges cover the rest of the obvious targets. Synapse additionally blocks `0.0.0.0` and `::` on its own.
-
-Enabling previews also requires the `url-preview` extra (lxml) in the image; it is present in the upstream image the package pins, verified via `check_requirements("url-preview")`.
-
-### Cache autotuning (derived, not configured)
-
-`caches.cache_autotuning` is filled from a `.catch()` default computed once from the box's RAM, so it lands on the next `merge()` and a hand-edited value is preserved rather than overwritten.
-
-It is **an out-of-memory guard, not a performance knob**, and that drives the sizing. Synapse's autotuner evicts on `jemalloc.get_stat("allocated")` -- the whole Synapse process's memory, not the size of its caches -- so the threshold has to clear ordinary usage or it evicts continuously and never settles below target. Measured against the real `matrix.start9labs.com` workload (ten users, ~100 rooms, 7.75 GiB box), Synapse holds **~815 MiB** steady, while the upstream playbook's `memtotal/16` target for that box is **496 MiB** -- below the floor it would have to reach. The playbook's divisors are therefore not portable here; its ceilings are.
-
-```
-max_cache_memory_usage    = clamp(totalmem / 4, 1 GiB, 2 GiB)
-target_cache_memory_usage = max_cache_memory_usage / 2
-min_cache_ttl             = 5m
-```
-
-| Box RAM  | max      | target   | vs. a ten-user workload |
-| -------- | -------- | -------- | ----------------------- |
-| 2--4 GiB | 1024 MiB | 512 MiB  | below it -- evicts      |
-| 8 GiB    | 2048 MiB | 1024 MiB | 1.26x -- settles        |
-| 16 GiB+  | 2048 MiB | 1024 MiB | 1.26x -- settles        |
-
-Both bounds are load-bearing. Without the **floor**, a small box gets a threshold under Synapse's own baseline and thrashes. Without the **ceiling**, a large box gets a threshold Synapse would never reach -- on a 32 GiB box a plain `memtotal/4` is 8 GiB, roughly ten times a ten-user server's steady state, so the guard would be inert exactly where it is cheapest to have.
-
-The 2--4 GiB row is the guard working, not failing: a ten-user homeserver alongside other services genuinely does not fit in that box, and evicting is the correct response to it. A smaller install on the same hardware sits well below 815 MiB and never triggers. Anything whose workload falls outside these assumptions can set its own values by hand, and because these are `.catch()` defaults rather than a `main` rewrite, they stick.
-
-Two mechanics worth knowing. The autotuner is a no-op without jemalloc, which the upstream image's `/start.py` supplies by setting `LD_PRELOAD` before it `execve`s -- verified present in the shipped image, so this works. And the box's RAM comes from Node's `os.totalmem()`, because the SDK exposes no effect for it; that reports host RAM rather than a cgroup limit, which is the number the formula wants.
-
-### Hand-editing `homeserver.yaml`
-
-Anything Synapse understands but this package does not expose can be set by hand. `FileHelper.yaml` validates through `deepLooseParse`, so **keys outside the package's schema survive every `merge()` the package performs** -- they are not stripped on the next start or the next action. Edit the file inside the container:
-
-```
-start-cli package attach synapse -n synapse-sub -- vi /data/homeserver.yaml
-```
-
-`main` holds a `.const()` watch on the file, so the service restarts itself to pick the change up. Two caveats: comments are lost when the file is re-serialized, and this does **not** apply to `homeserver.log.config`, whose file model is a `z.any().transform(() => staticConfig)` and is therefore rewritten wholesale on every init.
-
----
-
-## Network Access and Interfaces
-
-| Interface       | Internal Port | External Port | Type | Purpose                          |
-| --------------- | ------------- | ------------- | ---- | -------------------------------- |
-| Homeserver      | 80 (nginx)    | 443           | API  | Matrix client and federation API |
-| Admin Dashboard | 8080 (nginx)  | 443           | UI   | Synapse Admin web interface      |
-
-Internally, Synapse listens on port 8008. Nginx proxies traffic from port 80, handles `.well-known/matrix/server` responses, and enforces `max_upload_size` on Matrix API routes.
-
-**Federation is served on 443 only, by delegation.** Nginx answers `/.well-known/matrix/server` with `{"m.server": "<server_name>:443"}` unconditionally -- there is no setting for it and no way to turn it off. A remote server resolves `server_name` by fetching that first, then an SRV record, and only falling back to `<server_name>:8448` if both are absent. Since the well-known always answers, no peer reaches step three.
-
-**Port 8448 is deliberately not bound.** It would only ever serve peers holding a cached "this server has no well-known" result, which Synapse expires after `WELL_KNOWN_INVALID_CACHE_PERIOD` (1 hour). That is a bounded, self-healing window, and it only arises when migrating in a homeserver that served no well-known of its own -- which [Import Existing Homeserver](#import-existing-homeserver) handles by having the operator publish one on the source server before the cutover. Binding 8448 instead would put a second interface in front of every user, requiring a router forward most of them do not want, to cover a case the migration procedure already closes. 443 is also reachable on restrictive networks where 8448 is blocked.
-
----
-
-## Actions (StartOS UI)
-
-Actions are grouped in the UI by the `group` field on their metadata, and the source mirrors that: one directory per group under `startos/actions/`.
-
-| Group            | Directory              | Actions                                                            |
-| ---------------- | ---------------------- | ------------------------------------------------------------------ |
-| **Setup**        | `actions/setup/`       | Set Server Address/URL, Import Existing Homeserver                 |
-| **Accounts**     | `actions/accounts/`    | Set Admin Password, Get Access Token                               |
-| **Settings**     | `actions/settings/`    | Config, Registration, Rate Limits, Discoverability, Configure SMTP |
-| **App Services** | `actions/appServices/` | Register / List / Delete Appservice                                |
-
-Setup holds the two one-time, `only-stopped` actions that establish the server's identity; everything in Settings edits a running server.
-
-### Set Server Address/URL
-
-| Property     | Value                                            |
-| ------------ | ------------------------------------------------ |
-| ID           | `set-server-name`                                |
-| Visibility   | Hidden; reached only through its critical task   |
-| Availability | Only when stopped                                |
-| Purpose      | Choose permanent server domain (clearnet or Tor) |
-
-Presents available hostnames from the homeserver interface. Sets `server_name` and `public_baseurl` in `homeserver.yaml`. **Cannot be changed after first start.**
-
-### Import Existing Homeserver
-
-| Property     | Value                                                                                              |
-| ------------ | -------------------------------------------------------------------------------------------------- |
-| ID           | `import-homeserver`                                                                                |
-| Visibility   | Enabled while `server_name` is unset or `placeholder.com`; disabled with an explanation afterwards |
-| Availability | Only when stopped                                                                                  |
-| Purpose      | Adopt an existing homeserver's identity, database and media                                        |
-
-Migration splits in two because a media store is far too large for an action form. **Out of band**, the operator stages four things on the `main` volume:
-
-| Path                     | Contents                                                      |
-| ------------------------ | ------------------------------------------------------------- |
-| `import/homeserver.yaml` | The old server's config                                       |
-| `import/synapse.dump`    | `pg_dump -Fc` of the old database                             |
-| `import/signing.key`     | The old `<server_name>.signing.key`                           |
-| `media_store/`           | Rsynced straight to its final home, never staged in `import/` |
-
-**A step that is not a file:** the source server must publish `/.well-known/matrix/server` days before the cutover, and the instructions call for it. `serve_server_wellknown: true` emits `{"m.server": "<server_name>:443"}` — the same `m.server` value this package's nginx serves, which is the part peers cache — so they learn the correct answer while DNS still points at the old box and keep holding it across the move. Synapse caches a successful lookup for 24h (±10% jitter) and a failed one for an hour, so a source server that never published one leaves its peers resolving to `:8448` -- which this package does not serve. That is the only reason the step exists, and it is what makes binding 8448 unnecessary.
-
-**In the action**, `importedHomeserver.yml.ts` reads the staged config through a deliberately narrow schema -- `server_name`, `macaroon_secret_key`, `form_secret`, `old_signing_keys`, and nothing else. It carries no `.catch()` defaults, unlike every other file model here: a missing `macaroon_secret_key` would silently invalidate every access token on the imported server, so an incomplete identity must fail the read rather than heal into a fresh one. Everything StartOS manages -- `database`, `listeners`, `log_config`, `media_store_path`, `pid_file` -- stays at package defaults and is never read from the imported file.
-
-The action then refuses to proceed unless `server_name` is already a domain on the Homeserver interface (every imported user ID ends in it), copies the signing key to `/data/<server_name>.signing.key`, merges the identity keys into `homeserver.yaml`, sets `pendingImport` in `store.json`, and clears the `synapse:set-server-name` task -- whose critical severity would otherwise block the service from starting.
-
-**The database restore is deferred to the next start**, as a `restore-import` oneshot ordered after `chown` and `postgres` and before the `synapse` daemon. `pg_restore` needs a running PostgreSQL, and an `only-stopped` action has none; standing one up inside the action would mean duplicating the daemon's `POSTGRES_INITDB_ARGS` and re-implementing cluster initialization. Deferring instead reuses the real daemon, and the ordering guarantees Synapse never creates its own schema first. The restore runs `--no-owner --no-acl --single-transaction` in a throwaway postgres container as `root`; `--single-transaction` is what makes a failed restore retryable rather than leaving a half-populated database. `pendingImport` is cleared only on success.
-
-Restoring an older PostgreSQL's dump into the sidecar is the supported direction. The package creates its database with `--locale=C`, which is what Synapse wants; a dump taken from a `en_US.UTF-8` database restores into it correctly -- that is the recommended fix for the wrong collation, not a problem.
-
-### Set Admin Password
-
-| Property     | Value                                   |
-| ------------ | --------------------------------------- |
-| ID           | `set-admin-password`                    |
-| Visibility   | Enabled                                 |
-| Availability | Any status                              |
-| Purpose      | Set or reset the admin account password |
-
-Generates a random 22-character password, stores it in `store.json` as `pendingAdminPassword`, displays it, and calls `sdk.restart`. Applying the password needs both the Synapse image (for `hash_password`) and a running PostgreSQL, so the work happens at startup, not in the action: an `apply-admin-password` oneshot in the daemon chain consumes the pending password on the next start — if no users exist in PostgreSQL it runs `register_new_matrix_user` to create the admin; otherwise it hashes the password with `hash_password` and `UPDATE`s the first-registered user's `password_hash`. The pending field is cleared on success.
-
-The restart is what makes the new password take effect immediately. `pendingAdminPassword` is read in `main` with `.once()`, not `.const()`, because the oneshot clears it — a watch on that field would restart main on its own write. On a stopped service `sdk.restart` is a no-op and the password is applied at the next start, which is why the action allows any status.
-
-### Config
-
-| Property     | Value                                            |
-| ------------ | ------------------------------------------------ |
-| ID           | `config`                                         |
-| Visibility   | Enabled                                          |
-| Availability | Any status                                       |
-| Purpose      | Registration, federation, calls, limits, logging |
-
-**Settings:**
-
-| Setting                       | Default      | Description                                                         |
-| ----------------------------- | ------------ | ------------------------------------------------------------------- |
-| Federation                    | Disabled     | Enable/disable with optional domain whitelist                       |
-| Voice and Video Calls         | Off          | Opt in to TURN relay via the `coturn` package                       |
-| Presence                      | On           | `presence.enabled`; upstream default, exposed as a performance knob |
-| Max Upload Size               | 50 MB        | File upload limit (1-2000 MB)                                       |
-| Large Room Protection         | Join any     | `limit_remote_rooms`; off, or a complexity ceiling                  |
-| Link Previews                 | Off          | `url_preview_enabled`; upstream default, playbook differs           |
-| Message Text in Notifications | On           | `push.include_content`                                              |
-| Admin Contact                 | unset        | `admin_contact`, shown on resource-limit errors                     |
-| Log Level                     | INFO         | `root.level` in `homeserver.log.config`                             |
-| Remote Media Retention        | Keep forever | `media_retention.remote_media_lifetime`, in days                    |
-
-Most of these write `homeserver.yaml` directly, which `main` holds a `.const()` watch on, so the service restarts itself to pick them up. Two don't:
-
-- **Voice and Video Calls** writes `store.json.turn`, which `main` also watches. The `turn_*` keys themselves are rendered by `main` from the resolved coturn endpoint, before it const-reads `homeserver.yaml`, so the write is not a write-after-const.
-- **Log Level** writes `homeserver.log.config`. Synapse reads that file once at startup, so `main` const-reads `root.level` purely to force the restart that makes a change take effect.
-
-> **`log_config` is an enforced literal, and that is load-bearing.** `synapse generate` writes its own `<server_name>.log.config` on install and points `log_config` at it. That is a perfectly valid string, so a `.catch()` default never fires — which meant the package wrote `homeserver.log.config` and Synapse read a different file entirely. The log level was inert, and the rotating file handler the package declared had never once run. `log_config` is now `z.literal('/data/homeserver.log.config')`, so `merge()` corrects it on every init, including on existing installs. Verified on a real box: before the fix `log_config` read `/data/placeholder.com.log.config`; after it reads the package's, and switching the level to `WARNING` visibly silences Synapse's INFO output.
-
-#### Large Room Protection
-
-`limit_remote_rooms.complexity` is `current_state_events / 500`, evaluated the first time anyone on this server joins a given room. The form defaults to Synapse's own `1.0`, which is strict enough to refuse many ordinary rooms; that is deliberately not second-guessed here, since the workable ceiling depends on the box. `admins_can_join` is forced **on** whenever the limit is enabled -- without it an over-limit room is unjoinable by anyone on the server, whereas with it an admin can join first, after which the room is known locally and everyone else can follow.
-
-"Remote Media Retention" is written as `<n>d` and read back through a converter that understands `d`, `w` and `y`. A hand-written value in any other unit reads back as empty, and re-saving the form would clear it; use the [hand-edit escape hatch](#hand-editing-homeserveryaml) for sub-day precision.
-
-### Registration
-
-| Property     | Value                                                            |
-| ------------ | ---------------------------------------------------------------- |
-| ID           | `registration`                                                   |
-| Visibility   | Enabled                                                          |
-| Availability | Any status                                                       |
-| Purpose      | Who may sign up, where they land, and whether guests may look in |
-
-Its own action rather than a field on Config, because the mode drags two related settings along with it: which rooms a new account is put into, and whether people without an account may look around at all.
-
-#### The mode is three-state
-
-| Value           | `enable_registration` | `registration_requires_token` | `enable_registration_without_verification` |
-| --------------- | --------------------- | ----------------------------- | ------------------------------------------ |
-| **Disabled**    | `false`               | `false`                       | `false`                                    |
-| **Invite Only** | `true`                | `true`                        | `false`                                    |
-| **Open**        | `true`                | `false`                       | `true`                                     |
-
-The third column is load-bearing rather than incidental. Synapse's `validate_config` **refuses to start** when `enable_registration` is on and none of captcha, 3PID, or `registration_requires_token` is set, unless `enable_registration_without_verification` overrides that check. A token requirement satisfies it, which is why only **Open** needs the override -- and why this package no longer pins the key permanently `true` as it used to. Leaving it true under Invite Only would silently disarm the guard, so a later hand-edit clearing `registration_requires_token` would open the server to the world instead of refusing to boot.
-
-**Invite Only needs no custom code.** `m.login.registration_token` is a stable Matrix UIA stage, so users sign up through the ordinary client flow and enter the token as the final step, and the bundled Ketesa dashboard already ships the management UI for them -- mint, `uses_allowed`, `expiry_time`, revoke -- under **Registration Tokens**.
-
-**Auto-join rooms are pattern-checked before they are written.** Synapse validates each entry with `RoomAlias.is_valid` and **refuses to start** on a malformed one, so a typo in this field would otherwise take the server down rather than be ignored. `autocreate_auto_join_rooms` is left at its upstream `true`, which means a room named here that does not exist yet is created by the first person to sign up.
-
-**Guest access** is `allow_guest_access`, upstream default `false`. Guests get a passwordless temporary account they cannot recover and the admin cannot easily moderate.
-
-### Rate Limits
-
-| Property     | Value                                             |
-| ------------ | ------------------------------------------------- |
-| ID           | `rate-limits`                                     |
-| Visibility   | Enabled                                           |
-| Availability | Any status                                        |
-| Purpose      | How fast users may send, join, invite and sign in |
-
-A preset union -- **Normal / Relaxed / Custom** -- rather than ten pairs of numbers on the Config form. Custom expands to every knob individually, pre-filled with Synapse's own values, so the simple choice and the full one live in the same place.
-
-**Normal writes nothing.** It clears `rc_message`, `rc_registration`, `rc_joins`, `rc_invites` and `rc_login` from `homeserver.yaml`, so Synapse's own defaults apply. Absence is the representation, which is why those keys are `.optional()` in the file model rather than carrying `.catch()` defaults like everything else here.
-
-| Preset      | Basis                                                                                                                                                                            |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Normal**  | Upstream. Keys removed.                                                                                                                                                          |
-| **Relaxed** | The values Start9 runs on `start9.me`: `rc_message` 5/s burst 30, `rc_joins` local and remote 5/s burst 20. Nothing else is touched -- those are the two that were actually hit. |
-| **Custom**  | Whatever you set.                                                                                                                                                                |
-
-Every preset traces to something real: Normal is upstream, Relaxed is a running production server. There is deliberately no "strict" preset -- tightening these below upstream has no reference to point at, and inventing one would be presenting a guess as advice. Custom covers anyone who wants that. The prefill reports Custom whenever any of those keys is present, even if the values happen to match a preset, because matching values are not evidence the user picked that preset.
-
-### Discoverability
-
-| Property     | Value                                                         |
-| ------------ | ------------------------------------------------------------- |
-| ID           | `discoverability`                                             |
-| Visibility   | Enabled                                                       |
-| Availability | Any status                                                    |
-| Purpose      | What a stranger can learn about the server without an account |
-
-**Private / Normal / Public / Custom**, over seven `homeserver.yaml` keys (ten settings, since `user_directory` holds four).
-
-Unlike the rate-limit presets, these need no external reference. Every setting here is a boolean with an unambiguous privacy direction, so Private and Public are simply "all of them one way" -- there is no magnitude to guess at, which is exactly why a numeric `strict` rate-limit preset was dropped and these two were not.
-
-| Preset      | Writes                                                                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Private** | Room list unsearchable and unpublished, directory local-only, profiles behind auth and limited to shared rooms, no profile data on invites |
-| **Normal**  | Nothing -- the keys are cleared and Synapse's defaults apply                                                                               |
-| **Public**  | Room list published over federation and readable without an account, all local users searchable                                            |
-| **Custom**  | Each of the ten individually                                                                                                               |
-
-Private and Public both write **all seven keys**, so the prefill can match on exact equality and report the preset back. That is safe here in a way it is not for rate limits: those presets are sparse -- Relaxed touches three keys and leaves the rest absent -- so presence carries the signal and matching values prove nothing.
-
-`restrict_public_rooms_to_local_users` is deliberately never written. It is the obsolete spelling of the first two settings, and Synapse raises `ConfigError` if it appears alongside either of them.
-
-### Configure SMTP
-
-| Property     | Value                                        |
-| ------------ | -------------------------------------------- |
-| ID           | `manage-smtp`                                |
-| Visibility   | Enabled                                      |
-| Availability | Any status                                   |
-| Purpose      | Email notifications (disabled/system/custom) |
-
-The standard three-mode SMTP flow (see the packaging guide's [Set Up SMTP / Email](https://docs.start9.com/packaging/recipe-smtp.html) recipe). The action only writes the selection to `store.json`; `main` watches that field with `.const()` and renders the credentials into `homeserver.yaml`'s `email` block, so changing SMTP restarts the service. When the selection is **system**, `main` also watches `sdk.getSystemSmtp` with `.const()`, so a later change to StartOS's own SMTP settings restarts Synapse with the new credentials.
-
-Selecting **Disabled** writes `email: null`, which Synapse reads as an absent key (`EmailConfig.read_config`). `main` renders the `email` block _before_ it const-reads `homeserver.yaml`, so the write is not a write-after-const.
-
-**System SMTP is snapshotted at action time.** If StartOS's own SMTP settings change later, re-run this action to pick them up. (Several packages instead resolve `getSystemSmtp` in `main` with a `.const()` watch, which follows host changes live — that isn't available here without reintroducing the write-after-const problem above.)
-
-### Register Appservice
-
-| Property     | Value                                        |
-| ------------ | -------------------------------------------- |
-| ID           | `register-appservice`                        |
-| Visibility   | Enabled                                      |
-| Availability | Any status                                   |
-| Purpose      | Register a Matrix bridge with the homeserver |
-
-Accepts appservice credentials (ID, tokens, URL, namespace regex) and writes the registration YAML. Typically triggered automatically by bridge services via the exported `ensureAppserviceRegistration` API.
-
-### List Appservices
-
-| Property     | Value                       |
-| ------------ | --------------------------- |
-| ID           | `list-appservices`          |
-| Visibility   | Enabled                     |
-| Availability | Any status                  |
-| Purpose      | View all registered bridges |
-
-### Delete Appservice
-
-| Property     | Value                      |
-| ------------ | -------------------------- |
-| ID           | `delete-appservice`        |
-| Visibility   | Enabled                    |
-| Availability | Any status                 |
-| Purpose      | Remove a registered bridge |
-
----
-
-## Backups and Restore
-
-**Included in backup:**
-
-- `main` volume -- Synapse config, media, keys, appservice registrations, StartOS state
-- `db` volume -- PostgreSQL database (backed up via `pg_dump`, restored via `pg_restore`)
-
-**Excluded:** `/import` on the `main` volume. It is input to the import action, not homeserver data, and its `pg_dump` is the size of the whole database -- leaving it in would inflate every backup until the operator cleared the directory out.
-
-`media_store/` **is** included, and on an active homeserver it is usually the largest thing in the backup. "Remote Media Retention" in the Config action is the control for that.
-
-**Restore behavior:**
-
-- All data, users, rooms, and settings are restored
-- Server name, keys, and admin credentials remain the same
-
----
-
-## Health Checks
-
-| Check           | Method                                  | Grace Period | Display           |
-| --------------- | --------------------------------------- | ------------ | ----------------- |
-| Database        | `pg_isready`                            | Default      | "Database"        |
-| Homeserver      | HTTP GET `http://localhost:8008/health` | 15 seconds   | "Homeserver"      |
-| Nginx           | Port listening on 80                    | Default      | Hidden            |
-| Admin Dashboard | HTTP GET `http://localhost:8080`        | Default      | "Admin Dashboard" |
-
----
+**Yours** — everything the five Settings actions expose, plus anything you add by hand that the schema does not declare.
 
 ## Dependencies
 
-| Package  | Kind      | Optional | Purpose                                   |
-| -------- | --------- | -------- | ----------------------------------------- |
-| `coturn` | `running` | Yes      | TURN/STUN relay for voice and video calls |
+One, optional, and only while you have switched TURN on.
 
-Declared `optional: true` in the manifest and returned from `setupDependencies` **only while `store.json.turn` is set** -- a user who never asked for call relay should not see an unmet dependency. No `healthChecks` are listed: coturn's own `TURN Server` check fails until the user attaches a public domain to it, and inheriting that would leave a permanent unmet-dependency warning on Synapse even though Synapse serves fine without a relay.
+| Dependency | Kind      | Health checks |
+| ---------- | --------- | ------------- |
+| `coturn`   | `running` | **none**      |
 
-`main` resolves the endpoint from coturn's `turn` interface (plain `turn:` is the `ssl: false` address, `turns:` the `ssl: true` one, both on the same domain) and reads the shared secret by mounting coturn's `main` volume read-only **at subpath `shared`** into a throwaway container. If either step yields nothing -- coturn absent, stopped, or domainless -- the `turn_*` keys are left out and Synapse advertises no relay. `jitsi-startos` implements the same contract and is the reference for it.
+**No health check is declared, deliberately.** Coturn's own `TURN Server` check fails until you attach a public domain to it, and naming it here would leave Synapse showing a permanently unmet dependency even though Synapse serves fine without relay. Coturn's own check already says what is missing.
 
----
+The shared secret is read through a throwaway container that mounts only Coturn's `shared` subpath read-only — so a missing or broken Coturn can never take Synapse's own daemons down, and the rest of Coturn's volume stays out of view.
+
+## Network Access and Interfaces
+
+Two interfaces, on separate hosts so they can carry separate domains.
+
+| Interface       | Id           | Type | Port | Description                     |
+| --------------- | ------------ | ---- | ---- | ------------------------------- |
+| Homeserver      | `homeserver` | api  | 80   | Your Matrix homeserver instance |
+| Admin Dashboard | `admin`      | ui   | 8080 | The synapse-admin web dashboard |
+
+Neither is masked.
+
+**The homeserver interface is the one that matters for federation**, and the domain you attach to it has to match the server name you chose — that pairing is what other homeservers verify. The `.well-known/matrix/server` and `.well-known/matrix/client` documents are served from it automatically.
+
+**Port 8448 is deliberately not bound.** Federation rides 443 through the always-on `.well-known/matrix/server` delegation nginx serves, so the dedicated federation port would only ever catch peers holding a cached "no delegation" result — a one-hour window that arises only when importing a homeserver whose old host published none. Adding it back would mean a third interface and a router forward for every user, to cover a case the import procedure already closes.
+
+## Installation and First-Run Flow
+
+Install generates a Synapse configuration under a **placeholder server name** and raises a `critical` task to replace it. That placeholder is also the marker for "this homeserver has never been claimed", which is what the import action checks.
+
+Two mutually exclusive paths from there, and **both are only available before the first start**:
+
+1. **Set Server Address/URL** — claim a fresh homeserver under the domain you will run it on.
+2. **Import Existing Homeserver** — adopt a homeserver you run elsewhere, keeping its users, logins and history.
+
+**The server name is permanent.** Matrix identity is `@user:server-name`, so changing it later orphans every account and every federated room; that is why both actions are `only-stopped` and why import disables itself with an explanation once a real name is set.
+
+## Actions
+
+Twelve actions in four groups.
+
+### Setup — Set Server Address/URL, Import Existing Homeserver
+
+Both run only while the service is stopped, and both are effectively one-time.
+
+- **Set Server Address/URL** is hidden — the install task is what surfaces it. It writes the server name and public base URL.
+- **Import Existing Homeserver** adopts a staged homeserver: its configuration, signing key, database and media. **It cannot be undone**, and it replaces the empty homeserver created at install.
+  - **Staging happens on the volume, by you**, before running it — the action reads what it finds under `import/`.
+  - **The media store is rsynced to its final home rather than staged twice**, because it is far too large to copy through a staging directory.
+  - **The database is not restored by the action.** `pg_restore` needs the PostgreSQL daemon, which an action cannot run — so the action queues the work and the `restore-import` oneshot does it on the next start, inside a single transaction so a failure rolls back cleanly and the next start retries.
+  - The action **disables itself** once the homeserver has a real server name, saying why.
+
+### Accounts — Set Admin Password, Get Access Token
+
+- **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers.
+- **Get Access Token** returns a token for an account, and needs the service running.
+
+### Settings — Config, Registration, Rate Limits, Discoverability, Configure SMTP
+
+Five forms over `homeserver.yaml`, all available whether or not the service is running, all applied by the restart they trigger.
+
+- **Registration** governs whether new accounts can be created, and exposes the admin contact.
+- **Rate Limits** tunes Synapse's throttles.
+- **Discoverability** controls how visible the server and its rooms are to the wider network.
+- **Configure SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours.
+
+### App Services — Register Appservice, List Appservices, Delete Appservice
+
+Appservices are how bridges and bots attach to a homeserver. Each is a registration file on the `main` volume with a pair of tokens.
+
+- **Deleting one revokes that bridge's access**; the bridge stops working until it is registered again.
+- **These are also driven by other packages.** A dependent calls this package's exported helper, which mounts Synapse's volume read-only, compares the tokens, and raises a `critical` Register Appservice task here when they do not match. So a Register Appservice task you did not create yourself is a bridge asking to be connected.
+
+## Tasks
+
+Two tasks, and only one of them originates here.
+
+| Task                   | Severity   | Raised when                                               | Cleared when    |
+| ---------------------- | ---------- | --------------------------------------------------------- | --------------- |
+| Set Server Address/URL | `critical` | At install                                                | The action runs |
+| Register Appservice    | `critical` | A dependent package's tokens don't match its registration | The action runs |
+
+The first is `critical` because a homeserver on the placeholder name federates with nobody. The second is raised by another package rather than by this one, and re-raises whenever that package's tokens stop matching.
+
+## Health Checks
+
+Four checks, and the chain is strict — each daemon waits on the one before it.
+
+| Check             | Displayed         | Method                           |
+| ----------------- | ----------------- | -------------------------------- |
+| `postgres`        | "Database"        | `pg_isready`                     |
+| `synapse`         | "Homeserver"      | The homeserver's internal port   |
+| `nginx`           | Hidden            | The proxy is listening           |
+| `admin-interface` | "Admin Dashboard" | An HTTP request to the dashboard |
+
+A service stuck starting is waiting further down the chain than the check you are reading — nginx waits on Synapse and on the queued-password oneshot, and Synapse waits on the database and on any pending import.
+
+A homeserver that is green but not federating is almost always the server name and the attached domain disagreeing, or the `.well-known` documents not being reachable at the domain other servers look them up on. Neither shows up as a failed check here.
+
+## Backups and Restore
+
+Mixed, with one deliberate exclusion.
+
+- **`db` is dumped, not copied** — a logical `pg_dump`, authenticating with the password out of `homeserver.yaml`.
+- **`main` is copied wholesale except `import/`** — so the signing key, `homeserver.yaml`, the media store, appservice registrations and `store.json` all come back.
+- **`import/` is excluded on purpose.** A staged migration is input to the import action, not homeserver data, and its dump is the size of the whole database — leaving it in would grow every backup until you cleared the directory out by hand.
+
+**This backup contains the signing key**, which is the server's identity — treat it accordingly. Restore is complete: users, rooms, history and media all return, and clients keep working because the identity is unchanged.
 
 ## Limitations and Differences
 
-1. **Server name is permanent** -- once set and started, the server address/URL cannot be changed
-2. **Admin username fixed** -- always `admin`; only password can be changed. On an imported homeserver, "Set Admin Password" rewrites the **first-registered** user's password, which is not necessarily the account the operator thinks of as the admin
-3. **No workers** -- runs as a single monolith process (no worker-based scaling)
-4. **Logging is fixed apart from the level** -- handlers and formatters are rebuilt on every init, so unlike `homeserver.yaml` a hand-edit to `homeserver.log.config` does not survive. Only `root.level` is carried back through, which is what makes the Config action's choice stick. Synapse logs to the console only; StartOS captures that stream, so `start-cli package logs synapse` is where the logs are
-5. **`homeserver.yaml` is managed, not owned** -- configuration is normally done through StartOS actions, but keys outside the package's schema do survive a hand-edit; see [Hand-editing `homeserver.yaml`](#hand-editing-homeserveryaml)
-6. **Tor federation limitations** -- `.onion` servers can only federate with other `.onion` servers
-7. **Import is pre-first-start only** -- there is no path to merge an external homeserver into a running one
-
----
-
-## What Is Unchanged from Upstream
-
-- Full Matrix protocol compliance (client-server and server-server APIs)
-- End-to-end encryption support
-- Federation (when enabled)
-- Room creation, membership, and permissions
-- Media uploads and downloads
-- Push notifications
-- Account data and device management
-- Presence and typing indicators
-- All Matrix client compatibility (Element, FluffyChat, etc.)
-
----
-
-## Contributing
-
-Build and development workflow follow the StartOS packaging guide: <https://docs.start9.com/packaging>. Keep `README.md`, `instructions.md`, and `AGENTS.md` in sync with any change to user-visible behavior or package structure.
+1. **The server name is permanent.** Both setup actions are stopped-only, and import refuses once a real name is set.
+2. **Importing cannot be undone** and replaces the homeserver created at install.
+3. **A staged import's database is restored on the next start**, not by the action itself.
+4. **`import/` is never backed up.**
+5. **Synapse's own port is not published** — nginx serves both interfaces and proxies to it.
+6. **The admin dashboard is a pinned, checksummed static build**, not an upstream image, and it updates only when this package does.
+7. **TURN is advertised only when Coturn has a public domain.** Until then no relay is offered, and nothing reports that as an error.
+8. **The Coturn dependency declares no health check**, so a Coturn that is up but not yet publicly reachable will not block Synapse.
+9. **The nginx configuration is regenerated every start** and is not editable.
 
 ---
 
@@ -469,57 +224,54 @@ Build and development workflow follow the StartOS packaging guide: <https://docs
 
 ```yaml
 package_id: synapse
-images:
-  synapse: dockerTag (ghcr.io/element-hq/synapse)
-  nginx: nginx (Alpine)
-  postgres: postgres (Alpine)
-architectures: [x86_64, aarch64]
+image: ghcr.io/element-hq/synapse # plus nginx and postgres
+architectures:
+  - x86_64
+  - aarch64
+subcontainers:
+  - synapse-sub # the homeserver; the one to attach to
+  - postgres-sub # bundled database, loopback only
+  - nginx # serves both interfaces, proxies the Matrix API
+  - gen-config # temporary; install-time synapse generate
+  - pg-restore # temporary; restores a staged import
+  - coturn-secret-read # temporary; reads Coturn's shared secret
 volumes:
-  main: /data
-  db: /var/lib/postgresql
-ports:
-  homeserver: 80 internal -> 443 external (nginx proxy to synapse:8008)
-  admin: 8080 internal -> 443 external (synapse-admin dashboard)
-federation: served on 443 via an always-on .well-known delegation; 8448 is not bound
+  main: /data (synapse)
+  db: /var/lib/postgresql (postgres)
+file_models:
+  - /data/homeserver.yaml
+  - /data/homeserver.log.config
+  - /data/store.json
+  - /data/appservices/<id>.yaml
+startos_managed_env_vars:
+  - SYNAPSE_SERVER_NAME # gen-config only
+  - SYNAPSE_REPORT_STATS # gen-config only
+  - SYNAPSE_CONFIG_DIR # gen-config only
+  - PGPASSWORD # pg-restore only
 dependencies:
-  coturn: { kind: running, optional: true, declared_only_when: store.json.turn }
-database: PostgreSQL (sidecar, localhost-only, password auth, locale=C)
-startos_managed_config:
-  - server_name (one-time, permanent)
-  - limit_remote_rooms (large room protection)
-  - homeserver.log.config root.level
-  - caches.cache_autotuning (derived from os.totalmem(), not user-facing)
-  - url_preview_enabled + url_preview_ip_range_blacklist (blocklist always written)
-  - push.include_content
-  - federation (listeners + domain whitelist)
-  - presence.enabled
-  - max_upload_size
-  - media_retention.remote_media_lifetime
-  - turn_uris / turn_shared_secret / turn_allow_guests (rendered from coturn)
-  - smtp
-unmanaged_config: arbitrary homeserver.yaml keys survive merge() via deepLooseParse
+  - coturn # optional, running, no health checks; only while TURN is on
+interfaces:
+  homeserver: { type: api, port: 80 }
+  admin: { type: ui, port: 8080 }
 actions:
-  - set-server-name (hidden, only-stopped)
-  - import-homeserver (enabled pre-first-start then disabled, only-stopped)
-  - set-admin-password (enabled, any)
-  - config (enabled, any)
-  - manage-smtp (enabled, any)
-  - registration (enabled, any)
-  - rate-limits (enabled, any)
-  - discoverability (enabled, any)
-  - register-appservice (enabled, any)
-  - list-appservices (enabled, any)
-  - delete-appservice (enabled, any)
-oneshots:
-  - chown (991:991 on /data)
-  - restore-import (pg_restore when store.json.pendingImport; before the synapse daemon)
-  - apply-admin-password (after the synapse daemon)
+  - set-server-name # Setup; only-stopped, hidden (surfaced by the install task)
+  - import-homeserver # Setup; only-stopped, self-disabling once claimed
+  - set-admin-password # Accounts
+  - get-access-token # Accounts; only-running
+  - config # Settings
+  - registration # Settings
+  - rate-limits # Settings
+  - discoverability # Settings
+  - manage-smtp # Settings
+  - register-appservice # App Services; also driven by dependent packages
+  - list-appservices # App Services
+  - delete-appservice # App Services
+tasks:
+  - { action: set-server-name, severity: critical }
+  - { action: register-appservice, severity: critical } # raised by dependents
 health_checks:
-  - pg_isready (postgres)
-  - http_get: /health (port 8008, 15s grace)
-  - port_listening: 80
-  - http_get: / (port 8080)
-backup_method: pg_dump + main volume, excluding /import
-public_api:
-  - ensureAppserviceRegistration (for bridge services)
+  - postgres # displayed "Database"
+  - synapse # displayed "Homeserver"
+  - nginx # hidden
+  - admin-interface # displayed "Admin Dashboard"
 ```
