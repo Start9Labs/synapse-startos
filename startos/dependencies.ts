@@ -3,6 +3,9 @@ import { sdk } from './sdk'
 import { coturnId, coturnVersionRange } from './utils'
 
 export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
+  // Returned only while a TURN server is configured. Declaring coturn
+  // unconditionally would show an unmet-dependency warning to every user who
+  // never asked for voice or video.
   const turn = await storeJson.read((s) => s.turn).const(effects)
   if (!turn) return {}
 

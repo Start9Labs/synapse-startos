@@ -6,7 +6,7 @@ Develop it inside a StartOS packaging workspace created by `start-cli s9pk init-
 which provides the packaging guide and agent context one level up. If you're reading this in a
 bare clone with no workspace, the full guide is at <https://docs.start9.com/packaging>.
 
-Work this package's `TODO.md` from top to bottom. Keep `README.md` (the package's technical reference — the only one an AI support or administering agent reads) and `instructions.md` (end-user docs) in sync with your changes.
+Work this package's `TODO.md` from top to bottom. Keep `README.md` (technical reference for an AI support or administering agent) and `instructions.md` (end-user docs) in sync with your changes.
 
 ## This repo
 
@@ -17,6 +17,4 @@ Work this package's `TODO.md` from top to bottom. Keep `README.md` (the package'
 - **`fileModels/importedHomeserver.yml.ts` has no `.catch()` anywhere, on purpose.** It is the one file model here that must fail rather than heal: defaulting a missing `macaroon_secret_key` would mint a fresh one and silently log out every user on the homeserver being imported.
 - **`log_config` is an enforced `z.literal`, not a `.catch()` default, and it has to stay that way.** `synapse generate` writes `<server_name>.log.config` and points `log_config` at it — a valid string, so a `.catch()` never fires. Softening it back to `z.string().catch(...)` silently re-breaks the log level: the package writes `homeserver.log.config` and Synapse reads a different file. That was live for as long as the log config existed, and the rotating file handler it declared had never run once.
 - **`caches.cache_autotuning` is `clamp(os.totalmem() / 4, 1 GiB, 2 GiB)`, and both bounds are load-bearing.** Synapse evicts on whole-process allocated memory, not cache size, so the threshold must clear real usage: the upstream playbook's `memtotal/16` target lands below the ~815 MiB a real ten-user homeserver holds, which is why the divisor is looser. The ceiling matters for the opposite reason — an uncapped fraction puts the threshold out of reach on a big box (8 GiB on a 32 GiB machine) and the guard never fires. Don't restore the playbook's divisor or drop either bound without re-measuring. The SDK exposes no RAM effect, which is why this reaches for a Node builtin.
-- **The `coturn` dependency is returned from `setupDependencies` only while `store.json.turn` is set.** Declaring it unconditionally would show an unmet-dependency warning to every user who never asked for call relay. `jitsi-startos` is the reference implementation of coturn's consumer contract.
-- **The synapse-admin (Ketesa) web UI is a Makefile ingredient**, not a container image — `make` downloads and unpacks the pinned release into `assets/synapse-admin` (checksum-verified) and nginx serves it. Bump `SYNAPSE_ADMIN_VERSION`/`SYNAPSE_ADMIN_CHECKSUM` in the `Makefile` together.
 - **Dependent bridge services register appservices via `ensureAppserviceRegistration`** (exported from `startos/public.ts`), which mounts Synapse's volume read-only and creates a `register-appservice` task on Synapse. Treat that export and the appservice action inputs as a small API for dependents.
