@@ -1,48 +1,78 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.158.0:0',
+  version: '1.158.0:1',
   releaseNotes: {
-    en_US: `Updates Synapse to 1.158.0.
+    en_US: `Adds a migration path for homeservers hosted elsewhere, plus call relay and two new configuration controls.
 
-- New rooms are now created with room version 11 by default, in line with Matrix v1.14.
-- Thumbnails can now be animated, opted into per request with the \`animated\` query parameter.
-- Fixes intermittent failures when creating rooms or sending third-party (3pid) invitations over federation in version 12 rooms.
-- Fixes the homeserver not shutting down cleanly.
+- New **Import Existing Homeserver** action adopts the identity, database and media of a Matrix homeserver you already run somewhere else. Its users keep their accounts, their logins and their history.
+- New optional dependency on **Coturn** relays voice and video calls through NAT and restrictive firewalls. Turn it on under **Voice and Video Calls** in the Config action.
+- Config gains a **Presence** toggle and a **Remote Media Retention** period, which caps the disk and backup growth caused by cached media from other homeservers.
+- **Registration** moves to its own action and is now three-way: Disabled, **Invite Only**, or Open. It also sets which rooms new accounts join automatically, and whether guests may look around. Invite Only lets people sign up with a registration token you create and revoke in the Admin Dashboard, which is the middle ground the old on/off switch never had.
+- New **Large Room Protection** refuses joins to rooms bigger than your server can comfortably handle, the first thing that flattens a home homeserver.
+- New **Log Level** setting. Logging was pinned to Info and rewritten on every start; Warning is much quieter for day-to-day running.
+- The room summary API (MSC3266) is now enabled, which current-generation mobile clients require.
+- New **Discoverability** action, choosing in one step how much a stranger can learn about your server, with Private / Normal / Public presets and a Custom option.
+- New **Rate Limits** action, with Normal and Relaxed presets and a Custom option that exposes every limit individually.
+- **Link previews** can now be turned on, with the fetcher blocked from reaching anything on your own network.
+- Push notifications now fire for encrypted messages, and you can choose whether they carry the message text.
+- Synapse now evicts caches before it can eat the box. The ceiling is derived from your server's RAM and sized to stay out of the way in normal use.`,
+    es_ES: `Añade una ruta de migración para servidores alojados en otro sitio, además de retransmisión de llamadas y dos controles de configuración nuevos.
 
-Full release notes: https://github.com/element-hq/synapse/blob/release-v1.158/CHANGES.md`,
-    es_ES: `Actualiza Synapse a 1.158.0.
+- La nueva acción **Importar servidor existente** adopta la identidad, la base de datos y los medios de un servidor Matrix que ya tenga en otro lugar. Sus usuarios conservan sus cuentas, sus sesiones y su historial.
+- La nueva dependencia opcional de **Coturn** retransmite las llamadas de voz y vídeo a través de NAT y de cortafuegos restrictivos. Actívela en **Llamadas de voz y vídeo** dentro de la acción Configuración.
+- Configuración incorpora un interruptor de **Presencia** y un periodo de **Retención de medios remotos**, que limita el crecimiento de disco y de copias de seguridad causado por los medios en caché de otros servidores.
+- El **Registro** pasa a su propia acción y es ahora de tres estados: Deshabilitado, **Solo con invitación** o Abierto. También decide en qué salas entran automáticamente las cuentas nuevas y si los invitados pueden echar un vistazo. «Solo con invitación» permite registrarse con un token que usted crea y revoca en el panel de administración: el término medio que el antiguo interruptor no ofrecía.
+- La nueva **Protección frente a salas grandes** rechaza la entrada a salas mayores de lo que su servidor puede manejar con soltura, lo primero que tumba un servidor doméstico.
+- Nueva opción de **Nivel de registro**. El registro estaba fijado en «Info» y se reescribía en cada arranque; «Advertencia» es mucho más silencioso para el día a día.
+- Se habilita la API de resumen de salas (MSC3266), que requieren los clientes móviles de la generación actual.
+- Nueva acción **Visibilidad**, que decide de una vez cuánto puede averiguar un desconocido sobre su servidor, con ajustes Privado / Normal / Público y una opción Personalizado.
+- Nueva acción **Límites de frecuencia**, con los ajustes Normal y Laxo y una opción Personalizado que expone cada límite por separado.
+- Ya se pueden activar las **vistas previas de enlaces**, con el descargador impedido de alcanzar nada de su propia red.
+- Las notificaciones push ya funcionan con mensajes cifrados, y usted decide si llevan el texto del mensaje.
+- Synapse ahora purga sus cachés antes de poder comerse el servidor. El límite se deriva de la RAM de su máquina y está dimensionado para no estorbar en el uso normal.`,
+    de_DE: `Ergänzt einen Migrationsweg für anderswo betriebene Homeserver sowie ein Anruf-Relay und zwei neue Konfigurationsregler.
 
-- Las salas nuevas se crean ahora con la versión de sala 11 de forma predeterminada, en línea con Matrix v1.14.
-- Las miniaturas pueden ser animadas, activándose en cada petición con el parámetro de consulta \`animated\`.
-- Corrige fallos intermitentes al crear salas o al enviar invitaciones de terceros (3pid) por federación en salas de versión 12.
-- Corrige que el homeserver no se apagara limpiamente.
+- Die neue Aktion **Bestehenden Homeserver importieren** übernimmt Identität, Datenbank und Medien eines Matrix-Homeservers, den Sie bereits woanders betreiben. Dessen Nutzer behalten ihre Konten, ihre Anmeldungen und ihren Verlauf.
+- Die neue optionale Abhängigkeit **Coturn** leitet Sprach- und Videoanrufe durch NAT und restriktive Firewalls. Einschalten unter **Sprach- und Videoanrufe** in der Aktion Konfiguration.
+- Die Konfiguration erhält einen **Anwesenheit**-Schalter und eine **Aufbewahrung entfernter Medien**, die das durch zwischengespeicherte Medien anderer Homeserver verursachte Wachstum von Speicher und Backups begrenzt.
+- Die **Registrierung** bekommt eine eigene Aktion und ist jetzt dreistufig: Deaktiviert, **Nur mit Einladung** oder Offen. Sie legt außerdem fest, welchen Räumen neue Konten automatisch beitreten und ob Gäste sich umsehen dürfen. „Nur mit Einladung“ lässt Personen sich mit einem Token anmelden, das Sie im Admin-Dashboard erstellen und widerrufen — der Mittelweg, den der alte Schalter nie bot.
+- Der neue **Schutz vor großen Räumen** lehnt den Beitritt zu Räumen ab, die größer sind, als Ihr Server bequem verkraftet — der erste Grund, an dem ein Heim-Homeserver scheitert.
+- Neue Einstellung **Protokollstufe**. Das Protokoll war auf „Info“ festgenagelt und wurde bei jedem Start überschrieben; „Warnung“ ist im Alltag deutlich ruhiger.
+- Die Raumzusammenfassungs-API (MSC3266) ist nun aktiviert, die aktuelle mobile Clients voraussetzen.
+- Neue Aktion **Auffindbarkeit**: legt in einem Schritt fest, wie viel ein Fremder über Ihren Server erfahren kann, mit den Voreinstellungen Privat / Normal / Öffentlich und einer benutzerdefinierten Option.
+- Neue Aktion **Ratenbegrenzungen** mit den Voreinstellungen Normal und Locker und einer benutzerdefinierten Option, die jede Grenze einzeln zugänglich macht.
+- **Linkvorschauen** lassen sich nun einschalten, wobei der Abrufer nichts im eigenen Netzwerk erreichen kann.
+- Push-Benachrichtigungen kommen jetzt auch bei verschlüsselten Nachrichten an, und Sie entscheiden, ob sie den Nachrichtentext mitführen.
+- Synapse räumt seine Caches jetzt auf, bevor es den Server auffressen kann. Die Obergrenze wird aus dem Arbeitsspeicher Ihrer Maschine abgeleitet und ist so bemessen, dass sie im Normalbetrieb nicht stört.`,
+    pl_PL: `Dodaje ścieżkę migracji dla serwerów prowadzonych gdzie indziej, a także przekazywanie połączeń i dwa nowe ustawienia konfiguracji.
 
-Notas de versión completas: https://github.com/element-hq/synapse/blob/release-v1.158/CHANGES.md`,
-    de_DE: `Aktualisiert Synapse auf 1.158.0.
+- Nowa akcja **Importuj istniejący serwer** przejmuje tożsamość, bazę danych i media serwera Matrix, który już prowadzisz w innym miejscu. Jego użytkownicy zachowują konta, sesje i historię.
+- Nowa opcjonalna zależność **Coturn** przekazuje połączenia głosowe i wideo przez NAT i restrykcyjne zapory. Włącz ją w **Połączenia głosowe i wideo** w akcji Konfiguracja.
+- Konfiguracja zyskuje przełącznik **Obecność** oraz okres **Przechowywania mediów zdalnych**, który ogranicza przyrost miejsca na dysku i rozmiaru kopii zapasowych powodowany przez media z innych serwerów.
+- **Rejestracja** trafia do własnej akcji i ma teraz trzy stany: Wyłączona, **Tylko z zaproszeniem** lub Otwarta. Ustala też, do jakich pokoi automatycznie dołączają nowe konta i czy goście mogą się rozejrzeć. „Tylko z zaproszeniem” pozwala rejestrować się za pomocą tokenu, który tworzysz i unieważniasz w panelu administracyjnym — to złoty środek, którego dawny przełącznik nie dawał.
+- Nowa **Ochrona przed dużymi pokojami** odrzuca dołączanie do pokoi większych, niż serwer jest w stanie swobodnie obsłużyć — pierwszy problem, na którym przewraca się domowy serwer.
+- Nowe ustawienie **Poziom logowania**. Logi były przypięte do „Info” i nadpisywane przy każdym starcie; „Ostrzeżenia” są znacznie cichsze na co dzień.
+- Włączono API podsumowania pokoi (MSC3266), wymagane przez obecną generację klientów mobilnych.
+- Nowa akcja **Wykrywalność**: jednym wyborem ustala, ile obcy może dowiedzieć się o Twoim serwerze, z ustawieniami Prywatny / Normalny / Publiczny oraz opcją Własne.
+- Nowa akcja **Limity częstotliwości** z ustawieniami Normalne i Luźne oraz opcją Własne, która udostępnia każdy limit z osobna.
+- Można już włączyć **podglądy linków**, przy czym pobieracz nie sięgnie niczego w Twojej własnej sieci.
+- Powiadomienia push działają teraz dla wiadomości zaszyfrowanych, a Ty decydujesz, czy niosą treść wiadomości.
+- Synapse czyści teraz pamięci podręczne, zanim zdąży zająć całą maszynę. Limit wyliczany jest z ilości RAM Twojego serwera i dobrany tak, by nie przeszkadzać w normalnej pracy.`,
+    fr_FR: `Ajoute un chemin de migration pour les serveurs hébergés ailleurs, ainsi que le relais d'appels et deux nouveaux réglages de configuration.
 
-- Neue Räume werden jetzt standardmäßig mit Raumversion 11 erstellt, passend zu Matrix v1.14.
-- Vorschaubilder können nun animiert sein; dies wird pro Anfrage über den Abfrageparameter \`animated\` aktiviert.
-- Behebt sporadische Fehler beim Erstellen von Räumen und beim Versenden von Drittanbieter-Einladungen (3pid) über die Föderation in Räumen der Version 12.
-- Behebt, dass der Homeserver nicht sauber heruntergefahren wurde.
-
-Vollständige Versionshinweise: https://github.com/element-hq/synapse/blob/release-v1.158/CHANGES.md`,
-    pl_PL: `Aktualizuje Synapse do 1.158.0.
-
-- Nowe pokoje są domyślnie tworzone w wersji 11, zgodnie z Matrix v1.14.
-- Miniatury mogą być animowane — włącza się to dla pojedynczego żądania parametrem zapytania \`animated\`.
-- Naprawia sporadyczne błędy przy tworzeniu pokoi oraz przy wysyłaniu zaproszeń third-party (3pid) przez federację w pokojach w wersji 12.
-- Naprawia brak czystego zamykania serwera.
-
-Pełne informacje o wydaniu: https://github.com/element-hq/synapse/blob/release-v1.158/CHANGES.md`,
-    fr_FR: `Met à jour Synapse vers 1.158.0.
-
-- Les nouveaux salons sont désormais créés en version de salon 11 par défaut, conformément à Matrix v1.14.
-- Les vignettes peuvent être animées, à activer requête par requête via le paramètre \`animated\`.
-- Corrige des échecs intermittents lors de la création de salons et de l'envoi d'invitations tierces (3pid) via la fédération dans les salons de version 12.
-- Corrige l'arrêt non propre du homeserver.
-
-Notes de version complètes : https://github.com/element-hq/synapse/blob/release-v1.158/CHANGES.md`,
+- La nouvelle action **Importer un serveur existant** reprend l'identité, la base de données et les médias d'un serveur Matrix que vous hébergez déjà ailleurs. Ses utilisateurs conservent leurs comptes, leurs sessions et leur historique.
+- La nouvelle dépendance optionnelle **Coturn** relaie les appels audio et vidéo à travers le NAT et les pare-feu restrictifs. Activez-la dans **Appels audio et vidéo** de l'action Configuration.
+- La configuration gagne un interrupteur **Présence** et une durée de **Rétention des médias distants**, qui limite la croissance du disque et des sauvegardes causée par les médias mis en cache depuis d'autres serveurs.
+- L'**inscription** passe dans sa propre action et est désormais à trois états : Désactivée, **Sur invitation** ou Ouverte. Elle définit aussi les salons que les nouveaux comptes rejoignent automatiquement et si les invités peuvent regarder. « Sur invitation » permet de s'inscrire avec un jeton que vous créez et révoquez dans le tableau de bord d'administration — le juste milieu que l'ancien interrupteur n'offrait pas.
+- La nouvelle **protection contre les grands salons** refuse de rejoindre des salons plus gros que ce que votre serveur encaisse confortablement, la première chose qui met à genoux un serveur domestique.
+- Nouveau réglage **Niveau de journalisation**. Les journaux étaient figés sur « Info » et réécrits à chaque démarrage ; « Avertissement » est bien plus discret au quotidien.
+- L'API de résumé de salon (MSC3266) est désormais activée ; les clients mobiles actuels en dépendent.
+- Nouvelle action **Visibilité**, qui décide d'un coup ce qu'un inconnu peut apprendre de votre serveur, avec les préréglages Privé / Normal / Public et une option Personnalisé.
+- Nouvelle action **Limites de débit**, avec les préréglages Normal et Souple et une option Personnalisé qui expose chaque limite individuellement.
+- Les **aperçus de liens** peuvent désormais être activés, le récupérateur étant empêché d'atteindre quoi que ce soit sur votre propre réseau.
+- Les notifications push fonctionnent maintenant pour les messages chiffrés, et vous choisissez si elles transportent le texte du message.
+- Synapse purge désormais ses caches avant de pouvoir dévorer la machine. Le plafond est déduit de la RAM de votre serveur et dimensionné pour ne pas gêner en usage normal.`,
   },
   migrations: {},
 })

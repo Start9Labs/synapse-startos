@@ -85,7 +85,7 @@ export const registerAppservice = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: 'App Services',
+    group: i18n('App Services'),
     visibility: 'enabled',
   }),
 

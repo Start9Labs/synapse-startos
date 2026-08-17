@@ -1,7 +1,7 @@
 import { utils } from '@start9labs/start-sdk'
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 export const setAdminPassword = sdk.Action.withoutInput(
   // id
@@ -15,7 +15,7 @@ export const setAdminPassword = sdk.Action.withoutInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: null,
+    group: i18n('Accounts'),
     visibility: 'enabled',
   }),
 

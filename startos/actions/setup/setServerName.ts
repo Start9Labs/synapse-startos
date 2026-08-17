@@ -1,9 +1,9 @@
 import { T } from '@start9labs/start-sdk'
-import { homeserverYaml } from '../fileModels/homeserver.yml'
-import { i18n } from '../i18n'
-import { homeserverHostId, homeserverInterfaceId } from '../interfaces'
-import { sdk } from '../sdk'
-import { setAdminPassword } from './setAdminPassword'
+import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import { i18n } from '../../i18n'
+import { homeserverHostnames } from '../../interfaces'
+import { sdk } from '../../sdk'
+import { setAdminPassword } from '../accounts/setAdminPassword'
 
 const { InputSpec, Value } = sdk
 
@@ -27,7 +27,7 @@ export const setServerName = sdk.Action.withInput(
       'This can never be changed. You must first add a public domain to the Homeserver interface.',
     ),
     allowedStatuses: 'only-stopped',
-    group: null,
+    group: i18n('Setup'),
     visibility: 'hidden',
   }),
 
@@ -59,21 +59,7 @@ async function getClearnetHostnames(effects: T.Effects): Promise<{
   default: string
   values: Record<string, string>
 }> {
-  const hostnames =
-    (await sdk.host
-      .getOwn(effects, homeserverHostId, (host) => {
-        const iface =
-          host &&
-          Object.values(host.bindings)
-            .flatMap((b) => Object.values(b.interfaces))
-            .find((i) => i.id === homeserverInterfaceId)
-        return iface
-          ? iface.addressInfo
-              .filter({ kind: 'domain' })
-              .hostnames.map((h) => h.hostname)
-          : []
-      })
-      .once()) || []
+  const hostnames = await homeserverHostnames(effects)
 
   return {
     name: i18n('Address/URL'),
