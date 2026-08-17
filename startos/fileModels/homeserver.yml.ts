@@ -18,6 +18,12 @@ const dbDefault = {
     password: '',
     database: postgresDb,
     host: '127.0.0.1' as const,
+    // Synapse runs every database query in Twisted's adbapi connection pool,
+    // which is the only threadpool a monolith has. Left unset it falls to
+    // Twisted's own min=3/max=5 rather than anything Synapse chose; 5/10 is
+    // what the upstream playbook ships for every deployment.
+    cp_min: 5 as const,
+    cp_max: 10 as const,
   },
   name: 'psycopg2' as const,
 }
@@ -43,6 +49,8 @@ const dbShape = z
         password: z.string().catch(''),
         database: z.literal(postgresDb).catch(postgresDb),
         host: z.literal('127.0.0.1').catch('127.0.0.1'),
+        cp_min: z.literal(dbDefault.args.cp_min).catch(dbDefault.args.cp_min),
+        cp_max: z.literal(dbDefault.args.cp_max).catch(dbDefault.args.cp_max),
       })
       .catch(dbDefault.args),
     name: z.literal('psycopg2').catch('psycopg2' as const),

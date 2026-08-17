@@ -86,6 +86,8 @@ Within `homeserver.yaml`:
 
 **Enforced** — rewritten whenever the package writes: the whole database block (the bundled PostgreSQL on loopback), the listeners, the media store and pid paths, telemetry off, the key-server warning suppressed, and `log_config`.
 
+**The connection pool is sized, not inherited.** `cp_min`/`cp_max` are pinned to 5/10, matching the upstream playbook. Left unset they fall through to Twisted's own class defaults of 3/5, which is nothing Synapse chose — and since every query runs in that pool, it is the only threadpool a monolith has.
+
 **`log_config` is enforced rather than defaulted, and the distinction matters.** `synapse generate` writes its own `<server_name>.log.config` and points at that, which is a perfectly valid string — so a `.catch()` default would never fire, the package's log config would never be read, and the Config action's log level would be writing a file Synapse ignores.
 
 **Generated once** — the signing key path, form secret, macaroon secret, and registration shared secret, all written by `synapse generate` at install or carried over by an import.
