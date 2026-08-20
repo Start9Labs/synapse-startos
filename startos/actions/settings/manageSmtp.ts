@@ -13,7 +13,7 @@ export const manageSmtp = sdk.Action.withInput(
 
   // metadata
   async () => ({
-    name: i18n('Configure SMTP'),
+    name: i18n('Email/SMTP'),
     description: i18n(
       'Add SMTP credentials so your homeserver can send email notifications.',
     ),

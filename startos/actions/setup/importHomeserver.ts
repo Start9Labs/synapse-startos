@@ -34,14 +34,11 @@ export const importHomeserver = sdk.Action.withoutInput(
       ),
       allowedStatuses: 'only-stopped',
       group: i18n('Setup'),
+      // Only reachable before the first start: the critical set-server-name
+      // task keeps the service from starting until a real name is set, so
+      // there is never a homeserver with data to import over.
       visibility:
-        !claimed || claimed === placeholderServerName
-          ? 'enabled'
-          : {
-              disabled: i18n(
-                'This homeserver already has an address, so there is nothing to import into. Importing is only possible before the first start.',
-              ),
-            },
+        !claimed || claimed === placeholderServerName ? 'enabled' : 'hidden',
     }
   },
 

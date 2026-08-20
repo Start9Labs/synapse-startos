@@ -10,7 +10,8 @@ export const current = VersionInfo.of({
 - **Thumbnails are prepared at sizes a modern phone screen can use.** Synapse's largest was 800x600, which a high-density display upscales into something soft; two larger sizes are now generated as well. Set **Thumbnails** back to Standard in the Media action if you would rather save the disk space.
 - **Sync responses are cached for five minutes rather than two**, which spares the server repeated work from phones that keep dropping and re-establishing their connection.
 - **Rate Limits** gains a per-person speed limit for downloading files from other servers, so one person working through a photo-heavy backlog no longer competes with everyone else.
-- **Set Admin Password now asks for confirmation.** It generates a new password and restarts the homeserver, which is not what you want from a single stray click.`,
+- **Set Admin Password now asks for confirmation.** It generates a new password and restarts the homeserver, which is not what you want from a single stray click.
+- **Configure SMTP is now called Email/SMTP**, and **Import Existing Homeserver** no longer lingers in the Setup group once your server has an address — it was never usable past that point.`,
     es_ES: `Divide los ajustes en acciones más claras y mejora cómo llegan las imágenes a sus usuarios.
 
 - **Multimedia** es una acción nueva, con el límite de subida, los nuevos ajustes de imágenes y miniaturas, y cuánto tiempo se conservan los archivos de otros servidores. **Federación** también es una acción nueva, con la federación, la lista blanca de dominios y la protección frente a salas grandes. Antes ambas estaban enterradas en Configuración.
@@ -18,7 +19,8 @@ export const current = VersionInfo.of({
 - **Las miniaturas se preparan en tamaños que una pantalla de teléfono actual puede aprovechar.** La mayor de Synapse era de 800x600, que una pantalla de alta densidad amplía hasta verse borrosa; ahora se generan además dos tamaños mayores. Ponga **Miniaturas** en Estándar dentro de la acción Multimedia si prefiere ahorrar espacio en disco.
 - **Las respuestas de sincronización se guardan en caché cinco minutos en lugar de dos**, lo que ahorra al servidor trabajo repetido de los teléfonos que pierden y rehacen la conexión constantemente.
 - **Límites de frecuencia** incorpora un límite de velocidad por persona para descargar archivos de otros servidores, de modo que quien recorra un historial lleno de fotos ya no compite con los demás.
-- **Establecer contraseña de administrador ahora pide confirmación.** Genera una contraseña nueva y reinicia el servidor, que no es lo que uno espera de un clic accidental.`,
+- **Establecer contraseña de administrador ahora pide confirmación.** Genera una contraseña nueva y reinicia el servidor, que no es lo que uno espera de un clic accidental.
+- **Configurar SMTP pasa a llamarse Correo electrónico/SMTP**, e **Importar servidor existente** ya no permanece en el grupo Configuración inicial una vez que su servidor tiene dirección: nunca se podía usar pasado ese punto.`,
     de_DE: `Teilt die Einstellungen in klarere Aktionen auf und verbessert, wie Bilder bei Ihren Nutzern ankommen.
 
 - **Medien** ist eine neue Aktion mit dem Upload-Limit, den neuen Bild- und Vorschaubild-Einstellungen und der Aufbewahrungsdauer für Dateien anderer Server. **Föderation** ist ebenfalls neu und enthält Föderation, Domain-Whitelist und den Schutz vor großen Räumen. Beide steckten zuvor in der Konfiguration.
@@ -26,7 +28,8 @@ export const current = VersionInfo.of({
 - **Vorschaubilder entstehen in Größen, die ein modernes Handydisplay nutzen kann.** Synapses größte war 800x600, die ein hochauflösendes Display unscharf hochskaliert; zwei größere Formate kommen hinzu. Stellen Sie **Vorschaubilder** in der Aktion Medien auf Standard zurück, wenn Ihnen der Speicherplatz wichtiger ist.
 - **Sync-Antworten werden fünf statt zwei Minuten zwischengespeichert**, was dem Server wiederholte Arbeit durch Telefone erspart, die ihre Verbindung ständig verlieren und neu aufbauen.
 - **Ratenbegrenzungen** erhält ein Tempolimit pro Person für das Herunterladen von Dateien anderer Server, sodass jemand, der einen fotolastigen Verlauf durchgeht, nicht mehr mit allen anderen konkurriert.
-- **Administratorpasswort setzen fragt jetzt nach.** Die Aktion erzeugt ein neues Passwort und startet den Homeserver neu — nichts, was man sich von einem versehentlichen Klick wünscht.`,
+- **Administratorpasswort setzen fragt jetzt nach.** Die Aktion erzeugt ein neues Passwort und startet den Homeserver neu — nichts, was man sich von einem versehentlichen Klick wünscht.
+- **SMTP konfigurieren heißt jetzt E-Mail/SMTP**, und **Bestehenden Homeserver importieren** verbleibt nicht mehr in der Gruppe Einrichtung, sobald Ihr Server eine Adresse hat — nutzbar war die Aktion danach ohnehin nie.`,
     pl_PL: `Dzieli ustawienia na czytelniejsze akcje i poprawia sposób, w jaki obrazy docierają do użytkowników.
 
 - **Multimedia** to nowa akcja zawierająca limit wysyłania, nowe ustawienia obrazów i miniatur oraz czas przechowywania plików z innych serwerów. **Federacja** to również nowa akcja: federacja, biała lista domen i ochrona przed dużymi pokojami. Obie były wcześniej ukryte w Konfiguracji.
@@ -34,7 +37,8 @@ export const current = VersionInfo.of({
 - **Miniatury powstają w rozmiarach, z których potrafi skorzystać współczesny ekran telefonu.** Największa w Synapse miała 800x600, co ekran o dużej gęstości pikseli powiększa do nieostrego obrazu; teraz powstają też dwa większe rozmiary. Ustaw **Miniatury** z powrotem na Standardowe w akcji Multimedia, jeśli wolisz oszczędzić miejsce na dysku.
 - **Odpowiedzi synchronizacji są buforowane przez pięć minut zamiast dwóch**, co oszczędza serwerowi powtarzanej pracy przy telefonach stale tracących i wznawiających połączenie.
 - **Limity częstotliwości** zyskują limit prędkości pobierania plików z innych serwerów, liczony osobno dla każdej osoby, więc ktoś przeglądający historię pełną zdjęć nie konkuruje już z resztą.
-- **Ustawienie hasła administratora prosi teraz o potwierdzenie.** Akcja generuje nowe hasło i restartuje serwer, a tego nie chce się po przypadkowym kliknięciu.`,
+- **Ustawienie hasła administratora prosi teraz o potwierdzenie.** Akcja generuje nowe hasło i restartuje serwer, a tego nie chce się po przypadkowym kliknięciu.
+- **Konfiguracja SMTP nazywa się teraz E-mail/SMTP**, a **Importuj istniejący serwer** nie zostaje już w grupie Konfiguracja wstępna, gdy serwer ma adres — i tak nie dało się jej wtedy użyć.`,
     fr_FR: `Répartit les réglages en actions plus lisibles et améliore la façon dont les images parviennent à vos utilisateurs.
 
 - **Médias** est une nouvelle action : limite de téléversement, nouveaux réglages d'images et de miniatures, et durée de conservation des fichiers des autres serveurs. **Fédération** est également nouvelle : fédération, liste blanche de domaines et protection contre les grands salons. Les deux étaient auparavant noyées dans Configuration.
@@ -42,7 +46,8 @@ export const current = VersionInfo.of({
 - **Les miniatures sont préparées dans des tailles exploitables par un écran de téléphone moderne.** La plus grande de Synapse était 800x600, qu'un écran haute densité agrandit jusqu'au flou ; deux tailles supérieures sont désormais produites. Remettez **Miniatures** sur Standard dans l'action Médias si vous préférez économiser l'espace disque.
 - **Les réponses de synchronisation sont mises en cache cinq minutes au lieu de deux**, ce qui épargne au serveur le travail répété des téléphones qui perdent et rétablissent sans cesse leur connexion.
 - **Limites de débit** gagne une limite de vitesse par personne pour le téléchargement des fichiers des autres serveurs : quelqu'un qui parcourt un historique riche en photos ne concurrence plus tout le monde.
-- **Définir le mot de passe administrateur demande désormais confirmation.** L'action génère un nouveau mot de passe et redémarre le serveur, ce qu'on ne souhaite pas d'un clic malencontreux.`,
+- **Définir le mot de passe administrateur demande désormais confirmation.** L'action génère un nouveau mot de passe et redémarre le serveur, ce qu'on ne souhaite pas d'un clic malencontreux.
+- **Configurer SMTP s'appelle désormais E-mail/SMTP**, et **Importer un serveur existant** ne reste plus dans le groupe Configuration une fois que votre serveur a une adresse — elle n'y était de toute façon plus utilisable.`,
   },
   migrations: {},
 })

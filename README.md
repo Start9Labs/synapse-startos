@@ -161,14 +161,14 @@ Both run only while the service is stopped, and both are effectively one-time.
   - **Staging happens on the volume, by you**, before running it — the action reads what it finds under `import/`.
   - **The media store is rsynced to its final home rather than staged twice**, because it is far too large to copy through a staging directory.
   - **The database is not restored by the action.** `pg_restore` needs the PostgreSQL daemon, which an action cannot run — so the action queues the work and the `restore-import` oneshot does it on the next start, inside a single transaction so a failure rolls back cleanly and the next start retries.
-  - The action **disables itself** once the homeserver has a real server name, saying why.
+  - The action **hides itself** once the homeserver has a real server name, the same as Set Server Address/URL. It is only ever reachable before the first start: the critical `set-server-name` task keeps the service from starting until a real name is set, so there is never a populated homeserver to import over.
 
 ### Accounts — Set Admin Password, Get Access Token
 
 - **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers. It carries a `warning`, so StartOS asks for confirmation first — the action generates a fresh password and restarts the homeserver, and the old password stops working.
 - **Get Access Token** returns a token for an account, and needs the service running.
 
-### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Configure SMTP
+### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Email/SMTP
 
 Seven forms over `homeserver.yaml`, all available whether or not the service is running, all applied by the restart they trigger.
 
@@ -178,7 +178,7 @@ Seven forms over `homeserver.yaml`, all available whether or not the service is 
 - **Registration** governs whether new accounts can be created, and exposes the admin contact.
 - **Rate Limits** tunes Synapse's throttles.
 - **Discoverability** controls how visible the server and its rooms are to the wider network.
-- **Configure SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours.
+- **Email/SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours.
 
 ### App Services — Register Appservice, List Appservices, Delete Appservice
 
@@ -272,7 +272,7 @@ interfaces:
   admin: { type: ui, port: 8080 }
 actions:
   - set-server-name # Setup; only-stopped, hidden (surfaced by the install task)
-  - import-homeserver # Setup; only-stopped, self-disabling once claimed
+  - import-homeserver # Setup; only-stopped, self-hiding once claimed
   - set-admin-password # Accounts
   - get-access-token # Accounts; only-running
   - config # Settings
@@ -281,7 +281,7 @@ actions:
   - registration # Settings
   - rate-limits # Settings
   - discoverability # Settings
-  - manage-smtp # Settings
+  - manage-smtp # Settings; displayed "Email/SMTP"
   - register-appservice # App Services; also driven by dependent packages
   - list-appservices # App Services
   - delete-appservice # App Services

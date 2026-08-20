@@ -107,7 +107,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
 - **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
 - **Discoverability** — what someone without an account can find out about your server. Pick Private, Normal or Public; pick Custom to decide each setting.
-- **Configure SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
+- **Email/SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
 - **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard.
 
