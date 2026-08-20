@@ -24,7 +24,7 @@ Synapse posts two critical tasks after install. You can't start the service unti
 
 ## Importing an existing homeserver
 
-You can move a Matrix homeserver you run elsewhere onto StartOS without anyone losing their account, their logged-in sessions, or their history. Import **before you start Synapse for the first time** — once this homeserver has an address of its own, there is nothing to import into.
+You can move a Matrix homeserver you run elsewhere onto StartOS without anyone losing their account, their logged-in sessions, or their history. Import **before you start Synapse for the first time** — once this homeserver has an address of its own there is nothing to import into, and the action disappears from the Setup group.
 
 You will need shell access to your StartOS server and to the machine the old homeserver runs on.
 
@@ -100,7 +100,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 ### Actions
 
 - **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. It asks you to confirm first, because it replaces the current password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it.
-- **Config** — voice and video calls, presence, link previews, notification content, and log level.
+- **Config** — voice and video calls, presence, link previews, notification content, admin contact, and log level.
 - **Federation** — whether your server talks to other homeservers, which ones, and how large a room it will join.
 - **Media** — upload limit, how large an image can be and still get a thumbnail, which thumbnail sizes are prepared, and how long other servers' files are kept.
 - **Registration** — who may create an account, which rooms they join automatically, and whether guests may look around.
@@ -161,9 +161,11 @@ The **Discoverability** action collapses that into one choice. **Private** stops
 
 Synapse deliberately slows anyone down who sends, joins, invites or signs in too fast. The stock settings assume a server open to strangers, and they are easy to trip: inviting a dozen people at once, or running a bot, will hit them.
 
-The **Rate Limits** action has two ready-made choices. **Normal** is Synapse's own. **Relaxed** raises sending and joining to the values Start9 runs on its own server, which is usually the right pick for a server among people you know.
+The **Rate Limits** action has two ready-made choices. **Normal** is Synapse's own. **Relaxed** raises sending and joining to the values Start9 runs on its own server, and lifts the download limit described below. It is usually the right pick for a server among people you know.
 
 If none of those fit, **Custom** exposes every limit individually, starting from Synapse's values. Each has a _per second_ rate and a _burst_ — the burst is how many are allowed in quick succession before the slower sustained rate takes over.
+
+**Downloading Files from Other Servers** is the odd one out, and the one worth knowing about. It is measured in bytes rather than counts, and it applies to each person separately: someone scrolling back through a room full of other servers' photos spends their own allowance and is then slowed to a crawl, while everyone else is unaffected. Synapse allows 87 KB/s once the first 500 MB is spent, which a photo-heavy room reaches easily; Relaxed raises it to 1 MB/s.
 
 ### Pictures that will not load
 

@@ -175,8 +175,8 @@ Seven forms over `homeserver.yaml`, all available whether or not the service is 
 - **Config** holds what is left once the rest were split out: call relay, presence, link previews, notification content, admin contact and log level.
 - **Federation** governs which other homeservers yours will talk to — the on/off switch, the domain whitelist, and large-room protection. Turning federation off rewrites the listener resources rather than a flag, which is why this action and Config both write `listeners`.
 - **Media** governs files: upload limit, the largest image that still gets a thumbnail, which thumbnail sizes are prepared, and how long other servers' media is kept. Three of its defaults depart from Synapse's — see [File Models](#file-models).
-- **Registration** governs whether new accounts can be created, and exposes the admin contact.
-- **Rate Limits** tunes Synapse's throttles.
+- **Registration** governs whether new accounts can be created, which rooms they land in, and whether guests may look around.
+- **Rate Limits** tunes Synapse's throttles. Its Custom preset also carries `remote_media_download_per_second` and its burst — bytes rather than counts, and applied per requester, so they throttle one person's media fetching without touching anyone else's.
 - **Discoverability** controls how visible the server and its rooms are to the wider network.
 - **Email/SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours.
 
