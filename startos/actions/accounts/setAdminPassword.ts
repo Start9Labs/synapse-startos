@@ -13,7 +13,9 @@ export const setAdminPassword = sdk.Action.withoutInput(
     description: i18n(
       'Set the admin user password for your Synapse Matrix homeserver.',
     ),
-    warning: null,
+    warning: i18n(
+      'This generates a new admin password and restarts your homeserver to apply it. The current admin password stops working, and everyone is disconnected until Synapse comes back up. The new password is shown once, when the action finishes.',
+    ),
     allowedStatuses: 'any',
     group: i18n('Accounts'),
     visibility: 'enabled',

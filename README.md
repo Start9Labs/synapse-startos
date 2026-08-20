@@ -96,7 +96,19 @@ Within `homeserver.yaml`:
 
 **Sized to the machine** — `caches.cache_autotuning`, defaulted to a quarter of system RAM and clamped between 1 and 2 GiB. Synapse evicts on whole-process allocated memory rather than cache size, so the threshold has to clear real usage; the clamp keeps it from being unreachable on a large machine, where an uncapped fraction would mean the guard never fires at all.
 
-**Yours** — everything the five Settings actions expose, plus anything you add by hand that the schema does not declare.
+**Overridden defaults** — three keys where this package ships a value Synapse does not. Each is a starting point rather than an assertion: the Settings action that exposes it writes whatever you choose, and the form footnotes Synapse's own value beside it.
+
+| Key                                   | Synapse default | Packaged value  | Why                                                                             |
+| ------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------- |
+| `max_image_pixels`                    | `32M`           | `64M`           | Phone cameras shoot 48-50 MP; above the limit an image gets no thumbnail at all |
+| `thumbnail_sizes`                     | up to 800x600   | up to 1920x1440 | A 3x-DPI phone display upscales the 800x600 and shows it soft                   |
+| `caches.sync_response_cache_duration` | `2m`            | `5m`            | Mobile clients drop and re-issue the same `/sync` constantly                    |
+
+`remote_media_download_per_second` and `remote_media_download_burst_count` are deliberately **not** overridden. They belong to Rate Limits, whose Normal preset means "write nothing, upstream applies" — so the raised value lives in that action's Relaxed preset instead of in the package default.
+
+**A new thumbnail size only affects images uploaded after it is set.** Sizes are generated at upload; the exception is On Demand, which generates any size on request and is the only way an image already on disk gains one.
+
+**Yours** — everything the seven Settings actions expose, plus anything you add by hand that the schema does not declare.
 
 ## Dependencies
 
@@ -138,7 +150,7 @@ Two mutually exclusive paths from there, and **both are only available before th
 
 ## Actions
 
-Twelve actions in four groups.
+Fourteen actions in four groups.
 
 ### Setup — Set Server Address/URL, Import Existing Homeserver
 
@@ -153,13 +165,16 @@ Both run only while the service is stopped, and both are effectively one-time.
 
 ### Accounts — Set Admin Password, Get Access Token
 
-- **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers.
+- **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers. It carries a `warning`, so StartOS asks for confirmation first — the action generates a fresh password and restarts the homeserver, and the old password stops working.
 - **Get Access Token** returns a token for an account, and needs the service running.
 
-### Settings — Config, Registration, Rate Limits, Discoverability, Configure SMTP
+### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Configure SMTP
 
-Five forms over `homeserver.yaml`, all available whether or not the service is running, all applied by the restart they trigger.
+Seven forms over `homeserver.yaml`, all available whether or not the service is running, all applied by the restart they trigger.
 
+- **Config** holds what is left once the rest were split out: call relay, presence, link previews, notification content, admin contact and log level.
+- **Federation** governs which other homeservers yours will talk to — the on/off switch, the domain whitelist, and large-room protection. Turning federation off rewrites the listener resources rather than a flag, which is why this action and Config both write `listeners`.
+- **Media** governs files: upload limit, the largest image that still gets a thumbnail, which thumbnail sizes are prepared, and how long other servers' media is kept. Three of its defaults depart from Synapse's — see [File Models](#file-models).
 - **Registration** governs whether new accounts can be created, and exposes the admin contact.
 - **Rate Limits** tunes Synapse's throttles.
 - **Discoverability** controls how visible the server and its rooms are to the wider network.
@@ -261,6 +276,8 @@ actions:
   - set-admin-password # Accounts
   - get-access-token # Accounts; only-running
   - config # Settings
+  - federation # Settings
+  - media # Settings
   - registration # Settings
   - rate-limits # Settings
   - discoverability # Settings

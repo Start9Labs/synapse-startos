@@ -6,7 +6,9 @@ import { listAppservices } from './appServices/listAppservices'
 import { registerAppservice } from './appServices/registerAppservice'
 import { config } from './settings/config'
 import { discoverability } from './settings/discoverability'
+import { federation } from './settings/federation'
 import { manageSmtp } from './settings/manageSmtp'
+import { media } from './settings/media'
 import { rateLimits } from './settings/rateLimits'
 import { registration } from './settings/registration'
 import { importHomeserver } from './setup/importHomeserver'
@@ -18,6 +20,8 @@ export const actions = sdk.Actions.of()
   .addAction(setAdminPassword)
   .addAction(getAccessToken)
   .addAction(config)
+  .addAction(federation)
+  .addAction(media)
   .addAction(registration)
   .addAction(rateLimits)
   .addAction(discoverability)

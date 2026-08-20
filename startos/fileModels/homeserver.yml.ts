@@ -11,6 +11,37 @@ import {
 // shared constants
 const defaultMaxUpload = '50M'
 
+// Values this package ships in place of Synapse's own. Each is listed in
+// README.md § homeserver.yaml with its upstream value, and every form that
+// exposes one footnotes both numbers.
+export const upstreamDefaults = {
+  max_image_pixels: '32M',
+  sync_response_cache_duration: '2m',
+  remote_media_download_per_second: '87K',
+  remote_media_download_burst_count: '500M',
+} as const
+
+// Synapse refuses to thumbnail anything larger, and a 48-50MP phone camera —
+// the ordinary case now, not the exotic one — lands well past the stock 32M.
+// The ceiling is RAM, not disk: Pillow decodes the whole bitmap to thumbnail
+// it, so 64M costs roughly 192 MiB while one image is in flight.
+export const defaultMaxImagePixels = '64M'
+
+// Synapse's five stop at 800x600, which a 3x-DPI phone upscales. Two larger
+// scales cover them; the crops and the small scales are upstream's.
+export const defaultThumbnailSizes = [
+  { width: 32, height: 32, method: 'crop' as const },
+  { width: 96, height: 96, method: 'crop' as const },
+  { width: 320, height: 240, method: 'scale' as const },
+  { width: 640, height: 480, method: 'scale' as const },
+  { width: 800, height: 600, method: 'scale' as const },
+  { width: 1280, height: 960, method: 'scale' as const },
+  { width: 1920, height: 1440, method: 'scale' as const },
+]
+
+// Upstream's five, which the Standard thumbnail preset restores.
+export const upstreamThumbnailSizes = defaultThumbnailSizes.slice(0, 5)
+
 // extracted defaults
 const dbDefault = {
   args: {
@@ -138,6 +169,14 @@ const cacheAutotuningShape = z
     min_cache_ttl: z.string().catch(cacheAutotuningDefault.min_cache_ttl),
   })
   .catch(cacheAutotuningDefault)
+
+// Sync responses are cached per (user, device, since-token), so a client that
+// drops a long-poll and re-issues the identical request is answered from cache
+// instead of recomputing. Mobile clients do this constantly on flaky links.
+const cachesDefault = {
+  cache_autotuning: cacheAutotuningDefault,
+  sync_response_cache_duration: '5m',
+}
 
 // Absent means upstream applies, which is what the Rate Limits action's Normal
 // preset writes — so these stay optional rather than carrying defaults.
@@ -277,8 +316,13 @@ const shape = z.object({
     .catch(undefined),
   include_profile_data_on_invite: z.boolean().optional().catch(undefined),
   caches: z
-    .object({ cache_autotuning: cacheAutotuningShape })
-    .catch({ cache_autotuning: cacheAutotuningDefault }),
+    .object({
+      cache_autotuning: cacheAutotuningShape,
+      sync_response_cache_duration: z
+        .string()
+        .catch(cachesDefault.sync_response_cache_duration),
+    })
+    .catch(cachesDefault),
   limit_remote_rooms: z
     .object({
       enabled: z.boolean().catch(false),
@@ -296,6 +340,25 @@ const shape = z.object({
     .object({ remote_media_lifetime: z.string() })
     .optional()
     .catch(undefined),
+  max_image_pixels: z.string().catch(defaultMaxImagePixels),
+  // Generating on request rather than at upload is the only way an image
+  // already on disk gains a size it was not thumbnailed for, at the cost of
+  // CPU per request and an unbounded thumbnail directory.
+  dynamic_thumbnails: z.boolean().catch(false),
+  thumbnail_sizes: z
+    .array(
+      z.object({
+        width: z.number(),
+        height: z.number(),
+        method: z.enum(['crop', 'scale']),
+      }),
+    )
+    .catch(defaultThumbnailSizes),
+  // Byte sizes, not counts, and applied per requester: one user pulling a
+  // photo-heavy backlog spends the burst alone and is then held to the
+  // sustained rate while everyone else is unaffected.
+  remote_media_download_per_second: z.string().optional().catch(undefined),
+  remote_media_download_burst_count: z.string().optional().catch(undefined),
   trusted_key_servers: z.array(z.object({ server_name: z.string() })).catch([]),
   max_upload_size: z
     .string()

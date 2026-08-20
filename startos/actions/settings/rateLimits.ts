@@ -1,10 +1,25 @@
-import { homeserverYaml } from '../../fileModels/homeserver.yml'
+import {
+  homeserverYaml,
+  upstreamDefaults,
+} from '../../fileModels/homeserver.yml'
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
 
 const { InputSpec, Value, Variants } = sdk
 
 type Rate = { per_second: number; burst_count: number }
+
+// This pair is bytes rather than counts, so it is carried in the form's own
+// units and converted at the edges.
+const mediaUpstream = {
+  per_second: Number(
+    upstreamDefaults.remote_media_download_per_second.slice(0, -1),
+  ),
+  burst_count: Number(
+    upstreamDefaults.remote_media_download_burst_count.slice(0, -1),
+  ),
+}
+const mediaRelaxed = { per_second: 1024, burst_count: 500 }
 
 // Synapse's own defaults, read from the shipped image rather than its docs.
 // `Normal` writes none of these — it clears the keys so upstream applies —
@@ -116,6 +131,35 @@ export const inputSpec = InputSpec.of({
             i18n('Creating Accounts'),
             upstream.rc_registration,
           ),
+          remote_media_downloads: Value.object(
+            { name: i18n('Downloading Files from Other Servers') },
+            InputSpec.of({
+              per_second: Value.number({
+                name: i18n('Per Second'),
+                description: i18n(
+                  'The sustained download speed each person is held to once their burst allowance is spent. It is counted per requester, so one person working through a photo-heavy backlog is slowed without affecting anyone else.',
+                ),
+                required: true,
+                default: mediaUpstream.per_second,
+                integer: true,
+                min: 1,
+                units: i18n('KB/s'),
+                footnote: `${i18n('Default')}: ${mediaUpstream.per_second} ${i18n('KB/s')}`,
+              }),
+              burst_count: Value.number({
+                name: i18n('Burst'),
+                description: i18n(
+                  'How much each person may download at full speed before the sustained rate starts applying.',
+                ),
+                required: true,
+                default: mediaUpstream.burst_count,
+                integer: true,
+                min: 1,
+                units: i18n('MB'),
+                footnote: `${i18n('Default')}: ${mediaUpstream.burst_count} ${i18n('MB')}`,
+              }),
+            }),
+          ),
         }),
       },
     }),
@@ -146,7 +190,15 @@ export const rateLimits = sdk.Action.withInput(
     const yaml = await homeserverYaml.read().const(effects)
     if (!yaml) return {}
 
-    const { rc_message, rc_registration, rc_joins, rc_invites, rc_login } = yaml
+    const {
+      rc_message,
+      rc_registration,
+      rc_joins,
+      rc_invites,
+      rc_login,
+      remote_media_download_per_second,
+      remote_media_download_burst_count,
+    } = yaml
     // Absent keys mean nothing has been overridden, which is Normal by
     // definition. Anything else is shown as Custom with the live values, even
     // if it happens to match a preset — the user can always re-pick one.
@@ -155,7 +207,9 @@ export const rateLimits = sdk.Action.withInput(
       !rc_registration &&
       !rc_joins &&
       !rc_invites &&
-      !rc_login
+      !rc_login &&
+      !remote_media_download_per_second &&
+      !remote_media_download_burst_count
     )
       return { preset: { selection: 'normal' as const, value: {} } }
 
@@ -177,6 +231,16 @@ export const rateLimits = sdk.Action.withInput(
           rc_login_failed_attempts:
             rc_login?.failed_attempts ?? upstream.rc_login.failed_attempts,
           rc_registration: rc_registration ?? upstream.rc_registration,
+          remote_media_downloads: {
+            per_second: toKB(
+              remote_media_download_per_second,
+              mediaUpstream.per_second,
+            ),
+            burst_count: toMB(
+              remote_media_download_burst_count,
+              mediaUpstream.burst_count,
+            ),
+          },
         },
       },
     }
@@ -192,6 +256,8 @@ export const rateLimits = sdk.Action.withInput(
       rc_joins: undefined,
       rc_invites: undefined,
       rc_login: undefined,
+      remote_media_download_per_second: undefined,
+      remote_media_download_burst_count: undefined,
     }
 
     switch (input.preset.selection) {
@@ -201,6 +267,8 @@ export const rateLimits = sdk.Action.withInput(
         return void (await homeserverYaml.merge(effects, {
           ...blank,
           ...relaxed,
+          remote_media_download_per_second: `${mediaRelaxed.per_second}K`,
+          remote_media_download_burst_count: `${mediaRelaxed.burst_count}M`,
         }))
       case 'custom': {
         const v = input.preset.value
@@ -218,8 +286,32 @@ export const rateLimits = sdk.Action.withInput(
             account: v.rc_login_account,
             failed_attempts: v.rc_login_failed_attempts,
           },
+          remote_media_download_per_second: `${v.remote_media_downloads.per_second}K`,
+          remote_media_download_burst_count: `${v.remote_media_downloads.burst_count}M`,
         }))
       }
     }
   },
 )
+
+// Synapse parses these with parse_size: a bare number is bytes, and only the
+// K/M/G suffixes carry a multiplier.
+const parseSize = (size: string) => {
+  const value = Number(size.slice(0, -1))
+  switch (size.at(-1)) {
+    case 'G':
+      return value * 1024 ** 3
+    case 'M':
+      return value * 1024 ** 2
+    case 'K':
+      return value * 1024
+    default:
+      return Number(size)
+  }
+}
+
+const toKB = (size: string | undefined, fallback: number) =>
+  size ? Math.max(1, Math.round(parseSize(size) / 1024)) : fallback
+
+const toMB = (size: string | undefined, fallback: number) =>
+  size ? Math.max(1, Math.round(parseSize(size) / 1024 ** 2)) : fallback

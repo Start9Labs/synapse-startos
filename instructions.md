@@ -99,8 +99,10 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 
 ### Actions
 
-- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. Synapse restarts automatically to apply the new password; if it is stopped, the password is applied the next time you start it.
-- **Config** — federation, voice and video calls, presence, link previews, notification content, upload and room-size limits, log level, and how long to keep other servers' media.
+- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. It asks you to confirm first, because it replaces the current password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it.
+- **Config** — voice and video calls, presence, link previews, notification content, and log level.
+- **Federation** — whether your server talks to other homeservers, which ones, and how large a room it will join.
+- **Media** — upload limit, how large an image can be and still get a thumbnail, which thumbnail sizes are prepared, and how long other servers' files are kept.
 - **Registration** — who may create an account, which rooms they join automatically, and whether guests may look around.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
 - **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
@@ -111,7 +113,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 
 ### Federation
 
-Federation is off by default. Turn it on through the **Config** action, optionally restricting it to a whitelist of allowed server domains. With federation on, your client's **Explore Public Rooms** can join rooms hosted on other Matrix servers (e.g. `#room:matrix.example.com`).
+Federation is off by default. Turn it on through the **Federation** action, optionally restricting it to a whitelist of allowed server domains. With federation on, your client's **Explore Public Rooms** can join rooms hosted on other Matrix servers (e.g. `#room:matrix.example.com`).
 
 Other homeservers reach yours over the **Homeserver** interface on port 443. Your server publishes an address delegation telling them to use it, so there is no second port to open and nothing extra to forward.
 
@@ -129,7 +131,7 @@ The same action sets which rooms a new account joins automatically — give the 
 
 ### Staying out of trouble with very large rooms
 
-Joining a huge public room makes your server download and keep its whole history, which on home hardware can take hours and fill the disk. **Large Room Protection** in the **Config** action refuses joins above a size you choose.
+Joining a huge public room makes your server download and keep its whole history, which on home hardware can take hours and fill the disk. **Large Room Protection** in the **Federation** action refuses joins above a size you choose.
 
 The limit is a "complexity" number — roughly the room's size in units of 500 events, so 1 is a small room and 20 is a fairly large one. It starts at Synapse's own default of 1, which will turn away plenty of ordinary rooms, so raise it until the rooms you actually want work. It only applies the first time someone here joins a given room, and you as the admin are exempt: you can always join a room yourself and everyone else can then follow you in.
 
@@ -163,9 +165,20 @@ The **Rate Limits** action has two ready-made choices. **Normal** is Synapse's o
 
 If none of those fit, **Custom** exposes every limit individually, starting from Synapse's values. Each has a _per second_ rate and a _burst_ — the burst is how many are allowed in quick succession before the slower sustained rate takes over.
 
+### Pictures that will not load
+
+Nearly always this is the client, not the server, and clearing that device's cache fixes it — in Element, **Settings → Help & About → Clear cache and reload**. A client that failed to fetch an image once will keep showing the failure from its own cache long after the cause is gone, so try this before changing anything on the server.
+
+If it is every image on every device, or every image from one particular person, the **Media** action is where to look:
+
+- **Largest Image to Thumbnail** is the usual culprit for "some photos never appear". Above this size Synapse prepares no thumbnail at all, and the client is left fetching the full original or showing nothing. Current phone cameras take 48-50 megapixel photos in their ordinary mode, which is past what Synapse allows on its own; this package raises the limit, and you can raise it further.
+- **Thumbnails** decides which sizes are prepared. If images look soft rather than missing, this is why — a high-resolution phone screen given only a small thumbnail stretches it. **On Demand** always produces an exact fit, at the cost of processing each request and storing every size that gets asked for.
+
+Both only apply to images uploaded after you change them, except **On Demand**, which also works on images already on your server.
+
 ### Keeping disk use down
 
-An active homeserver caches every file its users see from other servers, and that cache is included in your StartOS backups. **Remote Media Retention** in the **Config** action puts an age limit on it. Anything purged is fetched again if someone opens it, so the only cost is a little bandwidth. Leaving it empty keeps everything forever, which is Synapse's own default.
+An active homeserver caches every file its users see from other servers, and that cache is included in your StartOS backups. **Remote Media Retention** in the **Media** action puts an age limit on it. Anything purged is fetched again if someone opens it, so the only cost is a little bandwidth. Leaving it empty keeps everything forever, which is Synapse's own default.
 
 ### Encryption and key backup
 

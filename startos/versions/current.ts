@@ -1,78 +1,48 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.158.0:1',
+  version: '1.158.0:2',
   releaseNotes: {
-    en_US: `Adds a migration path for homeservers hosted elsewhere, plus call relay and two new configuration controls.
+    en_US: `Splits the settings into clearer actions and improves how images reach your users.
 
-- New **Import Existing Homeserver** action adopts the identity, database and media of a Matrix homeserver you already run somewhere else. Its users keep their accounts, their logins and their history.
-- New optional dependency on **Coturn** relays voice and video calls through NAT and restrictive firewalls. Turn it on under **Voice and Video Calls** in the Config action.
-- Config gains a **Presence** toggle and a **Remote Media Retention** period, which caps the disk and backup growth caused by cached media from other homeservers.
-- **Registration** moves to its own action and is now three-way: Disabled, **Invite Only**, or Open. It also sets which rooms new accounts join automatically, and whether guests may look around. Invite Only lets people sign up with a registration token you create and revoke in the Admin Dashboard, which is the middle ground the old on/off switch never had.
-- New **Large Room Protection** refuses joins to rooms bigger than your server can comfortably handle, the first thing that flattens a home homeserver.
-- New **Log Level** setting. Logging was pinned to Info and rewritten on every start; Warning is much quieter for day-to-day running.
-- The room summary API (MSC3266) is now enabled, which current-generation mobile clients require.
-- New **Discoverability** action, choosing in one step how much a stranger can learn about your server, with Private / Normal / Public presets and a Custom option.
-- New **Rate Limits** action, with Normal and Relaxed presets and a Custom option that exposes every limit individually.
-- **Link previews** can now be turned on, with the fetcher blocked from reaching anything on your own network.
-- Push notifications now fire for encrypted messages, and you can choose whether they carry the message text.
-- Synapse now evicts caches before it can eat the box. The ceiling is derived from your server's RAM and sized to stay out of the way in normal use.`,
-    es_ES: `Añade una ruta de migración para servidores alojados en otro sitio, además de retransmisión de llamadas y dos controles de configuración nuevos.
+- **Media** is a new action, holding the upload limit, the new image and thumbnail settings, and how long other servers' files are kept. **Federation** is a new action too, holding federation, the domain whitelist and large-room protection. Both were previously buried in Config.
+- **Images from modern phone cameras now get thumbnails.** Synapse refuses to thumbnail anything above roughly 32 megapixels, which current phones exceed in their ordinary mode — the picture then arrives as a full-size download or not at all. This raises the limit to roughly 64 megapixels.
+- **Thumbnails are prepared at sizes a modern phone screen can use.** Synapse's largest was 800x600, which a high-density display upscales into something soft; two larger sizes are now generated as well. Set **Thumbnails** back to Standard in the Media action if you would rather save the disk space.
+- **Sync responses are cached for five minutes rather than two**, which spares the server repeated work from phones that keep dropping and re-establishing their connection.
+- **Rate Limits** gains a per-person speed limit for downloading files from other servers, so one person working through a photo-heavy backlog no longer competes with everyone else.
+- **Set Admin Password now asks for confirmation.** It generates a new password and restarts the homeserver, which is not what you want from a single stray click.`,
+    es_ES: `Divide los ajustes en acciones más claras y mejora cómo llegan las imágenes a sus usuarios.
 
-- La nueva acción **Importar servidor existente** adopta la identidad, la base de datos y los medios de un servidor Matrix que ya tenga en otro lugar. Sus usuarios conservan sus cuentas, sus sesiones y su historial.
-- La nueva dependencia opcional de **Coturn** retransmite las llamadas de voz y vídeo a través de NAT y de cortafuegos restrictivos. Actívela en **Llamadas de voz y vídeo** dentro de la acción Configuración.
-- Configuración incorpora un interruptor de **Presencia** y un periodo de **Retención de medios remotos**, que limita el crecimiento de disco y de copias de seguridad causado por los medios en caché de otros servidores.
-- El **Registro** pasa a su propia acción y es ahora de tres estados: Deshabilitado, **Solo con invitación** o Abierto. También decide en qué salas entran automáticamente las cuentas nuevas y si los invitados pueden echar un vistazo. «Solo con invitación» permite registrarse con un token que usted crea y revoca en el panel de administración: el término medio que el antiguo interruptor no ofrecía.
-- La nueva **Protección frente a salas grandes** rechaza la entrada a salas mayores de lo que su servidor puede manejar con soltura, lo primero que tumba un servidor doméstico.
-- Nueva opción de **Nivel de registro**. El registro estaba fijado en «Info» y se reescribía en cada arranque; «Advertencia» es mucho más silencioso para el día a día.
-- Se habilita la API de resumen de salas (MSC3266), que requieren los clientes móviles de la generación actual.
-- Nueva acción **Visibilidad**, que decide de una vez cuánto puede averiguar un desconocido sobre su servidor, con ajustes Privado / Normal / Público y una opción Personalizado.
-- Nueva acción **Límites de frecuencia**, con los ajustes Normal y Laxo y una opción Personalizado que expone cada límite por separado.
-- Ya se pueden activar las **vistas previas de enlaces**, con el descargador impedido de alcanzar nada de su propia red.
-- Las notificaciones push ya funcionan con mensajes cifrados, y usted decide si llevan el texto del mensaje.
-- Synapse ahora purga sus cachés antes de poder comerse el servidor. El límite se deriva de la RAM de su máquina y está dimensionado para no estorbar en el uso normal.`,
-    de_DE: `Ergänzt einen Migrationsweg für anderswo betriebene Homeserver sowie ein Anruf-Relay und zwei neue Konfigurationsregler.
+- **Multimedia** es una acción nueva, con el límite de subida, los nuevos ajustes de imágenes y miniaturas, y cuánto tiempo se conservan los archivos de otros servidores. **Federación** también es una acción nueva, con la federación, la lista blanca de dominios y la protección frente a salas grandes. Antes ambas estaban enterradas en Configuración.
+- **Las imágenes de las cámaras de los teléfonos actuales ya reciben miniatura.** Synapse se niega a generar miniaturas por encima de unos 32 megapíxeles, cifra que los teléfonos actuales superan en su modo normal: la imagen llega entonces como descarga a tamaño completo, o no llega. Ahora el límite sube a unos 64 megapíxeles.
+- **Las miniaturas se preparan en tamaños que una pantalla de teléfono actual puede aprovechar.** La mayor de Synapse era de 800x600, que una pantalla de alta densidad amplía hasta verse borrosa; ahora se generan además dos tamaños mayores. Ponga **Miniaturas** en Estándar dentro de la acción Multimedia si prefiere ahorrar espacio en disco.
+- **Las respuestas de sincronización se guardan en caché cinco minutos en lugar de dos**, lo que ahorra al servidor trabajo repetido de los teléfonos que pierden y rehacen la conexión constantemente.
+- **Límites de frecuencia** incorpora un límite de velocidad por persona para descargar archivos de otros servidores, de modo que quien recorra un historial lleno de fotos ya no compite con los demás.
+- **Establecer contraseña de administrador ahora pide confirmación.** Genera una contraseña nueva y reinicia el servidor, que no es lo que uno espera de un clic accidental.`,
+    de_DE: `Teilt die Einstellungen in klarere Aktionen auf und verbessert, wie Bilder bei Ihren Nutzern ankommen.
 
-- Die neue Aktion **Bestehenden Homeserver importieren** übernimmt Identität, Datenbank und Medien eines Matrix-Homeservers, den Sie bereits woanders betreiben. Dessen Nutzer behalten ihre Konten, ihre Anmeldungen und ihren Verlauf.
-- Die neue optionale Abhängigkeit **Coturn** leitet Sprach- und Videoanrufe durch NAT und restriktive Firewalls. Einschalten unter **Sprach- und Videoanrufe** in der Aktion Konfiguration.
-- Die Konfiguration erhält einen **Anwesenheit**-Schalter und eine **Aufbewahrung entfernter Medien**, die das durch zwischengespeicherte Medien anderer Homeserver verursachte Wachstum von Speicher und Backups begrenzt.
-- Die **Registrierung** bekommt eine eigene Aktion und ist jetzt dreistufig: Deaktiviert, **Nur mit Einladung** oder Offen. Sie legt außerdem fest, welchen Räumen neue Konten automatisch beitreten und ob Gäste sich umsehen dürfen. „Nur mit Einladung“ lässt Personen sich mit einem Token anmelden, das Sie im Admin-Dashboard erstellen und widerrufen — der Mittelweg, den der alte Schalter nie bot.
-- Der neue **Schutz vor großen Räumen** lehnt den Beitritt zu Räumen ab, die größer sind, als Ihr Server bequem verkraftet — der erste Grund, an dem ein Heim-Homeserver scheitert.
-- Neue Einstellung **Protokollstufe**. Das Protokoll war auf „Info“ festgenagelt und wurde bei jedem Start überschrieben; „Warnung“ ist im Alltag deutlich ruhiger.
-- Die Raumzusammenfassungs-API (MSC3266) ist nun aktiviert, die aktuelle mobile Clients voraussetzen.
-- Neue Aktion **Auffindbarkeit**: legt in einem Schritt fest, wie viel ein Fremder über Ihren Server erfahren kann, mit den Voreinstellungen Privat / Normal / Öffentlich und einer benutzerdefinierten Option.
-- Neue Aktion **Ratenbegrenzungen** mit den Voreinstellungen Normal und Locker und einer benutzerdefinierten Option, die jede Grenze einzeln zugänglich macht.
-- **Linkvorschauen** lassen sich nun einschalten, wobei der Abrufer nichts im eigenen Netzwerk erreichen kann.
-- Push-Benachrichtigungen kommen jetzt auch bei verschlüsselten Nachrichten an, und Sie entscheiden, ob sie den Nachrichtentext mitführen.
-- Synapse räumt seine Caches jetzt auf, bevor es den Server auffressen kann. Die Obergrenze wird aus dem Arbeitsspeicher Ihrer Maschine abgeleitet und ist so bemessen, dass sie im Normalbetrieb nicht stört.`,
-    pl_PL: `Dodaje ścieżkę migracji dla serwerów prowadzonych gdzie indziej, a także przekazywanie połączeń i dwa nowe ustawienia konfiguracji.
+- **Medien** ist eine neue Aktion mit dem Upload-Limit, den neuen Bild- und Vorschaubild-Einstellungen und der Aufbewahrungsdauer für Dateien anderer Server. **Föderation** ist ebenfalls neu und enthält Föderation, Domain-Whitelist und den Schutz vor großen Räumen. Beide steckten zuvor in der Konfiguration.
+- **Bilder aktueller Handykameras erhalten jetzt Vorschaubilder.** Synapse erzeugt oberhalb von rund 32 Megapixeln keine mehr — ein Wert, den heutige Telefone im Normalmodus überschreiten; das Bild kommt dann als Download in voller Größe an oder gar nicht. Die Grenze steigt auf rund 64 Megapixel.
+- **Vorschaubilder entstehen in Größen, die ein modernes Handydisplay nutzen kann.** Synapses größte war 800x600, die ein hochauflösendes Display unscharf hochskaliert; zwei größere Formate kommen hinzu. Stellen Sie **Vorschaubilder** in der Aktion Medien auf Standard zurück, wenn Ihnen der Speicherplatz wichtiger ist.
+- **Sync-Antworten werden fünf statt zwei Minuten zwischengespeichert**, was dem Server wiederholte Arbeit durch Telefone erspart, die ihre Verbindung ständig verlieren und neu aufbauen.
+- **Ratenbegrenzungen** erhält ein Tempolimit pro Person für das Herunterladen von Dateien anderer Server, sodass jemand, der einen fotolastigen Verlauf durchgeht, nicht mehr mit allen anderen konkurriert.
+- **Administratorpasswort setzen fragt jetzt nach.** Die Aktion erzeugt ein neues Passwort und startet den Homeserver neu — nichts, was man sich von einem versehentlichen Klick wünscht.`,
+    pl_PL: `Dzieli ustawienia na czytelniejsze akcje i poprawia sposób, w jaki obrazy docierają do użytkowników.
 
-- Nowa akcja **Importuj istniejący serwer** przejmuje tożsamość, bazę danych i media serwera Matrix, który już prowadzisz w innym miejscu. Jego użytkownicy zachowują konta, sesje i historię.
-- Nowa opcjonalna zależność **Coturn** przekazuje połączenia głosowe i wideo przez NAT i restrykcyjne zapory. Włącz ją w **Połączenia głosowe i wideo** w akcji Konfiguracja.
-- Konfiguracja zyskuje przełącznik **Obecność** oraz okres **Przechowywania mediów zdalnych**, który ogranicza przyrost miejsca na dysku i rozmiaru kopii zapasowych powodowany przez media z innych serwerów.
-- **Rejestracja** trafia do własnej akcji i ma teraz trzy stany: Wyłączona, **Tylko z zaproszeniem** lub Otwarta. Ustala też, do jakich pokoi automatycznie dołączają nowe konta i czy goście mogą się rozejrzeć. „Tylko z zaproszeniem” pozwala rejestrować się za pomocą tokenu, który tworzysz i unieważniasz w panelu administracyjnym — to złoty środek, którego dawny przełącznik nie dawał.
-- Nowa **Ochrona przed dużymi pokojami** odrzuca dołączanie do pokoi większych, niż serwer jest w stanie swobodnie obsłużyć — pierwszy problem, na którym przewraca się domowy serwer.
-- Nowe ustawienie **Poziom logowania**. Logi były przypięte do „Info” i nadpisywane przy każdym starcie; „Ostrzeżenia” są znacznie cichsze na co dzień.
-- Włączono API podsumowania pokoi (MSC3266), wymagane przez obecną generację klientów mobilnych.
-- Nowa akcja **Wykrywalność**: jednym wyborem ustala, ile obcy może dowiedzieć się o Twoim serwerze, z ustawieniami Prywatny / Normalny / Publiczny oraz opcją Własne.
-- Nowa akcja **Limity częstotliwości** z ustawieniami Normalne i Luźne oraz opcją Własne, która udostępnia każdy limit z osobna.
-- Można już włączyć **podglądy linków**, przy czym pobieracz nie sięgnie niczego w Twojej własnej sieci.
-- Powiadomienia push działają teraz dla wiadomości zaszyfrowanych, a Ty decydujesz, czy niosą treść wiadomości.
-- Synapse czyści teraz pamięci podręczne, zanim zdąży zająć całą maszynę. Limit wyliczany jest z ilości RAM Twojego serwera i dobrany tak, by nie przeszkadzać w normalnej pracy.`,
-    fr_FR: `Ajoute un chemin de migration pour les serveurs hébergés ailleurs, ainsi que le relais d'appels et deux nouveaux réglages de configuration.
+- **Multimedia** to nowa akcja zawierająca limit wysyłania, nowe ustawienia obrazów i miniatur oraz czas przechowywania plików z innych serwerów. **Federacja** to również nowa akcja: federacja, biała lista domen i ochrona przed dużymi pokojami. Obie były wcześniej ukryte w Konfiguracji.
+- **Zdjęcia z aparatów współczesnych telefonów wreszcie dostają miniatury.** Synapse odmawia tworzenia miniatur powyżej mniej więcej 32 megapikseli, co obecne telefony przekraczają w zwykłym trybie — obraz przychodzi wtedy jako pełne pobranie albo wcale. Limit rośnie do około 64 megapikseli.
+- **Miniatury powstają w rozmiarach, z których potrafi skorzystać współczesny ekran telefonu.** Największa w Synapse miała 800x600, co ekran o dużej gęstości pikseli powiększa do nieostrego obrazu; teraz powstają też dwa większe rozmiary. Ustaw **Miniatury** z powrotem na Standardowe w akcji Multimedia, jeśli wolisz oszczędzić miejsce na dysku.
+- **Odpowiedzi synchronizacji są buforowane przez pięć minut zamiast dwóch**, co oszczędza serwerowi powtarzanej pracy przy telefonach stale tracących i wznawiających połączenie.
+- **Limity częstotliwości** zyskują limit prędkości pobierania plików z innych serwerów, liczony osobno dla każdej osoby, więc ktoś przeglądający historię pełną zdjęć nie konkuruje już z resztą.
+- **Ustawienie hasła administratora prosi teraz o potwierdzenie.** Akcja generuje nowe hasło i restartuje serwer, a tego nie chce się po przypadkowym kliknięciu.`,
+    fr_FR: `Répartit les réglages en actions plus lisibles et améliore la façon dont les images parviennent à vos utilisateurs.
 
-- La nouvelle action **Importer un serveur existant** reprend l'identité, la base de données et les médias d'un serveur Matrix que vous hébergez déjà ailleurs. Ses utilisateurs conservent leurs comptes, leurs sessions et leur historique.
-- La nouvelle dépendance optionnelle **Coturn** relaie les appels audio et vidéo à travers le NAT et les pare-feu restrictifs. Activez-la dans **Appels audio et vidéo** de l'action Configuration.
-- La configuration gagne un interrupteur **Présence** et une durée de **Rétention des médias distants**, qui limite la croissance du disque et des sauvegardes causée par les médias mis en cache depuis d'autres serveurs.
-- L'**inscription** passe dans sa propre action et est désormais à trois états : Désactivée, **Sur invitation** ou Ouverte. Elle définit aussi les salons que les nouveaux comptes rejoignent automatiquement et si les invités peuvent regarder. « Sur invitation » permet de s'inscrire avec un jeton que vous créez et révoquez dans le tableau de bord d'administration — le juste milieu que l'ancien interrupteur n'offrait pas.
-- La nouvelle **protection contre les grands salons** refuse de rejoindre des salons plus gros que ce que votre serveur encaisse confortablement, la première chose qui met à genoux un serveur domestique.
-- Nouveau réglage **Niveau de journalisation**. Les journaux étaient figés sur « Info » et réécrits à chaque démarrage ; « Avertissement » est bien plus discret au quotidien.
-- L'API de résumé de salon (MSC3266) est désormais activée ; les clients mobiles actuels en dépendent.
-- Nouvelle action **Visibilité**, qui décide d'un coup ce qu'un inconnu peut apprendre de votre serveur, avec les préréglages Privé / Normal / Public et une option Personnalisé.
-- Nouvelle action **Limites de débit**, avec les préréglages Normal et Souple et une option Personnalisé qui expose chaque limite individuellement.
-- Les **aperçus de liens** peuvent désormais être activés, le récupérateur étant empêché d'atteindre quoi que ce soit sur votre propre réseau.
-- Les notifications push fonctionnent maintenant pour les messages chiffrés, et vous choisissez si elles transportent le texte du message.
-- Synapse purge désormais ses caches avant de pouvoir dévorer la machine. Le plafond est déduit de la RAM de votre serveur et dimensionné pour ne pas gêner en usage normal.`,
+- **Médias** est une nouvelle action : limite de téléversement, nouveaux réglages d'images et de miniatures, et durée de conservation des fichiers des autres serveurs. **Fédération** est également nouvelle : fédération, liste blanche de domaines et protection contre les grands salons. Les deux étaient auparavant noyées dans Configuration.
+- **Les photos des appareils des téléphones actuels obtiennent enfin une miniature.** Synapse refuse d'en produire au-delà d'environ 32 mégapixels, seuil que les téléphones d'aujourd'hui dépassent en mode ordinaire : l'image arrive alors en téléchargement pleine taille, ou pas du tout. La limite passe à environ 64 mégapixels.
+- **Les miniatures sont préparées dans des tailles exploitables par un écran de téléphone moderne.** La plus grande de Synapse était 800x600, qu'un écran haute densité agrandit jusqu'au flou ; deux tailles supérieures sont désormais produites. Remettez **Miniatures** sur Standard dans l'action Médias si vous préférez économiser l'espace disque.
+- **Les réponses de synchronisation sont mises en cache cinq minutes au lieu de deux**, ce qui épargne au serveur le travail répété des téléphones qui perdent et rétablissent sans cesse leur connexion.
+- **Limites de débit** gagne une limite de vitesse par personne pour le téléchargement des fichiers des autres serveurs : quelqu'un qui parcourt un historique riche en photos ne concurrence plus tout le monde.
+- **Définir le mot de passe administrateur demande désormais confirmation.** L'action génère un nouveau mot de passe et redémarre le serveur, ce qu'on ne souhaite pas d'un clic malencontreux.`,
   },
   migrations: {},
 })
