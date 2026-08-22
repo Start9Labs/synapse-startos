@@ -1,53 +1,43 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.158.0:2',
+  version: '1.159.0:0',
   releaseNotes: {
-    en_US: `Splits the settings into clearer actions and improves how images reach your users.
+    en_US: `Updated Synapse to 1.159.0, a small maintenance release.
 
-- **Media** is a new action, holding the upload limit, the new image and thumbnail settings, and how long other servers' files are kept. **Federation** is a new action too, holding federation, the domain whitelist and large-room protection. Both were previously buried in Config.
-- **Images from modern phone cameras now get thumbnails.** Synapse refuses to thumbnail anything above roughly 32 megapixels, which current phones exceed in their ordinary mode — the picture then arrives as a full-size download or not at all. This raises the limit to roughly 64 megapixels.
-- **Thumbnails are prepared at sizes a modern phone screen can use.** Synapse's largest was 800x600, which a high-density display upscales into something soft; two larger sizes are now generated as well. Set **Thumbnails** back to Standard in the Media action if you would rather save the disk space.
-- **Sync responses are cached for five minutes rather than two**, which spares the server repeated work from phones that keep dropping and re-establishing their connection.
-- **Rate Limits** gains a per-person speed limit for downloading files from other servers, so one person working through a photo-heavy backlog no longer competes with everyone else.
-- **Set Admin Password now asks for confirmation.** It generates a new password and restarts the homeserver, which is not what you want from a single stray click.
-- **Configure SMTP is now called Email/SMTP**, and **Import Existing Homeserver** no longer lingers in the Setup group once your server has an address — it was never usable past that point.`,
-    es_ES: `Divide los ajustes en acciones más claras y mejora cómo llegan las imágenes a sus usuarios.
+- **Photos taken in some phone camera modes now get thumbnails.** An MPO image — what a phone writes when it captures depth or several exposures at once — previously failed to thumbnail at all, and an animation Synapse could not decode did the same. Both now produce a still thumbnail.
+- **Synapse's log lines appear as they happen**, rather than arriving in bursts once its output buffer fills.
+- Database connections left idle inside a transaction are closed after thirty minutes, so a stuck connection no longer holds locks or blocks routine cleanup.
 
-- **Multimedia** es una acción nueva, con el límite de subida, los nuevos ajustes de imágenes y miniaturas, y cuánto tiempo se conservan los archivos de otros servidores. **Federación** también es una acción nueva, con la federación, la lista blanca de dominios y la protección frente a salas grandes. Antes ambas estaban enterradas en Configuración.
-- **Las imágenes de las cámaras de los teléfonos actuales ya reciben miniatura.** Synapse se niega a generar miniaturas por encima de unos 32 megapíxeles, cifra que los teléfonos actuales superan en su modo normal: la imagen llega entonces como descarga a tamaño completo, o no llega. Ahora el límite sube a unos 64 megapíxeles.
-- **Las miniaturas se preparan en tamaños que una pantalla de teléfono actual puede aprovechar.** La mayor de Synapse era de 800x600, que una pantalla de alta densidad amplía hasta verse borrosa; ahora se generan además dos tamaños mayores. Ponga **Miniaturas** en Estándar dentro de la acción Multimedia si prefiere ahorrar espacio en disco.
-- **Las respuestas de sincronización se guardan en caché cinco minutos en lugar de dos**, lo que ahorra al servidor trabajo repetido de los teléfonos que pierden y rehacen la conexión constantemente.
-- **Límites de frecuencia** incorpora un límite de velocidad por persona para descargar archivos de otros servidores, de modo que quien recorra un historial lleno de fotos ya no compite con los demás.
-- **Establecer contraseña de administrador ahora pide confirmación.** Genera una contraseña nueva y reinicia el servidor, que no es lo que uno espera de un clic accidental.
-- **Configurar SMTP pasa a llamarse Correo electrónico/SMTP**, e **Importar servidor existente** ya no permanece en el grupo Configuración inicial una vez que su servidor tiene dirección: nunca se podía usar pasado ese punto.`,
-    de_DE: `Teilt die Einstellungen in klarere Aktionen auf und verbessert, wie Bilder bei Ihren Nutzern ankommen.
+Full release notes: https://github.com/element-hq/synapse/blob/release-v1.159/CHANGES.md`,
+    es_ES: `Actualiza Synapse a 1.159.0, una versión de mantenimiento menor.
 
-- **Medien** ist eine neue Aktion mit dem Upload-Limit, den neuen Bild- und Vorschaubild-Einstellungen und der Aufbewahrungsdauer für Dateien anderer Server. **Föderation** ist ebenfalls neu und enthält Föderation, Domain-Whitelist und den Schutz vor großen Räumen. Beide steckten zuvor in der Konfiguration.
-- **Bilder aktueller Handykameras erhalten jetzt Vorschaubilder.** Synapse erzeugt oberhalb von rund 32 Megapixeln keine mehr — ein Wert, den heutige Telefone im Normalmodus überschreiten; das Bild kommt dann als Download in voller Größe an oder gar nicht. Die Grenze steigt auf rund 64 Megapixel.
-- **Vorschaubilder entstehen in Größen, die ein modernes Handydisplay nutzen kann.** Synapses größte war 800x600, die ein hochauflösendes Display unscharf hochskaliert; zwei größere Formate kommen hinzu. Stellen Sie **Vorschaubilder** in der Aktion Medien auf Standard zurück, wenn Ihnen der Speicherplatz wichtiger ist.
-- **Sync-Antworten werden fünf statt zwei Minuten zwischengespeichert**, was dem Server wiederholte Arbeit durch Telefone erspart, die ihre Verbindung ständig verlieren und neu aufbauen.
-- **Ratenbegrenzungen** erhält ein Tempolimit pro Person für das Herunterladen von Dateien anderer Server, sodass jemand, der einen fotolastigen Verlauf durchgeht, nicht mehr mit allen anderen konkurriert.
-- **Administratorpasswort setzen fragt jetzt nach.** Die Aktion erzeugt ein neues Passwort und startet den Homeserver neu — nichts, was man sich von einem versehentlichen Klick wünscht.
-- **SMTP konfigurieren heißt jetzt E-Mail/SMTP**, und **Bestehenden Homeserver importieren** verbleibt nicht mehr in der Gruppe Einrichtung, sobald Ihr Server eine Adresse hat — nutzbar war die Aktion danach ohnehin nie.`,
-    pl_PL: `Dzieli ustawienia na czytelniejsze akcje i poprawia sposób, w jaki obrazy docierają do użytkowników.
+- **Las fotos tomadas en algunos modos de cámara ya obtienen miniatura.** Una imagen MPO —lo que escribe un teléfono cuando captura profundidad o varias exposiciones a la vez— no llegaba a tener miniatura, y lo mismo ocurría con una animación que Synapse no pudiera decodificar. Ahora ambas producen una miniatura fija.
+- **Las líneas de registro de Synapse aparecen en el momento**, en lugar de llegar a ráfagas cuando se llena su búfer de salida.
+- Las conexiones a la base de datos que quedan inactivas dentro de una transacción se cierran a los treinta minutos, de modo que una conexión atascada ya no retiene bloqueos ni impide la limpieza rutinaria.
 
-- **Multimedia** to nowa akcja zawierająca limit wysyłania, nowe ustawienia obrazów i miniatur oraz czas przechowywania plików z innych serwerów. **Federacja** to również nowa akcja: federacja, biała lista domen i ochrona przed dużymi pokojami. Obie były wcześniej ukryte w Konfiguracji.
-- **Zdjęcia z aparatów współczesnych telefonów wreszcie dostają miniatury.** Synapse odmawia tworzenia miniatur powyżej mniej więcej 32 megapikseli, co obecne telefony przekraczają w zwykłym trybie — obraz przychodzi wtedy jako pełne pobranie albo wcale. Limit rośnie do około 64 megapikseli.
-- **Miniatury powstają w rozmiarach, z których potrafi skorzystać współczesny ekran telefonu.** Największa w Synapse miała 800x600, co ekran o dużej gęstości pikseli powiększa do nieostrego obrazu; teraz powstają też dwa większe rozmiary. Ustaw **Miniatury** z powrotem na Standardowe w akcji Multimedia, jeśli wolisz oszczędzić miejsce na dysku.
-- **Odpowiedzi synchronizacji są buforowane przez pięć minut zamiast dwóch**, co oszczędza serwerowi powtarzanej pracy przy telefonach stale tracących i wznawiających połączenie.
-- **Limity częstotliwości** zyskują limit prędkości pobierania plików z innych serwerów, liczony osobno dla każdej osoby, więc ktoś przeglądający historię pełną zdjęć nie konkuruje już z resztą.
-- **Ustawienie hasła administratora prosi teraz o potwierdzenie.** Akcja generuje nowe hasło i restartuje serwer, a tego nie chce się po przypadkowym kliknięciu.
-- **Konfiguracja SMTP nazywa się teraz E-mail/SMTP**, a **Importuj istniejący serwer** nie zostaje już w grupie Konfiguracja wstępna, gdy serwer ma adres — i tak nie dało się jej wtedy użyć.`,
-    fr_FR: `Répartit les réglages en actions plus lisibles et améliore la façon dont les images parviennent à vos utilisateurs.
+Notas de la versión completas: https://github.com/element-hq/synapse/blob/release-v1.159/CHANGES.md`,
+    de_DE: `Aktualisiert Synapse auf 1.159.0, eine kleine Wartungsversion.
 
-- **Médias** est une nouvelle action : limite de téléversement, nouveaux réglages d'images et de miniatures, et durée de conservation des fichiers des autres serveurs. **Fédération** est également nouvelle : fédération, liste blanche de domaines et protection contre les grands salons. Les deux étaient auparavant noyées dans Configuration.
-- **Les photos des appareils des téléphones actuels obtiennent enfin une miniature.** Synapse refuse d'en produire au-delà d'environ 32 mégapixels, seuil que les téléphones d'aujourd'hui dépassent en mode ordinaire : l'image arrive alors en téléchargement pleine taille, ou pas du tout. La limite passe à environ 64 mégapixels.
-- **Les miniatures sont préparées dans des tailles exploitables par un écran de téléphone moderne.** La plus grande de Synapse était 800x600, qu'un écran haute densité agrandit jusqu'au flou ; deux tailles supérieures sont désormais produites. Remettez **Miniatures** sur Standard dans l'action Médias si vous préférez économiser l'espace disque.
-- **Les réponses de synchronisation sont mises en cache cinq minutes au lieu de deux**, ce qui épargne au serveur le travail répété des téléphones qui perdent et rétablissent sans cesse leur connexion.
-- **Limites de débit** gagne une limite de vitesse par personne pour le téléchargement des fichiers des autres serveurs : quelqu'un qui parcourt un historique riche en photos ne concurrence plus tout le monde.
-- **Définir le mot de passe administrateur demande désormais confirmation.** L'action génère un nouveau mot de passe et redémarre le serveur, ce qu'on ne souhaite pas d'un clic malencontreux.
-- **Configurer SMTP s'appelle désormais E-mail/SMTP**, et **Importer un serveur existant** ne reste plus dans le groupe Configuration une fois que votre serveur a une adresse — elle n'y était de toute façon plus utilisable.`,
+- **Fotos aus bestimmten Kameramodi erhalten jetzt Vorschaubilder.** Ein MPO-Bild — was ein Telefon schreibt, wenn es Tiefe oder mehrere Belichtungen zugleich aufnimmt — bekam bisher gar kein Vorschaubild, ebenso wenig eine Animation, die Synapse nicht dekodieren konnte. Beide liefern nun ein unbewegtes Vorschaubild.
+- **Die Logzeilen von Synapse erscheinen sofort**, statt schubweise einzutreffen, sobald sich der Ausgabepuffer füllt.
+- Datenbankverbindungen, die innerhalb einer Transaktion untätig bleiben, werden nach dreißig Minuten geschlossen, sodass eine hängende Verbindung keine Sperren mehr hält und die routinemäßige Bereinigung nicht blockiert.
+
+Vollständige Versionshinweise: https://github.com/element-hq/synapse/blob/release-v1.159/CHANGES.md`,
+    pl_PL: `Aktualizuje Synapse do 1.159.0, niewielkie wydanie konserwacyjne.
+
+- **Zdjęcia z niektórych trybów aparatu wreszcie dostają miniatury.** Obraz MPO — taki, jaki telefon zapisuje przy rejestrowaniu głębi lub kilku ekspozycji naraz — w ogóle nie doczekiwał się miniatury, podobnie jak animacja, której Synapse nie potrafił zdekodować. Teraz oba dają nieruchomą miniaturę.
+- **Wiersze dziennika Synapse pojawiają się na bieżąco**, zamiast przychodzić partiami po zapełnieniu bufora wyjścia.
+- Połączenia z bazą danych bezczynne wewnątrz transakcji są zamykane po trzydziestu minutach, więc zablokowane połączenie nie trzyma już blokad ani nie wstrzymuje rutynowego sprzątania.
+
+Pełne informacje o wydaniu: https://github.com/element-hq/synapse/blob/release-v1.159/CHANGES.md`,
+    fr_FR: `Met à jour Synapse vers 1.159.0, une petite version de maintenance.
+
+- **Les photos prises dans certains modes de l'appareil obtiennent enfin une miniature.** Une image MPO — ce qu'un téléphone écrit lorsqu'il capture la profondeur ou plusieurs expositions à la fois — n'en obtenait aucune, pas plus qu'une animation que Synapse ne parvenait pas à décoder. Les deux produisent désormais une miniature fixe.
+- **Les lignes de journal de Synapse apparaissent au fil de l'eau**, au lieu d'arriver par salves une fois sa mémoire tampon de sortie remplie.
+- Les connexions à la base de données restées inactives à l'intérieur d'une transaction sont fermées au bout de trente minutes : une connexion bloquée ne retient donc plus de verrous et n'empêche plus le nettoyage courant.
+
+Notes de version complètes : https://github.com/element-hq/synapse/blob/release-v1.159/CHANGES.md`,
   },
   migrations: {},
 })
