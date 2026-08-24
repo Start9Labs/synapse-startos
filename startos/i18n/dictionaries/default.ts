@@ -59,7 +59,7 @@ const dict = {
   'Register a Matrix appservice (bridge) with the homeserver. This is typically triggered automatically by bridge services.': 61,
   Success: 66,
   'Address/URL': 68,
-  'Your server address/URL determines the "domain" part of user-ids for users on your server. For example, @user:my.domain.name, where "my.domain.com" is the addres/url. It also determines how other matrix servers will reach yours if you choose to enable federation.': 69,
+  'Your server address becomes the domain part of every user ID, for example @user:matrix.example.com. Public domains allow federation. Private Tailscale HTTPS addresses keep the homeserver available only to devices on your tailnet.': 69,
   'Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.': 70,
   Network: 71,
   'Choose whether your server will be hosted on clearnet (recommended) or Tor. IMPORTANT: Tor (.onion) servers can only federate with other .onion servers AND require clients to be configured for Tor.': 72,
@@ -67,7 +67,7 @@ const dict = {
   Tor: 74,
   'Set Server Address/URL': 75,
   'Choose a permanent address/URL for your Synapse server.': 76,
-  'This can never be changed. You must first add a public domain to the Homeserver interface.': 77,
+  'This can never be changed. First add either a public domain or a private Tailscale HTTPS address on port 443 to the Homeserver interface.': 77,
   'Choose the permanent address/URL of your Synapse Matrix server': 78,
   'Your admin username and password are below. Write them down or save them to a password manager.': 79,
   Database: 80,
@@ -190,6 +190,7 @@ const dict = {
   'How much each person may download at full speed before the sustained rate starts applying.': 200,
   'KB/s': 201,
   'This generates a new admin password and restarts your homeserver to apply it. The current admin password stops working, and everyone is disconnected until Synapse comes back up. The new password is shown once, when the action finishes.': 202,
+  'That address is no longer available on the Homeserver interface. Add it again, then reopen this task.': 203,
 } as const
 
 export type I18nKey = keyof typeof dict

@@ -51,7 +51,15 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
   return [homeserverReceipt, adminReceipt]
 })
 
-/** The domains the user has added to the Homeserver interface. */
+/**
+ * Permanent Matrix identities available on the Homeserver interface.
+ *
+ * Public/private domains support the ordinary federated setup. A Tailscale
+ * url-v0 export is also safe when it is private HTTPS on the default port:
+ * the exported MagicDNS hostname is stable input for Matrix user IDs, while
+ * rejecting HTTP, Funnel, raw TCP and non-default ports avoids writing a
+ * server_name that disagrees with public_baseurl.
+ */
 export async function homeserverHostnames(
   effects: T.Effects,
 ): Promise<string[]> {
@@ -63,11 +71,23 @@ export async function homeserverHostnames(
           Object.values(host.bindings)
             .flatMap((b) => Object.values(b.interfaces))
             .find((i) => i.id === homeserverInterfaceId)
-        return iface
-          ? iface.addressInfo
-              .filter({ kind: 'domain' })
-              .hostnames.map((h) => h.hostname)
-          : []
+        if (!iface) return []
+
+        const hostnames = iface.addressInfo
+          .matchesAny([
+            { kind: 'domain' },
+            {
+              pluginId: 'tailscale',
+              predicate: (hostname) =>
+                hostname.metadata.kind === 'plugin' &&
+                hostname.ssl &&
+                !hostname.public &&
+                hostname.port === null,
+            },
+          ])
+          .hostnames.map((hostname) => hostname.hostname)
+
+        return Array.from(new Set(hostnames))
       })
       .once()) || []
   )

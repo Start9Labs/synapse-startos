@@ -133,7 +133,7 @@ Two interfaces, on separate hosts so they can carry separate domains.
 
 Neither is masked.
 
-**The homeserver interface is the one that matters for federation**, and the domain you attach to it has to match the server name you chose — that pairing is what other homeservers verify. The `.well-known/matrix/server` and `.well-known/matrix/client` documents are served from it automatically.
+**The homeserver interface is the one that matters for identity and federation.** The permanent server name can be a public domain or a private HTTPS hostname exported by the Tailscale `url-v0` plugin on port 443. A public domain can federate; a private Tailnet hostname is for clients and agents on the same tailnet and should keep federation disabled. The `.well-known/matrix/server` and `.well-known/matrix/client` documents are served from it automatically.
 
 **Port 8448 is deliberately not bound.** Federation rides 443 through the always-on `.well-known/matrix/server` delegation nginx serves, so the dedicated federation port would only ever catch peers holding a cached "no delegation" result — a one-hour window that arises only when importing a homeserver whose old host published none. Adding it back would mean a third interface and a router forward for every user, to cover a case the import procedure already closes.
 
@@ -143,7 +143,7 @@ Install generates a Synapse configuration under a **placeholder server name** an
 
 Two mutually exclusive paths from there, and **both are only available before the first start**:
 
-1. **Set Server Address/URL** — claim a fresh homeserver under the domain you will run it on.
+1. **Set Server Address/URL** — claim a fresh homeserver under either its public domain or its private HTTPS Tailnet hostname.
 2. **Import Existing Homeserver** — adopt a homeserver you run elsewhere, keeping its users, logins and history.
 
 **The server name is permanent.** Matrix identity is `@user:server-name`, so changing it later orphans every account and every federated room; that is why both actions are `only-stopped` and why import disables itself with an explanation once a real name is set.
@@ -156,7 +156,7 @@ Fourteen actions in four groups.
 
 Both run only while the service is stopped, and both are effectively one-time.
 
-- **Set Server Address/URL** is hidden — the install task is what surfaces it. It writes the server name and public base URL.
+- **Set Server Address/URL** is hidden — the install task is what surfaces it. It lists OS-managed domains plus private HTTPS Tailscale plugin addresses on port 443, revalidates that the selected address still exists, then writes the server name and public base URL. HTTP, Funnel, raw TCP and non-default-port plugin routes are rejected for Matrix identity.
 - **Import Existing Homeserver** adopts a staged homeserver: its configuration, signing key, database and media. **It cannot be undone**, and it replaces the empty homeserver created at install.
   - **Staging happens on the volume, by you**, before running it — the action reads what it finds under `import/`.
   - **The media store is rsynced to its final home rather than staged twice**, because it is far too large to copy through a staging directory.
@@ -225,7 +225,7 @@ Mixed, with one deliberate exclusion.
 
 ## Limitations and Differences
 
-1. **The server name is permanent.** Both setup actions are stopped-only, and import refuses once a real name is set.
+1. **The server name is permanent.** Both setup actions are stopped-only, and import refuses once a real name is set. A private Tailnet setup therefore depends on retaining the chosen MagicDNS identity when the box is restored or replaced.
 2. **Importing cannot be undone** and replaces the homeserver created at install.
 3. **A staged import's database is restored on the next start**, not by the action itself.
 4. **`import/` is never backed up.**
@@ -234,6 +234,7 @@ Mixed, with one deliberate exclusion.
 7. **TURN is advertised only when Coturn has a public domain.** Until then no relay is offered, and nothing reports that as an error.
 8. **The Coturn dependency declares no health check**, so a Coturn that is up but not yet publicly reachable will not block Synapse.
 9. **The nginx configuration is regenerated every start** and is not editable.
+10. **Tailnet mode is private, not federated.** It requires the Community Tailscale package, an HTTPS Serve route on port 443, and client devices signed in to the same tailnet.
 
 ---
 

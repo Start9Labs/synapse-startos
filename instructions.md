@@ -15,8 +15,10 @@
 
 Synapse posts two critical tasks after install. You can't start the service until both are done.
 
-1. Add a public clearnet domain to the Homeserver interface. This is the domain your users will see in their Matrix IDs (e.g. `@you:matrix.example.com`).
-2. Run the **Choose the permanent address/URL of your Synapse Matrix server** task and pick the domain. **This choice is permanent** — it cannot be changed once Synapse starts for the first time, so choose carefully.
+1. Add the address that will become the permanent domain in every Matrix user ID:
+   - **Public/federated:** add a public clearnet domain to the Homeserver interface.
+   - **Private Tailnet:** install and sign in to Tailscale. On Synapse's **Homeserver** interface, choose **Serve On Tailscale**, select **HTTPS (tailnet only)**, and publish it on port **443**. Wait for the private `https://…ts.net` address to appear on that interface.
+2. Run the **Choose the permanent address/URL of your Synapse Matrix server** task and pick that address. **This choice is permanent** — it cannot be changed once Synapse starts for the first time, so choose carefully. A Tailnet address is reachable only by devices signed in to the same tailnet; leave federation disabled for this mode.
 3. Run the **Create a root admin user for your Synapse Matrix homeserver** task. A username (`admin`) and a random password are generated and shown once — copy and save the password before dismissing. If you lose it, run the **Set Admin Password** action later to set a new one.
 4. Start Synapse. On first start, the admin user is created with that password.
 
@@ -91,7 +93,7 @@ Two things worth knowing:
 
 ### Connecting a client
 
-Open a Matrix client and use the address you set during setup as your homeserver URL. Recommended clients: [Element](https://element.io), [Element X](https://element.io/app-for-productivity), [SchildiChat](https://schildi.chat), [FluffyChat](https://fluffychat.im).
+Open a Matrix client and use the address returned by the setup task as your homeserver URL. For a private Tailnet setup, connect the client device to the same tailnet first. Recommended clients: [Element](https://element.io), [Element X](https://element.io/app-for-productivity), [SchildiChat](https://schildi.chat), [FluffyChat](https://fluffychat.im).
 
 ### Admin Dashboard
 
