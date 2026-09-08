@@ -1,43 +1,38 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.160.0:0',
+  version: '1.160.0:1',
   releaseNotes: {
-    en_US: `Updated Synapse to 1.160.0.
+    en_US: `Updated the Ketesa admin dashboard to 1.5.0.
 
-- Fixes a failure that could stop presence, to-device messages, and other updates from reaching clients after a request was cancelled.
-- Transparent WebP images now keep their transparency in thumbnails.
-- Device-list federation uses less database CPU, and Rust dependency updates address three security advisories.
+- Room deletion now offers controls to purge all room data and to force a purge when local users remain in the room.
+- Media downloads no longer fail because of a malformed URL.
 
-Full release notes: https://github.com/element-hq/synapse/blob/release-v1.160/CHANGES.md`,
-    es_ES: `Actualiza Synapse a 1.160.0.
+Full release notes: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
+    es_ES: `Actualiza el panel de administración Ketesa a la versión 1.5.0.
 
-- Corrige un fallo por el que la presencia, los mensajes «to-device» y otras actualizaciones podían dejar de llegar a los clientes tras cancelar una solicitud.
-- Las imágenes WebP transparentes ahora conservan su transparencia en las miniaturas.
-- La federación de listas de dispositivos usa menos CPU de la base de datos, y las actualizaciones de dependencias de Rust corrigen tres avisos de seguridad.
+- La eliminación de salas ahora ofrece controles para purgar todos sus datos y forzar la purga cuando aún hay usuarios locales en la sala.
+- Las descargas multimedia ya no fallan debido a una URL mal formada.
 
-Notas de la versión completas: https://github.com/element-hq/synapse/blob/release-v1.160/CHANGES.md`,
-    de_DE: `Aktualisiert Synapse auf 1.160.0.
+Notas de la versión completas: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
+    de_DE: `Aktualisiert das Ketesa-Admin-Dashboard auf Version 1.5.0.
 
-- Behebt einen Fehler, durch den Anwesenheitsstatus, To-Device-Nachrichten und andere Aktualisierungen nach dem Abbruch einer Anfrage nicht mehr bei Clients ankamen.
-- Transparente WebP-Bilder behalten nun ihre Transparenz in Vorschaubildern.
-- Die Föderation von Gerätelisten benötigt weniger Datenbank-CPU; Aktualisierungen von Rust-Abhängigkeiten beheben drei Sicherheitshinweise.
+- Beim Löschen von Räumen kann nun festgelegt werden, ob sämtliche Raumdaten gelöscht werden und ob die Löschung erzwungen wird, wenn sich noch lokale Benutzer im Raum befinden.
+- Medien-Downloads schlagen nicht mehr aufgrund einer fehlerhaften URL fehl.
 
-Vollständige Versionshinweise: https://github.com/element-hq/synapse/blob/release-v1.160/CHANGES.md`,
-    pl_PL: `Aktualizuje Synapse do 1.160.0.
+Vollständige Versionshinweise: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
+    pl_PL: `Aktualizuje panel administracyjny Ketesa do wersji 1.5.0.
 
-- Naprawia błąd, przez który obecność, wiadomości to-device i inne aktualizacje mogły przestać docierać do klientów po anulowaniu żądania.
-- Przezroczyste obrazy WebP zachowują teraz przezroczystość w miniaturach.
-- Federacja list urządzeń zużywa mniej mocy procesora bazy danych, a aktualizacje zależności Rust usuwają trzy podatności bezpieczeństwa.
+- Usuwanie pokoju udostępnia teraz opcje wyczyszczenia wszystkich jego danych oraz wymuszenia czyszczenia, gdy w pokoju nadal znajdują się lokalni użytkownicy.
+- Pobieranie multimediów nie kończy się już niepowodzeniem z powodu nieprawidłowego adresu URL.
 
-Pełne informacje o wydaniu: https://github.com/element-hq/synapse/blob/release-v1.160/CHANGES.md`,
-    fr_FR: `Met à jour Synapse vers 1.160.0.
+Pełne informacje o wydaniu: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
+    fr_FR: `Met à jour le tableau de bord d'administration Ketesa vers la version 1.5.0.
 
-- Corrige un problème qui pouvait empêcher la présence, les messages « to-device » et d'autres mises à jour d'atteindre les clients après l'annulation d'une requête.
-- Les images WebP transparentes conservent désormais leur transparence dans les miniatures.
-- La fédération des listes d'appareils utilise moins de ressources processeur pour la base de données, et les mises à jour des dépendances Rust corrigent trois avis de sécurité.
+- La suppression d'un salon permet désormais de purger toutes ses données et de forcer la purge lorsque des utilisateurs locaux sont encore présents.
+- Le téléchargement de médias n'échoue plus à cause d'une URL mal formée.
 
-Notes de version complètes : https://github.com/element-hq/synapse/blob/release-v1.160/CHANGES.md`,
+Notes de version complètes : https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
   },
   migrations: {},
 })
