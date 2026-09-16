@@ -10,6 +10,8 @@ export const current = VersionInfo.of({
 
 MatrixRTC operators should add the new \`url\` setting while retaining the deprecated \`livekit_service_url\` setting for older clients.
 
+Push notifications now reach a push gateway running on this server, such as the one in Element Web.
+
 Full release notes: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
     es_ES: `Actualiza Synapse a la versión 1.161.0.
 
@@ -17,6 +19,8 @@ Full release notes: https://github.com/element-hq/synapse/releases/tag/v1.161.0`
 - Añade un endpoint para obtener eventos retrasados individuales.
 
 Los operadores de MatrixRTC deben añadir el nuevo ajuste \`url\` y conservar el ajuste obsoleto \`livekit_service_url\` para los clientes antiguos.
+
+Las notificaciones push ahora llegan a una pasarela push que se ejecute en este servidor, como la de Element Web.
 
 Notas de la versión completas: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
     de_DE: `Aktualisiert Synapse auf Version 1.161.0.
@@ -26,6 +30,8 @@ Notas de la versión completas: https://github.com/element-hq/synapse/releases/t
 
 MatrixRTC-Betreiber sollten die neue Einstellung \`url\` hinzufügen und die veraltete Einstellung \`livekit_service_url\` für ältere Clients beibehalten.
 
+Push-Benachrichtigungen erreichen jetzt ein Push-Gateway, das auf diesem Server läuft, etwa das von Element Web.
+
 Vollständige Versionshinweise: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
     pl_PL: `Aktualizuje Synapse do wersji 1.161.0.
 
@@ -34,6 +40,8 @@ Vollständige Versionshinweise: https://github.com/element-hq/synapse/releases/t
 
 Operatorzy MatrixRTC powinni dodać nowe ustawienie \`url\`, zachowując przestarzałe ustawienie \`livekit_service_url\` dla starszych klientów.
 
+Powiadomienia push docierają teraz do bramki push działającej na tym serwerze, na przykład tej w Element Web.
+
 Pełne informacje o wydaniu: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
     fr_FR: `Met à jour Synapse vers la version 1.161.0.
 
@@ -41,6 +49,8 @@ Pełne informacje o wydaniu: https://github.com/element-hq/synapse/releases/tag/
 - Ajoute un point de terminaison permettant de récupérer individuellement les événements différés.
 
 Les opérateurs MatrixRTC doivent ajouter le nouveau paramètre \`url\` tout en conservant le paramètre obsolète \`livekit_service_url\` pour les anciens clients.
+
+Les notifications push atteignent désormais une passerelle push qui s'exécute sur ce serveur, comme celle d'Element Web.
 
 Notes de version complètes : https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
   },
