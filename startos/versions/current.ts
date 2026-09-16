@@ -1,38 +1,48 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.160.0:1',
+  version: '1.161.0:0',
   releaseNotes: {
-    en_US: `Updated the Ketesa admin dashboard to 1.5.0.
+    en_US: `Updated Synapse to 1.161.0.
 
-- Room deletion now offers controls to purge all room data and to force a purge when local users remain in the room.
-- Media downloads no longer fail because of a malformed URL.
+- Fixes event persistence after temporary database outages, duplicate room-encryption events during room creation, and missing room topics after search index rebuilds.
+- Adds an endpoint for retrieving individual delayed events.
 
-Full release notes: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
-    es_ES: `Actualiza el panel de administración Ketesa a la versión 1.5.0.
+MatrixRTC operators should add the new \`url\` setting while retaining the deprecated \`livekit_service_url\` setting for older clients.
 
-- La eliminación de salas ahora ofrece controles para purgar todos sus datos y forzar la purga cuando aún hay usuarios locales en la sala.
-- Las descargas multimedia ya no fallan debido a una URL mal formada.
+Full release notes: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
+    es_ES: `Actualiza Synapse a la versión 1.161.0.
 
-Notas de la versión completas: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
-    de_DE: `Aktualisiert das Ketesa-Admin-Dashboard auf Version 1.5.0.
+- Corrige la persistencia de eventos tras interrupciones temporales de la base de datos, los eventos duplicados de cifrado de salas durante su creación y los temas de salas ausentes tras reconstruir el índice de búsqueda.
+- Añade un endpoint para obtener eventos retrasados individuales.
 
-- Beim Löschen von Räumen kann nun festgelegt werden, ob sämtliche Raumdaten gelöscht werden und ob die Löschung erzwungen wird, wenn sich noch lokale Benutzer im Raum befinden.
-- Medien-Downloads schlagen nicht mehr aufgrund einer fehlerhaften URL fehl.
+Los operadores de MatrixRTC deben añadir el nuevo ajuste \`url\` y conservar el ajuste obsoleto \`livekit_service_url\` para los clientes antiguos.
 
-Vollständige Versionshinweise: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
-    pl_PL: `Aktualizuje panel administracyjny Ketesa do wersji 1.5.0.
+Notas de la versión completas: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
+    de_DE: `Aktualisiert Synapse auf Version 1.161.0.
 
-- Usuwanie pokoju udostępnia teraz opcje wyczyszczenia wszystkich jego danych oraz wymuszenia czyszczenia, gdy w pokoju nadal znajdują się lokalni użytkownicy.
-- Pobieranie multimediów nie kończy się już niepowodzeniem z powodu nieprawidłowego adresu URL.
+- Behebt die Ereignisspeicherung nach vorübergehenden Datenbankausfällen, doppelte Raumverschlüsselungsereignisse beim Erstellen von Räumen und fehlende Raumthemen nach dem Neuaufbau des Suchindexes.
+- Fügt einen Endpunkt zum Abrufen einzelner verzögerter Ereignisse hinzu.
 
-Pełne informacje o wydaniu: https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
-    fr_FR: `Met à jour le tableau de bord d'administration Ketesa vers la version 1.5.0.
+MatrixRTC-Betreiber sollten die neue Einstellung \`url\` hinzufügen und die veraltete Einstellung \`livekit_service_url\` für ältere Clients beibehalten.
 
-- La suppression d'un salon permet désormais de purger toutes ses données et de forcer la purge lorsque des utilisateurs locaux sont encore présents.
-- Le téléchargement de médias n'échoue plus à cause d'une URL mal formée.
+Vollständige Versionshinweise: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
+    pl_PL: `Aktualizuje Synapse do wersji 1.161.0.
 
-Notes de version complètes : https://github.com/etkecc/ketesa/releases/tag/v1.5.0`,
+- Naprawia zapisywanie zdarzeń po tymczasowych awariach bazy danych, powielone zdarzenia szyfrowania podczas tworzenia pokojów oraz brakujące tematy pokojów po przebudowaniu indeksu wyszukiwania.
+- Dodaje punkt końcowy do pobierania pojedynczych opóźnionych zdarzeń.
+
+Operatorzy MatrixRTC powinni dodać nowe ustawienie \`url\`, zachowując przestarzałe ustawienie \`livekit_service_url\` dla starszych klientów.
+
+Pełne informacje o wydaniu: https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
+    fr_FR: `Met à jour Synapse vers la version 1.161.0.
+
+- Corrige la persistance des événements après des interruptions temporaires de la base de données, les événements de chiffrement de salon dupliqués lors de la création d'un salon et les sujets de salon manquants après la reconstruction de l'index de recherche.
+- Ajoute un point de terminaison permettant de récupérer individuellement les événements différés.
+
+Les opérateurs MatrixRTC doivent ajouter le nouveau paramètre \`url\` tout en conservant le paramètre obsolète \`livekit_service_url\` pour les anciens clients.
+
+Notes de version complètes : https://github.com/element-hq/synapse/releases/tag/v1.161.0`,
   },
   migrations: {},
 })
