@@ -92,7 +92,7 @@ Within `homeserver.yaml`:
 
 **Generated once** — the signing key path, form secret, macaroon secret, and registration shared secret, all written by `synapse generate` at install or carried over by an import.
 
-**Derived** — `turn_uris` and `turn_shared_secret`, rendered by `main` from the Coturn dependency. Absent when Coturn has no public domain yet, which Synapse reads as "advertise no relay" rather than as an error.
+**Derived** — `turn_uris` and `turn_shared_secret`, rendered by `main` from the Coturn dependency. Absent when Coturn has no public domain yet, which Synapse reads as "advertise no relay" rather than as an error. `ip_range_whitelist`, rendered by `main` as the container bridge gateway, so Synapse can post push notifications to a push gateway running in another package on this server (Element Web's); Synapse's own blocklist covers the whole private range and would otherwise drop them silently.
 
 **Sized to the machine** — `caches.cache_autotuning`, defaulted to a quarter of system RAM and clamped between 1 and 2 GiB. Synapse evicts on whole-process allocated memory rather than cache size, so the threshold has to clear real usage; the clamp keeps it from being unreachable on a large machine, where an uncapped fraction would mean the guard never fires at all.
 

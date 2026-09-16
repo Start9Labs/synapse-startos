@@ -146,6 +146,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
     turn_uris: turn?.uris,
     turn_shared_secret: turn?.secret,
     turn_allow_guests: turn ? false : undefined,
+    // Synapse's default blocklist covers 10.0.0.0/8, where a sibling package's push gateway lives.
+    ip_range_whitelist: [await sdk.getOsIp(effects)],
   })
 
   // Synapse reads its log config once at startup, so the level only takes

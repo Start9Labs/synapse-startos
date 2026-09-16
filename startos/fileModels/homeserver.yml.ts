@@ -248,6 +248,7 @@ const shape = z.object({
   turn_uris: z.array(z.string()).optional().catch(undefined),
   turn_shared_secret: z.string().optional().catch(undefined),
   turn_allow_guests: z.boolean().optional().catch(undefined),
+  ip_range_whitelist: z.array(z.string()).optional().catch(undefined),
   enable_registration: z.boolean().catch(false),
   // Synapse refuses to start with registration on and no verification of any
   // kind, so this tracks the registration mode rather than sitting permanently
