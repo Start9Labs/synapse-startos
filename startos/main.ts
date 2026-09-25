@@ -348,6 +348,7 @@ server {
                   // operator's copy left behind; root reads it either way.
                   user: 'root',
                 },
+                null,
               ),
           )
 
