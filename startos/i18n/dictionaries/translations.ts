@@ -191,6 +191,8 @@ export default {
     200: 'Cuánto puede descargar cada persona a máxima velocidad antes de que empiece a aplicarse la velocidad sostenida.',
     201: 'KB/s',
     202: 'Esto genera una nueva contraseña de administrador y reinicia su servidor para aplicarla. La contraseña de administrador actual deja de funcionar y todo el mundo se desconecta hasta que Synapse vuelve a estar disponible. La nueva contraseña se muestra una sola vez, al terminar la acción.',
+    203: 'Consultas de perfiles',
+    204: 'Limita las consultas de perfiles por usuario autenticado, o por dirección IP del cliente para solicitudes sin autenticación.',
   },
   de_DE: {
     0: '[i] Synapse wird gestartet!',
@@ -382,6 +384,8 @@ export default {
     200: 'Wie viel jede Person mit voller Geschwindigkeit herunterladen darf, bevor die dauerhafte Rate greift.',
     201: 'KB/s',
     202: 'Dies erzeugt ein neues Administratorpasswort und startet Ihren Homeserver neu, um es anzuwenden. Das bisherige Administratorpasswort funktioniert nicht mehr, und alle werden getrennt, bis Synapse wieder läuft. Das neue Passwort wird einmalig angezeigt, wenn die Aktion abgeschlossen ist.',
+    203: 'Profilabfragen',
+    204: 'Begrenzt Profilabfragen pro angemeldetem Benutzer oder pro Client-IP-Adresse bei Anfragen ohne Authentifizierung.',
   },
   pl_PL: {
     0: '[i] Uruchamianie Synapse!',
@@ -573,6 +577,8 @@ export default {
     200: 'Ile każda osoba może pobrać z pełną prędkością, zanim zacznie obowiązywać stała prędkość.',
     201: 'KB/s',
     202: 'To generuje nowe hasło administratora i restartuje serwer, aby je zastosować. Dotychczasowe hasło administratora przestaje działać, a wszyscy zostają rozłączeni, dopóki Synapse nie wróci. Nowe hasło jest pokazywane jeden raz, po zakończeniu akcji.',
+    203: 'Zapytania o profile',
+    204: 'Ogranicza zapytania o profile na zalogowanego użytkownika lub na adres IP klienta w przypadku żądań bez uwierzytelniania.',
   },
   fr_FR: {
     0: '[i] Démarrage de Synapse !',
@@ -764,5 +770,7 @@ export default {
     200: "Ce que chaque personne peut télécharger à pleine vitesse avant que le débit soutenu ne s'applique.",
     201: 'Ko/s',
     202: "Ceci génère un nouveau mot de passe administrateur et redémarre votre serveur pour l'appliquer. Le mot de passe administrateur actuel cesse de fonctionner et tout le monde est déconnecté jusqu'au retour de Synapse. Le nouveau mot de passe n'est affiché qu'une fois, à la fin de l'action.",
+    203: 'Consultations de profils',
+    204: 'Limite les consultations de profils par utilisateur connecté, ou par adresse IP du client pour les requêtes sans authentification.',
   },
 } satisfies Record<string, LangDict>

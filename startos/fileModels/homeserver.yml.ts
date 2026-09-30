@@ -274,6 +274,7 @@ const shape = z.object({
     .array(z.string())
     .catch(urlPreviewIpRangeBlacklist),
   rc_message: rateShape,
+  rc_profile: rateShape,
   rc_registration: rateShape,
   rc_joins: z
     .object({ local: rateShape, remote: rateShape })

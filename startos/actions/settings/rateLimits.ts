@@ -26,6 +26,7 @@ const mediaRelaxed = { per_second: 1024, burst_count: 500 }
 // but Custom pre-fills from them, so they have to be right.
 const upstream = {
   rc_message: { per_second: 0.2, burst_count: 10 },
+  rc_profile: { per_second: 1, burst_count: 500 },
   rc_registration: { per_second: 0.17, burst_count: 3 },
   rc_joins: {
     local: { per_second: 0.1, burst_count: 10 },
@@ -54,9 +55,9 @@ const relaxed = {
   },
 }
 
-const rate = (name: string, d: Rate) =>
+const rate = (name: string, d: Rate, description: string | null = null) =>
   Value.object(
-    { name },
+    { name, description },
     InputSpec.of({
       per_second: Value.number({
         name: i18n('Per Second'),
@@ -95,6 +96,13 @@ export const inputSpec = InputSpec.of({
         name: i18n('Custom'),
         spec: InputSpec.of({
           rc_message: rate(i18n('Sending Messages'), upstream.rc_message),
+          rc_profile: rate(
+            i18n('Profile Lookups'),
+            upstream.rc_profile,
+            i18n(
+              'Limits profile lookups per signed-in user, or per client IP address for requests without authentication.',
+            ),
+          ),
           rc_joins_local: rate(
             i18n('Joining Rooms on This Server'),
             upstream.rc_joins.local,
@@ -186,12 +194,13 @@ export const rateLimits = sdk.Action.withInput(
   inputSpec,
 
   // optionally pre-fill the input form
-  async ({ effects }) => {
-    const yaml = await homeserverYaml.read().const(effects)
+  async () => {
+    const yaml = await homeserverYaml.read().once()
     if (!yaml) return {}
 
     const {
       rc_message,
+      rc_profile,
       rc_registration,
       rc_joins,
       rc_invites,
@@ -204,6 +213,7 @@ export const rateLimits = sdk.Action.withInput(
     // if it happens to match a preset — the user can always re-pick one.
     if (
       !rc_message &&
+      !rc_profile &&
       !rc_registration &&
       !rc_joins &&
       !rc_invites &&
@@ -218,6 +228,7 @@ export const rateLimits = sdk.Action.withInput(
         selection: 'custom' as const,
         value: {
           rc_message: rc_message ?? upstream.rc_message,
+          rc_profile: rc_profile ?? upstream.rc_profile,
           rc_joins_local: rc_joins?.local ?? upstream.rc_joins.local,
           rc_joins_remote: rc_joins?.remote ?? upstream.rc_joins.remote,
           rc_invites_per_room:
@@ -252,6 +263,7 @@ export const rateLimits = sdk.Action.withInput(
     // Synapse's own defaults apply to anything homeserver.yaml doesn't name.
     const blank = {
       rc_message: undefined,
+      rc_profile: undefined,
       rc_registration: undefined,
       rc_joins: undefined,
       rc_invites: undefined,
@@ -274,6 +286,7 @@ export const rateLimits = sdk.Action.withInput(
         const v = input.preset.value
         return void (await homeserverYaml.merge(effects, {
           rc_message: v.rc_message,
+          rc_profile: v.rc_profile,
           rc_registration: v.rc_registration,
           rc_joins: { local: v.rc_joins_local, remote: v.rc_joins_remote },
           rc_invites: {
