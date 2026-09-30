@@ -13,7 +13,7 @@
 
 ## Getting set up
 
-Synapse posts two critical tasks after install. You can't start the service until both are done.
+Fresh-server setup presents two required steps in sequence: choose the server address, then create the admin account. Complete both before starting Synapse.
 
 1. Add a public clearnet domain to the Homeserver interface. This is the domain your users will see in their Matrix IDs (e.g. `@you:matrix.example.com`).
 2. Run the **Choose the permanent address/URL of your Synapse Matrix server** task and pick the domain. **This choice is permanent** — it cannot be changed once Synapse starts for the first time, so choose carefully.
@@ -105,7 +105,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 - **Media** — upload limit, how large an image can be and still get a thumbnail, which thumbnail sizes are prepared, and how long other servers' files are kept.
 - **Registration** — who may create an account, which rooms they join automatically, and whether guests may look around.
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
-- **Rate Limits** — how fast people may send messages, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
+- **Rate Limits** — how fast people may send messages, look up profiles, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
 - **Discoverability** — what someone without an account can find out about your server. Pick Private, Normal or Public; pick Custom to decide each setting.
 - **Email/SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
@@ -164,6 +164,8 @@ Synapse deliberately slows anyone down who sends, joins, invites or signs in too
 The **Rate Limits** action has two ready-made choices. **Normal** is Synapse's own. **Relaxed** raises sending and joining to the values Start9 runs on its own server, and lifts the download limit described below. It is usually the right pick for a server among people you know.
 
 If none of those fit, **Custom** exposes every limit individually, starting from Synapse's values. Each has a _per second_ rate and a _burst_ — the burst is how many are allowed in quick succession before the slower sustained rate takes over.
+
+**Profile Lookups** controls how quickly clients may fetch profiles. In Custom, set its sustained rate and burst; the allowance applies per signed-in user, or per client IP address for requests without authentication. Normal and Relaxed use Synapse's own profile-lookup limits.
 
 **Downloading Files from Other Servers** is the odd one out, and the one worth knowing about. It is measured in bytes rather than counts, and it applies to each person separately: someone scrolling back through a room full of other servers' photos spends their own allowance and is then slowed to a crawl, while everyone else is unaffected. Synapse allows 87 KB/s once the first 500 MB is spent, which a photo-heavy room reaches easily; Relaxed raises it to 1 MB/s.
 

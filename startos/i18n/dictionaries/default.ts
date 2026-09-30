@@ -190,6 +190,8 @@ const dict = {
   'How much each person may download at full speed before the sustained rate starts applying.': 200,
   'KB/s': 201,
   'This generates a new admin password and restarts your homeserver to apply it. The current admin password stops working, and everyone is disconnected until Synapse comes back up. The new password is shown once, when the action finishes.': 202,
+  'Profile Lookups': 203,
+  'Limits profile lookups per signed-in user, or per client IP address for requests without authentication.': 204,
 } as const
 
 export type I18nKey = keyof typeof dict

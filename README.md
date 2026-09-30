@@ -42,7 +42,7 @@ Three upstream images, unmodified, plus one asset fetched at build time.
 | Images        | `ghcr.io/element-hq/synapse`, `nginx` (alpine), `postgres` (alpine) |
 | Architectures | x86_64, aarch64                                                     |
 
-**The admin dashboard is not an image.** The Makefile downloads a pinned synapse-admin release and verifies it against a committed SHA-256 before packing it as an asset; nginx then serves those static files. A checksum mismatch fails the build rather than shipping an unverified dashboard.
+**The admin dashboard is not an image.** The Makefile downloads a pinned Ketesa release and verifies it against a committed SHA-256 before packing it as an asset; nginx then serves those static files. Downloads are cached by release tag, and changes to the Makefile refresh the download and extracted assets. A checksum mismatch fails the build rather than shipping an unverified dashboard.
 
 | Subcontainer         | Purpose                                                       |
 | -------------------- | ------------------------------------------------------------- |
@@ -143,7 +143,7 @@ Install generates a Synapse configuration under a **placeholder server name** an
 
 Two mutually exclusive paths from there, and **both are only available before the first start**:
 
-1. **Set Server Address/URL** — claim a fresh homeserver under the domain you will run it on.
+1. **Set Server Address/URL** — claim a fresh homeserver under the domain you will run it on, then complete the critical Set Admin Password task it raises.
 2. **Import Existing Homeserver** — adopt a homeserver you run elsewhere, keeping its users, logins and history.
 
 **The server name is permanent.** Matrix identity is `@user:server-name`, so changing it later orphans every account and every federated room; that is why both actions are `only-stopped` and why import disables itself with an explanation once a real name is set.
@@ -176,7 +176,7 @@ Seven forms over `homeserver.yaml`, all available whether or not the service is 
 - **Federation** governs which other homeservers yours will talk to — the on/off switch, the domain whitelist, and large-room protection. Turning federation off rewrites the listener resources rather than a flag, which is why this action and Config both write `listeners`.
 - **Media** governs files: upload limit, the largest image that still gets a thumbnail, which thumbnail sizes are prepared, and how long other servers' media is kept. Three of its defaults depart from Synapse's — see [File Models](#file-models).
 - **Registration** governs whether new accounts can be created, which rooms they land in, and whether guests may look around.
-- **Rate Limits** tunes Synapse's throttles. Its Custom preset also carries `remote_media_download_per_second` and its burst — bytes rather than counts, and applied per requester, so they throttle one person's media fetching without touching anyone else's.
+- **Rate Limits** tunes Synapse's throttles, including `rc_profile` for profile lookups. Normal and Relaxed leave that limit to Synapse; Custom reads and writes its sustained rate and burst. Its Custom preset also carries `remote_media_download_per_second` and its burst — bytes rather than counts, and applied per requester, so they throttle one person's media fetching without touching anyone else's.
 - **Discoverability** controls how visible the server and its rooms are to the wider network.
 - **Email/SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours.
 
@@ -189,14 +189,15 @@ Appservices are how bridges and bots attach to a homeserver. Each is a registrat
 
 ## Tasks
 
-Two tasks, and only one of them originates here.
+Three tasks: two for fresh-server setup, and one requested by dependent bridges.
 
 | Task                   | Severity   | Raised when                                               | Cleared when    |
 | ---------------------- | ---------- | --------------------------------------------------------- | --------------- |
 | Set Server Address/URL | `critical` | At install                                                | The action runs |
+| Set Admin Password    | `critical` | Set Server Address/URL completes                          | The action runs |
 | Register Appservice    | `critical` | A dependent package's tokens don't match its registration | The action runs |
 
-The first is `critical` because a homeserver on the placeholder name federates with nobody. The second is raised by another package rather than by this one, and re-raises whenever that package's tokens stop matching.
+The setup tasks block startup until the homeserver has an identity and a queued admin password. Register Appservice is raised by another package and re-raises whenever that package's tokens stop matching.
 
 ## Health Checks
 
@@ -287,6 +288,7 @@ actions:
   - delete-appservice # App Services
 tasks:
   - { action: set-server-name, severity: critical }
+  - { action: set-admin-password, severity: critical }
   - { action: register-appservice, severity: critical } # raised by dependents
 health_checks:
   - postgres # displayed "Database"
