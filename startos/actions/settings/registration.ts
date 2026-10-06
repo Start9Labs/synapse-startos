@@ -8,7 +8,7 @@ export const inputSpec = InputSpec.of({
   mode: Value.select({
     name: i18n('Registration'),
     description: i18n(
-      'Who may create an account on your homeserver. Invite only lets people sign up with a registration token you hand out, which you create and revoke under Registration Tokens in the Admin Dashboard. Open means anyone on the internet who can reach your server can create an account, which is a standing invitation to spam and abuse.',
+      'Who may create an account on your homeserver.\n- Disabled: no one; you create accounts yourself in the Admin Dashboard\n- Invite Only: people holding a registration token you hand out, created and revoked under Registration Tokens in the Admin Dashboard\n- Open: anyone on the internet who can reach your server, which is a standing invitation to spam and abuse',
     ),
     default: 'disabled',
     values: {

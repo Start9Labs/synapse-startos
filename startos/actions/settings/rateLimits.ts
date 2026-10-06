@@ -87,7 +87,7 @@ export const inputSpec = InputSpec.of({
     name: i18n('Rate Limits'),
     default: 'normal',
     description: i18n(
-      "Synapse slows down anyone who sends, joins, invites or signs in too quickly. The stock limits suit a server open to strangers; a private server among people you know can afford to be looser, and bots and bulk operations hit the stock limits almost immediately. Choose Custom to set any of them yourself — it starts pre-filled with Synapse's own values.",
+      "Synapse slows down anyone who sends, joins, invites or signs in too quickly. Bots and bulk operations hit the stock limits almost immediately.\n- Normal: Synapse's stock limits, which suit a server open to strangers\n- Relaxed: looser limits on sending messages, joining rooms and downloading files from other servers, for a private server among people you know\n- Custom: set any of them yourself, starting from Synapse's own values",
     ),
     variants: Variants.of({
       normal: { name: i18n('Normal'), spec: InputSpec.of({}) },

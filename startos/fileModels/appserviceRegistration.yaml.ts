@@ -8,10 +8,10 @@ const defaultNamespaces = {
 }
 
 const namespacesShape = z
-  .object({
+  .looseObject({
     users: z
       .array(
-        z.object({
+        z.looseObject({
           regex: z.string(),
           exclusive: z.boolean().catch(true),
         }),
@@ -22,7 +22,7 @@ const namespacesShape = z
   })
   .catch(defaultNamespaces)
 
-const shape = z.object({
+const shape = z.looseObject({
   // set per-appservice
   id: z.string(),
   url: z.string(),

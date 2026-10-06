@@ -59,7 +59,7 @@ export const inputSpec = InputSpec.of({
     name: i18n('Discoverability'),
     default: 'normal',
     description: i18n(
-      'How much a stranger can learn about your server without an account on it: which rooms it hosts, who has an account, and what their display names and avatars are. Private closes all of it down, Public opens all of it up, and Normal leaves Synapse to its own defaults, which sit in between. Choose Custom to decide each one.',
+      'How much a stranger can learn about your server without an account on it: which rooms it hosts, who has an account, and what their display names and avatars are.\n- Private: closes all of it down\n- Normal: leaves Synapse to its own defaults, which sit in between\n- Public: opens all of it up\n- Custom: decide each one yourself',
     ),
     variants: Variants.of({
       private: { name: i18n('Private'), spec: InputSpec.of({}) },

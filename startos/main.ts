@@ -347,8 +347,8 @@ server {
                   // The staged dump's owner and mode are whatever the
                   // operator's copy left behind; root reads it either way.
                   user: 'root',
+                  timeout: null,
                 },
-                null,
               ),
           )
 

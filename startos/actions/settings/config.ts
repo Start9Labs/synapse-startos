@@ -50,7 +50,7 @@ export const inputSpec = InputSpec.of({
   log_level: Value.select({
     name: i18n('Log Level'),
     description: i18n(
-      'How much detail Synapse writes to its logs. Info records every request and is useful while setting things up; Warning is quieter and is what most servers should sit on day to day. Debug is very noisy and should only be turned on while chasing a specific problem.',
+      'How much detail Synapse writes to its logs.\n- Debug: very noisy; turn it on only while chasing a specific problem\n- Info: records every request; useful while setting things up\n- Warning: quieter; what most servers should sit on day to day\n- Error: records only failures',
     ),
     default: defaultLogLevel,
     values: {

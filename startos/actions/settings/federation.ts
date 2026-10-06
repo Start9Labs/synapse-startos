@@ -9,7 +9,7 @@ export const inputSpec = InputSpec.of({
     name: i18n('Federation'),
     default: 'disabled',
     description: i18n(
-      'If enabled, users on your homeserver will be able to join rooms on other homeservers and vica versa. If disabled, users on your homeserver will only be able to interact with other users and rooms on your homeserver.',
+      'Whether people on your homeserver can reach people and rooms on other Matrix servers.\n- Disabled: your users interact only with users and rooms on your homeserver\n- Enabled: your users can join rooms on other homeservers, and theirs can join yours',
     ),
     variants: Variants.of({
       disabled: { name: i18n('Disabled'), spec: InputSpec.of({}) },
@@ -38,7 +38,7 @@ export const inputSpec = InputSpec.of({
     name: i18n('Large Room Protection'),
     default: 'unlimited',
     description: i18n(
-      'Refuse to join rooms above a size your server can handle. Joining a very large room — a public one with tens of thousands of members — makes your homeserver download and keep its entire history, which on a home server can take hours and fill the disk. This limit applies only the first time anyone here joins a given room.',
+      'Joining a very large room — a public one with tens of thousands of members — makes your homeserver download and keep its entire history, which on a home server can take hours and fill the disk.\n- Join Any Room: no size limit\n- Limit by Size: refuse to join a room above the complexity you set; the limit applies only the first time anyone here joins a given room',
     ),
     variants: Variants.of({
       unlimited: { name: i18n('Join Any Room'), spec: InputSpec.of({}) },

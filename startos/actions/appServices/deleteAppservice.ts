@@ -19,13 +19,11 @@ export const inputSpec = InputSpec.of({
       if (match) values[match[1]] = match[1]
     }
 
-    const keys = Object.keys(values)
-
     return {
       name: i18n('Appservice'),
-      description: i18n('Select the appservice to remove'),
+      description: null,
       values,
-      default: keys[0] || '',
+      default: null,
     }
   }),
 })
