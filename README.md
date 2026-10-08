@@ -82,6 +82,8 @@ Five models. Only two are ordinary configuration; the rest exist for specific jo
 | `appservices/<id>.yaml`  | YAML   | Yes, one per appservice | The appservice actions                        |
 | `import/homeserver.yaml` | YAML   | Read-only               | You, when staging an import                   |
 
+`import/homeserver.yaml` is read strictly: a file missing `server_name`, `macaroon_secret_key` or `form_secret` fails the import rather than defaulting one, since a fresh macaroon key would log out every user of the imported server.
+
 Within `homeserver.yaml`:
 
 **Enforced** — rewritten whenever the package writes: the whole database block (the bundled PostgreSQL on loopback), the listeners, the media store and pid paths, telemetry off, the key-server warning suppressed, and `log_config`.
@@ -139,14 +141,14 @@ Neither is masked.
 
 ## Installation and First-Run Flow
 
-Install generates a Synapse configuration under a **placeholder server name** and raises a `critical` task to replace it. That placeholder is also the marker for "this homeserver has never been claimed", which is what the import action checks.
+Install generates a Synapse configuration under a **placeholder server name** and raises a `critical` task to replace it. The task comes back whenever the chosen name is not one of the Homeserver interface's domains, and keeps Synapse from starting until that same domain is added back. The placeholder is also the marker for "this homeserver has never been claimed", which is what the import action checks.
 
 Two mutually exclusive paths from there, and **both are only available before the first start**:
 
 1. **Set Server Address/URL** — claim a fresh homeserver under the domain you will run it on, then complete the critical Set Admin Password task it raises.
 2. **Import Existing Homeserver** — adopt a homeserver you run elsewhere, keeping its users, logins and history.
 
-**The server name is permanent.** Matrix identity is `@user:server-name`, so changing it later orphans every account and every federated room; that is why both actions are `only-stopped` and why import disables itself with an explanation once a real name is set.
+**The server name is permanent.** Matrix identity is `@user:server-name`, so changing it later orphans every account and every federated room; that is why both actions are `only-stopped`, why Set Server Address/URL refuses any other domain once a name is set, and why import disables itself with an explanation.
 
 ## Actions
 
@@ -156,7 +158,7 @@ Fourteen actions in four groups.
 
 Both run only while the service is stopped, and both are effectively one-time.
 
-- **Set Server Address/URL** is hidden — the install task is what surfaces it. It writes the server name and public base URL.
+- **Set Server Address/URL** is hidden — its task is what surfaces it. It offers the Homeserver interface's domains and writes the server name and public base URL. The form preselects no address, so the permanent name is always a deliberate choice. Once a name is set it accepts only that name, fails on any other, and its warning names the server.
 - **Import Existing Homeserver** adopts a staged homeserver: its configuration, signing key, database and media. **It cannot be undone**, and it replaces the empty homeserver created at install.
   - **Staging happens on the volume, by you**, before running it — the action reads what it finds under `import/`.
   - **The media store is rsynced to its final home rather than staged twice**, because it is far too large to copy through a staging directory.
@@ -165,7 +167,7 @@ Both run only while the service is stopped, and both are effectively one-time.
 
 ### Accounts — Set Admin Password, Get Access Token
 
-- **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers. It carries a `warning`, so StartOS asks for confirmation first — the action generates a fresh password and restarts the homeserver, and the old password stops working.
+- **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers. Once an admin password exists — after the action has run once, or after an import — StartOS asks for confirmation first, because the action generates a fresh password, restarts the homeserver, and the old password stops working. The first run, from the install task, needs none; `store.json`'s `adminPasswordSet` tracks which case applies, and an install from before it existed counts as set.
 - **Get Access Token** returns a token for an account, and needs the service running.
 
 ### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Email/SMTP
@@ -184,18 +186,18 @@ Seven forms over `homeserver.yaml`, all available whether or not the service is 
 
 Appservices are how bridges and bots attach to a homeserver. Each is a registration file on the `main` volume with a pair of tokens.
 
-- **Deleting one revokes that bridge's access**; the bridge stops working until it is registered again.
+- **Deleting one revokes that bridge's access**; the bridge stops working until it is registered again. The form preselects no appservice.
 - **These are also driven by other packages.** A dependent calls this package's exported helper, which mounts Synapse's volume read-only, compares the tokens, and raises a `critical` Register Appservice task here when they do not match. So a Register Appservice task you did not create yourself is a bridge asking to be connected.
 
 ## Tasks
 
 Three tasks: two for fresh-server setup, and one requested by dependent bridges.
 
-| Task                   | Severity   | Raised when                                               | Cleared when    |
-| ---------------------- | ---------- | --------------------------------------------------------- | --------------- |
-| Set Server Address/URL | `critical` | At install                                                | The action runs |
-| Set Admin Password    | `critical` | Set Server Address/URL completes                          | The action runs |
-| Register Appservice    | `critical` | A dependent package's tokens don't match its registration | The action runs |
+| Task                   | Severity   | Raised when                                                                   | Cleared when                                       |
+| ---------------------- | ---------- | ----------------------------------------------------------------------------- | -------------------------------------------------- |
+| Set Server Address/URL | `critical` | No server name is set, or its domain is missing from the Homeserver interface | The name is set and its domain is on the interface |
+| Set Admin Password     | `critical` | Set Server Address/URL completes                                              | The action runs                                    |
+| Register Appservice    | `critical` | A dependent package's tokens don't match its registration                     | The action runs                                    |
 
 The setup tasks block startup until the homeserver has an identity and a queued admin password. Register Appservice is raised by another package and re-raises whenever that package's tokens stop matching.
 
@@ -226,7 +228,7 @@ Mixed, with one deliberate exclusion.
 
 ## Limitations and Differences
 
-1. **The server name is permanent.** Both setup actions are stopped-only, and import refuses once a real name is set.
+1. **The server name is permanent.** Both setup actions are stopped-only, Set Server Address/URL refuses any other domain once a name is set, and import refuses once a real name is set. Removing the name's domain from the Homeserver interface blocks Synapse from starting until it is added back.
 2. **Importing cannot be undone** and replaces the homeserver created at install.
 3. **A staged import's database is restored on the next start**, not by the action itself.
 4. **`import/` is never backed up.**
@@ -272,7 +274,7 @@ interfaces:
   homeserver: { type: api, port: 80 }
   admin: { type: ui, port: 8080 }
 actions:
-  - set-server-name # Setup; only-stopped, hidden (surfaced by the install task)
+  - set-server-name # Setup; only-stopped, hidden (surfaced by its task); refuses a different name once set
   - import-homeserver # Setup; only-stopped, self-hiding once claimed
   - set-admin-password # Accounts
   - get-access-token # Accounts; only-running
@@ -287,7 +289,7 @@ actions:
   - list-appservices # App Services
   - delete-appservice # App Services
 tasks:
-  - { action: set-server-name, severity: critical }
+  - { action: set-server-name, severity: critical } # while no name is set or its domain is missing
   - { action: set-admin-password, severity: critical }
   - { action: register-appservice, severity: critical } # raised by dependents
 health_checks:

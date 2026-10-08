@@ -59,7 +59,7 @@ export const inputSpec = InputSpec.of({
   rateLimited: Value.toggle({
     name: i18n('Rate Limited'),
     description: i18n(
-      'Whether requests from this appservice should be rate limited',
+      'Hold this bridge to the same rate limits as your users. A bridge sends on behalf of many people at once, so this is normally left off.',
     ),
     default: false,
   }),

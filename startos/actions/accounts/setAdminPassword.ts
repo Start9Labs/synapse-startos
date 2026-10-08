@@ -8,14 +8,17 @@ export const setAdminPassword = sdk.Action.withoutInput(
   'set-admin-password',
 
   // metadata
-  async () => ({
+  async ({ effects }) => ({
     name: i18n('Set Admin Password'),
     description: i18n(
       'Set the admin user password for your Synapse Matrix homeserver.',
     ),
-    warning: i18n(
-      'This generates a new admin password and restarts your homeserver to apply it. The current admin password stops working, and everyone is disconnected until Synapse comes back up. The new password is shown once, when the action finishes.',
-    ),
+    warning:
+      (await storeJson.read((s) => s.adminPasswordSet).const(effects)) === false
+        ? null
+        : i18n(
+            'This generates a new admin password and restarts your homeserver to apply it. The current admin password stops working, and everyone is disconnected until Synapse comes back up. The new password is shown once, when the action finishes.',
+          ),
     allowedStatuses: 'any',
     group: i18n('Accounts'),
     visibility: 'enabled',
@@ -28,7 +31,10 @@ export const setAdminPassword = sdk.Action.withoutInput(
       len: 22,
     })
 
-    await storeJson.merge(effects, { pendingAdminPassword: adminPassword })
+    await storeJson.merge(effects, {
+      pendingAdminPassword: adminPassword,
+      adminPasswordSet: true,
+    })
     await sdk.restart(effects)
 
     return {

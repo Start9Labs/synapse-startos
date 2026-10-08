@@ -21,7 +21,7 @@ export const inputSpec = InputSpec.of({
   max_upload_size: Value.number({
     name: i18n('Max Upload Size'),
     description: i18n(
-      'The maximum file size that is permitted to be uploaded by users to your homeserver.',
+      'The largest file anyone on your server can send. Every upload is kept on disk and in every backup, so a high limit lets a few large videos fill both.',
     ),
     required: true,
     default: 50,
@@ -47,7 +47,7 @@ export const inputSpec = InputSpec.of({
     name: i18n('Thumbnails'),
     default: 'high_detail',
     description: i18n(
-      'Which sizes your server prepares when someone uploads an image. Clients ask for the size that suits their screen and get the closest one that exists, so a high-density phone display shown only small thumbnails will upscale them and look soft.',
+      "Which sizes your server prepares when someone uploads an image. Clients ask for the size that suits their screen and get the closest one that exists, so a high-density phone display shown only small thumbnails will upscale them and look soft.\n- Standard: Synapse's own sizes, up to 800x600\n- High Detail: adds 1280x960 and 1920x1440, which stay sharp on high-density phone displays\n- On Demand: also produces any other size a client asks for, when it asks, at the cost of CPU on each request and a thumbnail store that grows without limit",
     ),
     variants: Variants.of({
       standard: { name: i18n('Standard'), spec: InputSpec.of({}) },

@@ -73,9 +73,9 @@ const listenerDefault = {
 
 // extracted shapes
 const dbShape = z
-  .object({
+  .looseObject({
     args: z
-      .object({
+      .looseObject({
         user: z.literal(postgresUser).catch(postgresUser),
         password: z.string().catch(''),
         database: z.literal(postgresDb).catch(postgresDb),
@@ -89,7 +89,7 @@ const dbShape = z
   .catch(dbDefault)
 
 const resourceShape = z
-  .object({
+  .looseObject({
     compress: z.boolean().catch(resourceDefault.compress),
     names: z
       .array(z.enum(['client', 'federation']))
@@ -109,7 +109,7 @@ const experimentalDefault = {
   msc3202_transaction_extensions: true,
 }
 const experimentalShape = z
-  .object({
+  .looseObject({
     msc3266_enabled: z.boolean().catch(true),
     msc4028_push_encrypted_events: z.boolean().catch(true),
     msc2409_to_device_messages_enabled: z.boolean().catch(true),
@@ -159,7 +159,7 @@ const cacheAutotuningDefault = {
   min_cache_ttl: '5m',
 }
 const cacheAutotuningShape = z
-  .object({
+  .looseObject({
     max_cache_memory_usage: z
       .string()
       .catch(cacheAutotuningDefault.max_cache_memory_usage),
@@ -181,7 +181,7 @@ const cachesDefault = {
 // Absent means upstream applies, which is what the Rate Limits action's Normal
 // preset writes — so these stay optional rather than carrying defaults.
 const rateShape = z
-  .object({
+  .looseObject({
     per_second: z.number().optional(),
     burst_count: z.number().optional(),
   })
@@ -189,7 +189,7 @@ const rateShape = z
   .catch(undefined)
 
 const listenerShape = z
-  .object({
+  .looseObject({
     bind_addresses: z.array(z.string()).catch(listenerDefault.bind_addresses),
     port: z.number().catch(listenerDefault.port),
     resources: z.array(resourceShape).catch(listenerDefault.resources),
@@ -199,7 +199,7 @@ const listenerShape = z
   })
   .catch(listenerDefault)
 
-const shape = z.object({
+const shape = z.looseObject({
   // enforced
   database: dbShape,
   listeners: z.array(listenerShape).catch([listenerDefault]),
@@ -221,7 +221,10 @@ const shape = z.object({
   macaroon_secret_key: z.string().optional(),
   registration_shared_secret: z.string().optional(),
   old_signing_keys: z
-    .record(z.string(), z.object({ key: z.string(), expired_ts: z.number() }))
+    .record(
+      z.string(),
+      z.looseObject({ key: z.string(), expired_ts: z.number() }),
+    )
     .optional(),
 
   // set by actions
@@ -230,7 +233,7 @@ const shape = z.object({
 
   // configurable
   email: z
-    .object({
+    .looseObject({
       // enforced
       enable_notifs: z.literal(true),
       require_transport_security: z.literal(true),
@@ -261,7 +264,7 @@ const shape = z.object({
   allow_guest_access: z.boolean().catch(false),
   admin_contact: z.string().optional().catch(undefined),
   experimental_features: experimentalShape,
-  push: z.object({ include_content: z.boolean().catch(true) }).catch({
+  push: z.looseObject({ include_content: z.boolean().catch(true) }).catch({
     include_content: true,
   }),
   url_preview_enabled: z.boolean().catch(false),
@@ -277,11 +280,11 @@ const shape = z.object({
   rc_profile: rateShape,
   rc_registration: rateShape,
   rc_joins: z
-    .object({ local: rateShape, remote: rateShape })
+    .looseObject({ local: rateShape, remote: rateShape })
     .optional()
     .catch(undefined),
   rc_invites: z
-    .object({
+    .looseObject({
       per_room: rateShape,
       per_user: rateShape,
       per_issuer: rateShape,
@@ -289,7 +292,7 @@ const shape = z.object({
     .optional()
     .catch(undefined),
   rc_login: z
-    .object({
+    .looseObject({
       address: rateShape,
       account: rateShape,
       failed_attempts: rateShape,
@@ -303,7 +306,7 @@ const shape = z.object({
   allow_public_rooms_without_auth: z.boolean().optional().catch(undefined),
   enable_room_list_search: z.boolean().optional().catch(undefined),
   user_directory: z
-    .object({
+    .looseObject({
       enabled: z.boolean().optional(),
       search_all_users: z.boolean().optional(),
       prefer_local_users: z.boolean().optional(),
@@ -318,7 +321,7 @@ const shape = z.object({
     .catch(undefined),
   include_profile_data_on_invite: z.boolean().optional().catch(undefined),
   caches: z
-    .object({
+    .looseObject({
       cache_autotuning: cacheAutotuningShape,
       sync_response_cache_duration: z
         .string()
@@ -326,7 +329,7 @@ const shape = z.object({
     })
     .catch(cachesDefault),
   limit_remote_rooms: z
-    .object({
+    .looseObject({
       enabled: z.boolean().catch(false),
       complexity: z.number().catch(1),
       admins_can_join: z.boolean().catch(true),
@@ -334,12 +337,12 @@ const shape = z.object({
     .catch({ enabled: false, complexity: 1, admins_can_join: true }),
   federation_certificate_verification_whitelist: z.array(z.string()).catch([]),
   federation_domain_whitelist: z.array(z.string()).optional(),
-  presence: z.object({ enabled: z.boolean().catch(true) }).catch({
+  presence: z.looseObject({ enabled: z.boolean().catch(true) }).catch({
     enabled: true,
   }),
   // Absent means "keep remote media forever", which is Synapse's default.
   media_retention: z
-    .object({ remote_media_lifetime: z.string() })
+    .looseObject({ remote_media_lifetime: z.string() })
     .optional()
     .catch(undefined),
   max_image_pixels: z.string().catch(defaultMaxImagePixels),
@@ -349,7 +352,7 @@ const shape = z.object({
   dynamic_thumbnails: z.boolean().catch(false),
   thumbnail_sizes: z
     .array(
-      z.object({
+      z.looseObject({
         width: z.number(),
         height: z.number(),
         method: z.enum(['crop', 'scale']),
@@ -361,7 +364,9 @@ const shape = z.object({
   // sustained rate while everyone else is unaffected.
   remote_media_download_per_second: z.string().optional().catch(undefined),
   remote_media_download_burst_count: z.string().optional().catch(undefined),
-  trusted_key_servers: z.array(z.object({ server_name: z.string() })).catch([]),
+  trusted_key_servers: z
+    .array(z.looseObject({ server_name: z.string() }))
+    .catch([]),
   max_upload_size: z
     .string()
     .transform((s) =>

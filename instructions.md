@@ -16,7 +16,7 @@
 Fresh-server setup presents two required steps in sequence: choose the server address, then create the admin account. Complete both before starting Synapse.
 
 1. Add a public clearnet domain to the Homeserver interface. This is the domain your users will see in their Matrix IDs (e.g. `@you:matrix.example.com`).
-2. Run the **Choose the permanent address/URL of your Synapse Matrix server** task and pick the domain. **This choice is permanent** — it cannot be changed once Synapse starts for the first time, so choose carefully.
+2. Run the **Choose the permanent address/URL of your Synapse Matrix server** task and pick the domain. **This choice is permanent** — it can never be changed, so choose carefully. If that domain is ever removed from the Homeserver interface, StartOS asks for the address again and Synapse won't start until you add the same domain back; any other domain is refused.
 3. Run the **Create a root admin user for your Synapse Matrix homeserver** task. A username (`admin`) and a random password are generated and shown once — copy and save the password before dismissing. If you lose it, run the **Set Admin Password** action later to set a new one.
 4. Start Synapse. On first start, the admin user is created with that password.
 

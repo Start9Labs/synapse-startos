@@ -52,23 +52,16 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
 })
 
 /** The domains the user has added to the Homeserver interface. */
-export async function homeserverHostnames(
-  effects: T.Effects,
-): Promise<string[]> {
-  return (
-    (await sdk.host
-      .getOwn(effects, homeserverHostId, (host) => {
-        const iface =
-          host &&
-          Object.values(host.bindings)
-            .flatMap((b) => Object.values(b.interfaces))
-            .find((i) => i.id === homeserverInterfaceId)
-        return iface
-          ? iface.addressInfo
-              .filter({ kind: 'domain' })
-              .hostnames.map((h) => h.hostname)
-          : []
-      })
-      .once()) || []
-  )
-}
+export const homeserverHostnames = (effects: T.Effects) =>
+  sdk.host.getOwn(effects, homeserverHostId, (host) => {
+    const iface =
+      host &&
+      Object.values(host.bindings)
+        .flatMap((b) => Object.values(b.interfaces))
+        .find((i) => i.id === homeserverInterfaceId)
+    return iface
+      ? iface.addressInfo
+          .filter({ kind: 'domain' })
+          .hostnames.map((h) => h.hostname)
+      : []
+  })

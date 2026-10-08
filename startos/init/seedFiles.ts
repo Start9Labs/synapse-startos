@@ -1,9 +1,7 @@
 import { utils } from '@start9labs/start-sdk'
-import { setServerName } from '../actions/setup/setServerName'
 import { homeserverLogConfig } from '../fileModels/homeserver.log.config'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { mount, placeholderServerName } from '../utils'
 
@@ -37,11 +35,7 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
       database: { args: { password: postgresPassword } },
     })
 
-    await sdk.action.createOwnTask(effects, setServerName, 'critical', {
-      reason: i18n(
-        'Choose the permanent address/URL of your Synapse Matrix server',
-      ),
-    })
+    await storeJson.merge(effects, { adminPasswordSet: false })
   } else {
     await storeJson.merge(effects, {})
     await homeserverYaml.merge(effects, {})

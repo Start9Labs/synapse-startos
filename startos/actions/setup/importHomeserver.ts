@@ -78,7 +78,7 @@ export const importHomeserver = sdk.Action.withoutInput(
     // The imported user IDs all end in this domain, so it has to be reachable
     // here byte for byte. Catching that now beats catching it after the media
     // has been copied across.
-    const hostnames = await homeserverHostnames(effects)
+    const hostnames = (await homeserverHostnames(effects).once()) ?? []
     if (!hostnames.includes(imported.server_name)) {
       throw new Error(
         i18n(
@@ -105,7 +105,10 @@ export const importHomeserver = sdk.Action.withoutInput(
       old_signing_keys: imported.old_signing_keys,
     })
 
-    await storeJson.merge(effects, { pendingImport: true })
+    await storeJson.merge(effects, {
+      pendingImport: true,
+      adminPasswordSet: true,
+    })
 
     // The import stands in for set-server-name, whose critical task would
     // otherwise keep the service from starting.

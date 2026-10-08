@@ -11,12 +11,15 @@ import { importConfigSubpath } from '../utils'
 // No `.catch()` anywhere, unlike a normal file model: a missing macaroon key
 // would silently log out every user on the imported server, so a file that
 // doesn't carry a full identity must fail the read rather than heal into one.
-const shape = z.object({
+const shape = z.looseObject({
   server_name: z.string(),
   macaroon_secret_key: z.string(),
   form_secret: z.string(),
   old_signing_keys: z
-    .record(z.string(), z.object({ key: z.string(), expired_ts: z.number() }))
+    .record(
+      z.string(),
+      z.looseObject({ key: z.string(), expired_ts: z.number() }),
+    )
     .optional(),
 })
 
