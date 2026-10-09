@@ -24,7 +24,7 @@ Fresh-server setup presents two required steps in sequence: choose the server ad
 
 ## Importing an existing homeserver
 
-You can move a Matrix homeserver you run elsewhere onto StartOS without anyone losing their account, their logged-in sessions, or their history. Import **before you start Synapse for the first time** — once this homeserver has an address of its own there is nothing to import into, and the action disappears from the Setup group.
+You can move a Matrix homeserver you run elsewhere onto StartOS without anyone losing their account, their logged-in sessions, or their history. Import **in place of the Set Server Address/URL task**, before you start Synapse for the first time — once this homeserver has an address of its own there is nothing to import into, and the action disappears from the Setup group.
 
 You will need shell access to your StartOS server and to the machine the old homeserver runs on.
 
@@ -99,7 +99,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 
 ### Actions
 
-- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. It asks you to confirm first, because it replaces the current password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it.
+- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. It asks you to confirm first, because it replaces the current password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it. On an imported homeserver it sets the password of `@admin`, creating that account if there is none. If your server already has an `@admin` that is deactivated or not an administrator, the new password is not applied until you make that account an administrator again from the Admin Dashboard, signed in with one of your existing admin accounts.
 - **Config** — voice and video calls, presence, link previews, notification content, admin contact, and log level.
 - **Federation** — whether your server talks to other homeservers, which ones, and how large a room it will join.
 - **Media** — upload limit, how large an image can be and still get a thumbnail, which thumbnail sizes are prepared, and how long other servers' files are kept.
@@ -109,7 +109,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 - **Discoverability** — what someone without an account can find out about your server. Pick Private, Normal or Public; pick Custom to decide each setting.
 - **Email/SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
-- **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard.
+- **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard. Leave **Appservice URL** empty for a bot that only sends messages and never needs to hear from the homeserver.
 
 ### Federation
 

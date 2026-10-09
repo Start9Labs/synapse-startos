@@ -18,6 +18,8 @@ export const watchServerName = sdk.setupOnInit(async (effects) => {
           'Add ${name} back to the Homeserver interface. Synapse cannot start without its server name.',
           { name },
         )
-      : i18n('Choose the permanent address/URL of your Synapse Matrix server'),
+      : i18n(
+          'Choose the permanent address/URL of your Synapse Matrix server. Moving an existing homeserver here? Run Import Existing Homeserver instead.',
+        ),
   })
 })

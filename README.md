@@ -82,7 +82,7 @@ Five models. Only two are ordinary configuration; the rest exist for specific jo
 | `appservices/<id>.yaml`  | YAML   | Yes, one per appservice | The appservice actions                        |
 | `import/homeserver.yaml` | YAML   | Read-only               | You, when staging an import                   |
 
-`import/homeserver.yaml` is read strictly: a file missing `server_name`, `macaroon_secret_key` or `form_secret` fails the import rather than defaulting one, since a fresh macaroon key would log out every user of the imported server.
+`import/homeserver.yaml` is read strictly: a file missing `server_name`, `macaroon_secret_key` or `form_secret` fails the import rather than defaulting one, since a fresh macaroon key would log out every user of the imported server. The error names the key at fault. An `old_signing_keys:` with nothing but comments beneath it, as `synapse generate` writes it, reads as no old keys.
 
 Within `homeserver.yaml`:
 
@@ -168,6 +168,7 @@ Both run only while the service is stopped, and both are effectively one-time.
 ### Accounts — Set Admin Password, Get Access Token
 
 - **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers. Once an admin password exists — after the action has run once, or after an import — StartOS asks for confirmation first, because the action generates a fresh password, restarts the homeserver, and the old password stops working. The first run, from the install task, needs none; `store.json`'s `adminPasswordSet` tracks which case applies, and an install from before it existed counts as set.
+  - **Whose password it sets depends on where the homeserver came from.** On one created here it is the oldest account — the admin the install task registered, whatever it was named in older releases. On an imported one — recognised by `signing_key_path` pointing at the old server's key rather than the install's placeholder — the oldest account belongs to one of its users, so it sets `@admin:<server name>` instead and registers that account if it does not exist. If that account exists but is not an active admin, the password is left pending and a warning is logged on every start until the account is made an admin again — the package never promotes or reactivates an imported user itself. The oneshot does not fail in that case: nginx waits on it, so failing would take the whole homeserver offline.
 - **Get Access Token** returns a token for an account, and needs the service running.
 
 ### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Email/SMTP
@@ -186,6 +187,7 @@ Seven forms over `homeserver.yaml`, all available whether or not the service is 
 
 Appservices are how bridges and bots attach to a homeserver. Each is a registration file on the `main` volume with a pair of tokens.
 
+- **The URL is optional.** Left empty, the registration carries `url: null` and Synapse pushes the appservice nothing — right for a bot that only sends with its token. IDs are letters, digits, dots, dashes and underscores, since each names a file under `appservices/`.
 - **Deleting one revokes that bridge's access**; the bridge stops working until it is registered again. The form preselects no appservice.
 - **These are also driven by other packages.** A dependent calls this package's exported helper, which mounts Synapse's volume read-only, compares the tokens, and raises a `critical` Register Appservice task here when they do not match. So a Register Appservice task you did not create yourself is a bridge asking to be connected.
 

@@ -18,6 +18,7 @@ import {
   mountpoint,
   nginxPort,
   postgresDb,
+  placeholderServerName,
   postgresUser,
 } from './utils'
 
@@ -383,36 +384,53 @@ server {
           if (!pendingAdminPassword) return null
 
           const PGPASSWORD = config.database.args.password
-          const userCount = parseInt(
-            (
-              await sdk.SubContainer.withTemp(
-                effects,
-                { imageId: 'postgres' },
-                sdk.Mounts.of(),
-                'count-users',
-                (psql) =>
-                  psql.execFail(
-                    [
-                      'psql',
-                      '-h',
-                      '127.0.0.1',
-                      '-U',
-                      postgresUser,
-                      '-d',
-                      postgresDb,
-                      '-tAc',
-                      'SELECT COUNT(*) FROM users',
-                    ],
-                    { env: { PGPASSWORD } },
-                  ),
-              )
-            ).stdout
-              .toString()
-              .trim(),
-            10,
-          )
+          const psql = (name: string, args: string[]) =>
+            sdk.SubContainer.withTemp(
+              effects,
+              { imageId: 'postgres' },
+              sdk.Mounts.of(),
+              name,
+              (pg) =>
+                pg.execFail(
+                  [
+                    'psql',
+                    '-h',
+                    '127.0.0.1',
+                    '-U',
+                    postgresUser,
+                    '-d',
+                    postgresDb,
+                    ...args,
+                  ],
+                  { env: { PGPASSWORD } },
+                ),
+            )
 
-          if (userCount > 0) {
+          // Import repoints the key at the old server's; on an imported server the oldest account is someone's
+          const imported =
+            config.signing_key_path !==
+            `${mountpoint}/${placeholderServerName}.signing.key`
+          const [target, active] = (
+            await psql('find-admin', [
+              '-tAc',
+              imported
+                ? `SELECT name, admin = 1 AND deactivated = 0 FROM users WHERE name = '${sqlLiteral(`@admin:${config.server_name}`)}'`
+                : 'SELECT name, true FROM users ORDER BY creation_ts ASC LIMIT 1',
+            ])
+          ).stdout
+            .toString()
+            .trim()
+            .split('|')
+
+          // nginx waits on this oneshot, so failing here would take the whole homeserver down
+          if (target && active !== 't') {
+            console.warn(
+              `[!] ${target} exists but is not an active admin; the queued admin password stays pending until it is`,
+            )
+            return null
+          }
+
+          if (target) {
             const hash = (
               await subc.execFail([
                 'hash_password',
@@ -424,27 +442,10 @@ server {
             ).stdout
               .toString()
               .trim()
-            await sdk.SubContainer.withTemp(
-              effects,
-              { imageId: 'postgres' },
-              sdk.Mounts.of(),
-              'apply-admin-password-update',
-              (psql) =>
-                psql.execFail(
-                  [
-                    'psql',
-                    '-h',
-                    '127.0.0.1',
-                    '-U',
-                    postgresUser,
-                    '-d',
-                    postgresDb,
-                    '-c',
-                    `UPDATE users SET password_hash = '${sqlLiteral(hash)}' WHERE name = (SELECT name FROM users ORDER BY creation_ts ASC LIMIT 1)`,
-                  ],
-                  { env: { PGPASSWORD } },
-                ),
-            )
+            await psql('apply-admin-password-update', [
+              '-c',
+              `UPDATE users SET password_hash = '${sqlLiteral(hash)}' WHERE name = '${sqlLiteral(target)}'`,
+            ])
           } else {
             await subc.execFail([
               'register_new_matrix_user',

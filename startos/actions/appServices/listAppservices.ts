@@ -25,7 +25,7 @@ const appserviceFields = (
       type: 'single',
       name: i18n('URL'),
       description: null,
-      value: reg.url,
+      value: reg.url ?? i18n('None'),
       masked: false,
       copyable: true,
       qr: false,
