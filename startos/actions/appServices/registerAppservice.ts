@@ -17,6 +17,14 @@ export const inputSpec = InputSpec.of({
     default: null,
     placeholder: 'signal',
     masked: false,
+    patterns: [
+      {
+        regex: '^[A-Za-z0-9._-]+$',
+        description: i18n(
+          'Letters, digits, dots, dashes and underscores only, with no spaces.',
+        ),
+      },
+    ],
   }),
   asToken: Value.text({
     name: i18n('AS Token'),
@@ -47,11 +55,11 @@ export const inputSpec = InputSpec.of({
     masked: false,
   }),
   url: Value.text({
-    name: i18n('Bridge URL'),
+    name: i18n('Appservice URL'),
     description: i18n(
-      'The URL where the homeserver can reach the bridge appservice',
+      'Where the homeserver sends events for this appservice. Leave it empty for one that only sends messages, such as a bot that posts alerts; the homeserver then sends it nothing.',
     ),
-    required: true,
+    required: false,
     default: null,
     placeholder: 'http://127.0.0.1:29328',
     masked: false,

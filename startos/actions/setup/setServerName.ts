@@ -42,7 +42,7 @@ export const setServerName = sdk.Action.withInput(
             { name },
           )
         : i18n(
-            'This can never be changed. You must first add a public domain to the Homeserver interface.',
+            'This can never be changed, and once it is set an existing homeserver can no longer be imported here. You must first add a public domain to the Homeserver interface.',
           ),
       allowedStatuses: 'only-stopped',
       group: i18n('Setup'),

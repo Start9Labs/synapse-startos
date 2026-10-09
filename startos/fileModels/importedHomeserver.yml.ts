@@ -20,7 +20,8 @@ const shape = z.looseObject({
       z.string(),
       z.looseObject({ key: z.string(), expired_ts: z.number() }),
     )
-    .optional(),
+    // `synapse generate` leaves the key in place with only comments beneath it
+    .nullish(),
 })
 
 export const importedHomeserverYaml = FileHelper.yaml(

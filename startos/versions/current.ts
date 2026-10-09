@@ -1,68 +1,28 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.162.0:1',
+  version: '1.162.0:2',
   releaseNotes: {
-    en_US: `Updated Synapse to 1.162.0 and Ketesa to 1.5.1.
-
-- New rooms use room version 12 by default.
-- Configure profile-lookup throttling in Rate Limits → Custom.
-- Improved federated invitations and faster recursive relation queries in large rooms.
-
-[Synapse release notes](https://github.com/element-hq/synapse/releases/tag/v1.162.0) · [Ketesa release notes](https://github.com/etkecc/ketesa/releases/tag/v1.5.1)
-
-- Set Admin Password asks for confirmation only when it replaces an existing admin password.
-- Delete Appservice starts with no appservice selected.
-- Log Level, Registration, Federation, Large Room Protection, Thumbnails, Rate Limits and Discoverability describe what each of their options does.
-- If your server's domain is removed from the Homeserver interface, Synapse asks for it again and won't start until that same domain is added back.`,
-    es_ES: `Synapse actualizado a 1.162.0 y Ketesa a 1.5.1.
-
-- Las salas nuevas usan la versión de sala 12 de forma predeterminada.
-- Configure los límites de consultas de perfiles en Límites de velocidad → Personalizado.
-- Mejoras en las invitaciones federadas y consultas recursivas de relaciones más rápidas en salas grandes.
-
-[Notas de Synapse](https://github.com/element-hq/synapse/releases/tag/v1.162.0) · [Notas de Ketesa](https://github.com/etkecc/ketesa/releases/tag/v1.5.1)
-
-- Set Admin Password pide confirmación solo cuando sustituye una contraseña de administrador existente.
-- Eliminar servicio de aplicación empieza sin ningún servicio de aplicación seleccionado.
-- Nivel de registro, Registro, Federación, Protección frente a salas grandes, Miniaturas, Límites de frecuencia y Visibilidad describen qué hace cada una de sus opciones.
-- Si el dominio de su servidor se elimina de la interfaz Servidor, Synapse lo vuelve a pedir y no arranca hasta que se añada de nuevo ese mismo dominio.`,
-    de_DE: `Synapse auf 1.162.0 und Ketesa auf 1.5.1 aktualisiert.
-
-- Neue Räume verwenden standardmäßig Raumversion 12.
-- Profilabfragen lassen sich unter Ratenlimits → Benutzerdefiniert begrenzen.
-- Verbesserte föderierte Einladungen und schnellere rekursive Relationsabfragen in großen Räumen.
-
-[Synapse-Versionshinweise](https://github.com/element-hq/synapse/releases/tag/v1.162.0) · [Ketesa-Versionshinweise](https://github.com/etkecc/ketesa/releases/tag/v1.5.1)
-
-- „Set Admin Password“ fragt nur dann nach einer Bestätigung, wenn es ein vorhandenes Admin-Passwort ersetzt.
-- „Appservice löschen“ beginnt ohne ausgewählten Appservice.
-- Protokollstufe, Registrierung, Föderation, Schutz vor großen Räumen, Vorschaubilder, Ratenbegrenzungen und Auffindbarkeit beschreiben, was jede ihrer Optionen bewirkt.
-- Wird die Domain Ihres Servers von der Homeserver-Schnittstelle entfernt, fragt Synapse erneut danach und startet erst, wenn genau diese Domain wieder hinzugefügt ist.`,
-    pl_PL: `Zaktualizowano Synapse do 1.162.0 i Ketesa do 1.5.1.
-
-- Nowe pokoje domyślnie używają wersji pokoju 12.
-- Limity zapytań o profile można ustawić w Limity szybkości → Niestandardowe.
-- Ulepszono zaproszenia federacyjne i przyspieszono rekurencyjne zapytania o relacje w dużych pokojach.
-
-[Informacje o wydaniu Synapse](https://github.com/element-hq/synapse/releases/tag/v1.162.0) · [Informacje o wydaniu Ketesa](https://github.com/etkecc/ketesa/releases/tag/v1.5.1)
-
-- „Set Admin Password” prosi o potwierdzenie tylko wtedy, gdy zastępuje istniejące hasło administratora.
-- „Usuń usługę aplikacji” zaczyna bez wybranej usługi aplikacji.
-- Poziom logowania, Rejestracja, Federacja, Ochrona przed dużymi pokojami, Miniatury, Limity częstotliwości i Wykrywalność opisują, co robi każda z ich opcji.
-- Jeśli domena Twojego serwera zostanie usunięta z interfejsu Serwer, Synapse poprosi o nią ponownie i nie uruchomi się, dopóki ta sama domena nie zostanie dodana z powrotem.`,
-    fr_FR: `Synapse mis à jour vers 1.162.0 et Ketesa vers 1.5.1.
-
-- Les nouveaux salons utilisent par défaut la version de salon 12.
-- Configurez la limitation des consultations de profils dans Limites de débit → Personnalisé.
-- Amélioration des invitations fédérées et accélération des requêtes récursives de relations dans les grands salons.
-
-[Notes de Synapse](https://github.com/element-hq/synapse/releases/tag/v1.162.0) · [Notes de Ketesa](https://github.com/etkecc/ketesa/releases/tag/v1.5.1)
-
-- Set Admin Password ne demande une confirmation que lorsqu'il remplace un mot de passe administrateur existant.
-- Supprimer le service d'application démarre sans aucun service d'application sélectionné.
-- Niveau de journalisation, Inscription, Fédération, Protection contre les grands salons, Miniatures, Limites de débit et Visibilité décrivent ce que fait chacune de leurs options.
-- Si le domaine de votre serveur est retiré de l'interface Serveur, Synapse le redemande et ne démarre pas tant que ce même domaine n'est pas rajouté.`,
+    en_US: `- Import Existing Homeserver accepts a homeserver.yaml whose \`old_signing_keys\` is empty, and names the setting at fault when it rejects a file.
+- On an imported homeserver, Set Admin Password sets the password of \`@admin\`, creating that account if there is none.
+- The Set Server Address/URL task points you to Import Existing Homeserver if you are moving a homeserver here.
+- Register Appservice: leave Appservice URL empty for a bot that only sends messages. Appservice IDs use letters, digits, dots, dashes and underscores only.`,
+    es_ES: `- Importar servidor existente acepta un homeserver.yaml cuyo \`old_signing_keys\` está vacío e indica qué ajuste falla cuando rechaza un archivo.
+- En un servidor importado, Set Admin Password establece la contraseña de \`@admin\` y crea esa cuenta si no existe.
+- La tarea Establecer dirección/URL del servidor le indica Importar servidor existente si está trasladando aquí un servidor.
+- Registrar servicio de aplicación: deje vacía la URL del servicio de aplicación para un bot que solo envía mensajes. Los identificadores solo admiten letras, dígitos, puntos, guiones y guiones bajos.`,
+    de_DE: `- „Bestehenden Homeserver importieren“ akzeptiert eine homeserver.yaml mit leerem \`old_signing_keys\` und nennt die betroffene Einstellung, wenn es eine Datei ablehnt.
+- Auf einem importierten Homeserver setzt „Set Admin Password“ das Passwort von \`@admin\` und legt dieses Konto an, falls es fehlt.
+- Die Aufgabe „Serveradresse/URL festlegen“ verweist auf „Bestehenden Homeserver importieren“, wenn Sie einen Homeserver hierher umziehen.
+- „Appservice registrieren“: Lassen Sie die Appservice-URL für einen Bot leer, der nur Nachrichten sendet. Appservice-IDs bestehen nur aus Buchstaben, Ziffern, Punkten, Binde- und Unterstrichen.`,
+    pl_PL: `- „Importuj istniejący serwer” akceptuje homeserver.yaml z pustym \`old_signing_keys\` i wskazuje błędne ustawienie, gdy odrzuca plik.
+- Na zaimportowanym serwerze „Set Admin Password” ustawia hasło konta \`@admin\`, tworząc je, jeśli nie istnieje.
+- Zadanie „Ustaw adres/URL serwera” wskazuje „Importuj istniejący serwer”, jeśli przenosisz tu serwer.
+- „Zarejestruj usługę aplikacji”: zostaw pusty URL usługi aplikacji dla bota, który tylko wysyła wiadomości. Identyfikatory usług mogą zawierać tylko litery, cyfry, kropki, myślniki i podkreślenia.`,
+    fr_FR: `- Importer un serveur existant accepte un homeserver.yaml dont \`old_signing_keys\` est vide, et nomme le réglage en cause lorsqu'il refuse un fichier.
+- Sur un serveur importé, Set Admin Password définit le mot de passe de \`@admin\` et crée ce compte s'il n'existe pas.
+- La tâche Définir l'adresse/URL du serveur vous oriente vers Importer un serveur existant si vous migrez un serveur ici.
+- Enregistrer le service d'application : laissez l'URL du service d'application vide pour un bot qui ne fait qu'envoyer des messages. Les identifiants n'utilisent que des lettres, chiffres, points, tirets et traits de soulignement.`,
   },
   migrations: {},
 })

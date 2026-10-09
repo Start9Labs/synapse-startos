@@ -1,3 +1,4 @@
+import { z } from '@start9labs/start-sdk'
 import { access, copyFile } from 'fs/promises'
 import { homeserverYaml } from '../../fileModels/homeserver.yml'
 import { importedHomeserverYaml } from '../../fileModels/importedHomeserver.yml'
@@ -47,14 +48,14 @@ export const importHomeserver = sdk.Action.withoutInput(
     const imported = await importedHomeserverYaml
       .read()
       .once()
-      .catch(() => {
+      .catch((e) => {
         throw new Error(
-          i18n(
-            '${path} is missing server_name, macaroon_secret_key or form_secret.',
-            {
-              path: importConfigSubpath,
-            },
-          ),
+          e instanceof z.ZodError
+            ? i18n('${path} is missing or has an invalid ${fields}.', {
+                path: importConfigSubpath,
+                fields: e.issues.map((i) => i.path.join('.')).join(', '),
+              })
+            : i18n('${path} is not valid YAML.', { path: importConfigSubpath }),
         )
       })
     if (!imported) {
@@ -102,7 +103,7 @@ export const importHomeserver = sdk.Action.withoutInput(
       signing_key_path: `${mountpoint}/${signingKeySubpath}`,
       macaroon_secret_key: imported.macaroon_secret_key,
       form_secret: imported.form_secret,
-      old_signing_keys: imported.old_signing_keys,
+      old_signing_keys: imported.old_signing_keys ?? undefined,
     })
 
     await storeJson.merge(effects, {

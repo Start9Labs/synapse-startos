@@ -25,7 +25,7 @@ const namespacesShape = z
 const shape = z.looseObject({
   // set per-appservice
   id: z.string(),
-  url: z.string(),
+  url: z.string().nullable(),
   as_token: z.string(),
   hs_token: z.string(),
   sender_localpart: z.string(),
