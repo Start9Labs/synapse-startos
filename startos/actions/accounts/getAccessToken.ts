@@ -87,6 +87,7 @@ export const getAccessToken = sdk.Action.withInput(
         masked: true,
         copyable: true,
         qr: false,
+        launchable: false,
       },
     }
   },

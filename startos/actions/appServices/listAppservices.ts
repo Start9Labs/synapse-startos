@@ -20,6 +20,7 @@ const appserviceFields = (
       masked: false,
       copyable: true,
       qr: false,
+      launchable: false,
     },
     {
       type: 'single',
@@ -29,6 +30,7 @@ const appserviceFields = (
       masked: false,
       copyable: true,
       qr: false,
+      launchable: false,
     },
     {
       type: 'single',
@@ -38,6 +40,7 @@ const appserviceFields = (
       masked: false,
       copyable: true,
       qr: false,
+      launchable: false,
     },
     {
       type: 'single',
@@ -47,6 +50,7 @@ const appserviceFields = (
       masked: true,
       copyable: true,
       qr: false,
+      launchable: false,
     },
     {
       type: 'single',
@@ -56,6 +60,7 @@ const appserviceFields = (
       masked: true,
       copyable: true,
       qr: false,
+      launchable: false,
     },
     {
       type: 'single',
@@ -65,6 +70,7 @@ const appserviceFields = (
       masked: false,
       copyable: false,
       qr: false,
+      launchable: false,
     },
   ]
 
@@ -77,6 +83,7 @@ const appserviceFields = (
       masked: false,
       copyable: true,
       qr: false,
+      launchable: false,
     })
   }
 
@@ -139,6 +146,7 @@ export const listAppservices = sdk.Action.withoutInput(
           masked: false,
           copyable: false,
           qr: false,
+          launchable: false,
         })
       }
     }
