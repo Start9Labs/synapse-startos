@@ -36,7 +36,7 @@ export const inputSpec = InputSpec.of({
   }),
   large_rooms: Value.union({
     name: i18n('Large Room Protection'),
-    default: 'unlimited',
+    default: 'limited',
     description: i18n(
       'Joining a very large room — a public one with tens of thousands of members — makes your homeserver download and keep its entire history, which on a home server can take hours and fill the disk.\n- Join Any Room: no size limit\n- Limit by Size: refuse to join a room above the complexity you set; the limit applies only the first time anyone here joins a given room',
     ),
@@ -51,7 +51,7 @@ export const inputSpec = InputSpec.of({
               "A room's complexity is its number of state events divided by 500, so 1 is roughly a 500-event room and 20 is roughly a 10,000-event room. Synapse's own default is 1, which is strict enough to refuse many ordinary rooms — raise it until joins succeed. Server admins are exempt, so you can always join a room yourself and let everyone else in behind you.",
             ),
             required: true,
-            default: 1,
+            default: 5,
             integer: false,
             step: 0.5,
             min: 0.5,

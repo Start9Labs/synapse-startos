@@ -1,18 +1,18 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.162.0:3',
+  version: '1.162.0:4',
   releaseNotes: {
     en_US:
-      'Restarting Synapse while it is still starting stops every process of the previous run.',
+      'New Force-Purge Room action deletes a room from your server when deleting it from the Admin Dashboard fails.',
     es_ES:
-      'Reiniciar Synapse mientras aún se está iniciando detiene todos los procesos de la ejecución anterior.',
+      'La nueva acción Purgar sala a la fuerza elimina una sala de su servidor cuando eliminarla desde el Panel de administración falla.',
     de_DE:
-      'Ein Neustart von Synapse, während es noch startet, beendet alle Prozesse des vorherigen Laufs.',
+      'Die neue Aktion „Raum zwangsweise löschen“ entfernt einen Raum von Ihrem Server, wenn das Löschen über das Admin-Dashboard fehlschlägt.',
     pl_PL:
-      'Ponowne uruchomienie Synapse w trakcie uruchamiania zatrzymuje wszystkie procesy poprzedniego uruchomienia.',
+      'Nowa akcja Wymuś usunięcie pokoju usuwa pokój z serwera, gdy usunięcie go z Panelu administratora się nie udaje.',
     fr_FR:
-      "Redémarrer Synapse pendant son démarrage arrête tous les processus de l'exécution précédente.",
+      'La nouvelle action Purger le salon de force supprime un salon de votre serveur lorsque sa suppression depuis le Tableau de bord administrateur échoue.',
   },
   migrations: {},
 })

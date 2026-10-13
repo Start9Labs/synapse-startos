@@ -190,6 +190,18 @@ const dict = {
   'Letters, digits, dots, dashes and underscores only, with no spaces.': 208,
   '${path} is not valid YAML.': 209,
   None: 210,
+  'Room ID': 211,
+  "The room's ID as the Rooms tab of the Admin Dashboard shows it, starting with !": 212,
+  'A room ID starts with !': 213,
+  'An administrator account on this server.': 214,
+  'Force-Purge Room': 215,
+  'Delete a room and its history from this server when deleting it from the Admin Dashboard fails.': 216,
+  "This permanently deletes the room's history from this server and removes everyone here from it, even members Synapse cannot remove the normal way. Their apps may keep showing the room until they leave it.": 217,
+  Rooms: 218,
+  '${room} was purged from this server.': 219,
+  'Synapse could not purge ${room}: ${error}': 220,
+  'Still purging': 221,
+  'Synapse is still purging ${room} and will finish in the background. The room disappears from the Rooms tab of the Admin Dashboard when it is done.': 222,
 } as const
 
 export type I18nKey = keyof typeof dict

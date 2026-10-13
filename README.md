@@ -98,13 +98,14 @@ Within `homeserver.yaml`:
 
 **Sized to the machine** — `caches.cache_autotuning`, defaulted to a quarter of system RAM and clamped between 1 and 2 GiB. Synapse evicts on whole-process allocated memory rather than cache size, so the threshold has to clear real usage; the clamp keeps it from being unreachable on a large machine, where an uncapped fraction would mean the guard never fires at all.
 
-**Overridden defaults** — three keys where this package ships a value Synapse does not. Each is a starting point rather than an assertion: the Settings action that exposes it writes whatever you choose, and the form footnotes Synapse's own value beside it.
+**Overridden defaults** — four keys where this package ships a value Synapse does not. Each is a starting point rather than an assertion: the Settings action that exposes it writes whatever you choose, and the form footnotes Synapse's own value beside it.
 
-| Key                                   | Synapse default | Packaged value  | Why                                                                             |
-| ------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------- |
-| `max_image_pixels`                    | `32M`           | `64M`           | Phone cameras shoot 48-50 MP; above the limit an image gets no thumbnail at all |
-| `thumbnail_sizes`                     | up to 800x600   | up to 1920x1440 | A 3x-DPI phone display upscales the 800x600 and shows it soft                   |
-| `caches.sync_response_cache_duration` | `2m`            | `5m`            | Mobile clients drop and re-issue the same `/sync` constantly                    |
+| Key                                   | Synapse default | Packaged value   | Why                                                                             |
+| ------------------------------------- | --------------- | ---------------- | ------------------------------------------------------------------------------- |
+| `max_image_pixels`                    | `32M`           | `64M`            | Phone cameras shoot 48-50 MP; above the limit an image gets no thumbnail at all |
+| `thumbnail_sizes`                     | up to 800x600   | up to 1920x1440  | A 3x-DPI phone display upscales the 800x600 and shows it soft                   |
+| `caches.sync_response_cache_duration` | `2m`            | `5m`             | Mobile clients drop and re-issue the same `/sync` constantly                    |
+| `limit_remote_rooms`                  | off             | on, complexity 5 | One join to a huge public room can swamp a home server; written at install only |
 
 `remote_media_download_per_second` and `remote_media_download_burst_count` are deliberately **not** overridden. They belong to Rate Limits, whose Normal preset means "write nothing, upstream applies" — so the raised value lives in that action's Relaxed preset instead of in the package default.
 
@@ -152,7 +153,7 @@ Two mutually exclusive paths from there, and **both are only available before th
 
 ## Actions
 
-Fourteen actions in four groups.
+Fifteen actions in five groups.
 
 ### Setup — Set Server Address/URL, Import Existing Homeserver
 
@@ -170,6 +171,11 @@ Both run only while the service is stopped, and both are effectively one-time.
 - **Set Admin Password** works whether or not the service is running: the password is queued in `store.json` and applied by a oneshot once the homeserver answers. Once an admin password exists — after the action has run once, or after an import — StartOS asks for confirmation first, because the action generates a fresh password, restarts the homeserver, and the old password stops working. The first run, from the install task, needs none; `store.json`'s `adminPasswordSet` tracks which case applies, and an install from before it existed counts as set.
   - **Whose password it sets depends on where the homeserver came from.** On one created here it is the oldest account — the admin the install task registered, whatever it was named in older releases. On an imported one — recognised by `signing_key_path` pointing at the old server's key rather than the install's placeholder — the oldest account belongs to one of its users, so it sets `@admin:<server name>` instead and registers that account if it does not exist. If that account exists but is not an active admin, the password is left pending and a warning is logged on every start until the account is made an admin again — the package never promotes or reactivates an imported user itself. The oneshot does not fail in that case: nginx waits on it, so failing would take the whole homeserver offline.
 - **Get Access Token** returns a token for an account, and needs the service running.
+
+### Rooms — Force-Purge Room
+
+- **Force-Purge Room** deletes a room through Synapse's admin API with `purge` and `force_purge` set, then polls the delete until it finishes or five minutes pass. It signs in with the admin credentials it is given and logs that session out afterwards, and needs the service running.
+  - **It covers the room the Admin Dashboard cannot delete.** Synapse's delete first makes each local member leave. When the server's copy of the room lacks an event the leave must reference (`unknown auth event` in the logs), the member stays joined and the purge fails with `Users are still joined to this room`. Ketesa never sends `force_purge`. Members left joined get no leave event, so their clients show the room until they leave it.
 
 ### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Email/SMTP
 
@@ -287,6 +293,7 @@ actions:
   - rate-limits # Settings
   - discoverability # Settings
   - manage-smtp # Settings; displayed "Email/SMTP"
+  - force-purge-room # Rooms; only-running; signs in with admin credentials
   - register-appservice # App Services; also driven by dependent packages
   - list-appservices # App Services
   - delete-appservice # App Services

@@ -33,6 +33,11 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
     // Must run after synapse generate, which creates signing_key_path, server_name
     await homeserverYaml.merge(effects, {
       database: { args: { password: postgresPassword } },
+      limit_remote_rooms: {
+        enabled: true,
+        complexity: 5,
+        admins_can_join: true,
+      },
     })
 
     await storeJson.merge(effects, { adminPasswordSet: false })
