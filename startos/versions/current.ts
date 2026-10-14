@@ -1,4 +1,4 @@
-import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
+import { VersionInfo } from '@start9labs/start-sdk'
 import { homeserverYaml } from '../fileModels/homeserver.yml'
 import { hasInvalidProfilePrivacy } from '../utils'
 
@@ -47,6 +47,5 @@ Notes de version complètes : https://github.com/element-hq/synapse/blob/v1.163.
         }
       })
     },
-    down: IMPOSSIBLE,
   },
 })
