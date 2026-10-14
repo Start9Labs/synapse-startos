@@ -98,19 +98,16 @@ const resourceShape = z
   .catch(resourceDefault)
 
 // Flags with no user-facing choice, each forced on because getting it wrong has
-// a cost and getting it right has none: msc3266 is the room summary API that
-// Element X requires, msc4028 is what makes push notifications fire for
-// encrypted messages, and msc2409/msc3202 carry the to-device and one-time-key
-// data an encrypted bridge needs. A hand-set `false` is still honoured.
+// a cost and getting it right has none: msc4028 is what makes push notifications
+// fire for encrypted messages, and msc2409/msc3202 carry the to-device and
+// one-time-key data an encrypted bridge needs. A hand-set `false` is still honoured.
 const experimentalDefault = {
-  msc3266_enabled: true,
   msc4028_push_encrypted_events: true,
   msc2409_to_device_messages_enabled: true,
   msc3202_transaction_extensions: true,
 }
 const experimentalShape = z
   .looseObject({
-    msc3266_enabled: z.boolean().catch(true),
     msc4028_push_encrypted_events: z.boolean().catch(true),
     msc2409_to_device_messages_enabled: z.boolean().catch(true),
     msc3202_transaction_extensions: z.boolean().catch(true),

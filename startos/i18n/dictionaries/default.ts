@@ -148,7 +148,7 @@ const dict = {
   'Require Sign-in to View Profiles': 166,
   'Refuse display name and avatar lookups from anyone who is not signed in.': 167,
   'Only Share Profiles Within Shared Rooms': 168,
-  'Only reveal a display name and avatar to someone who is already in a room with that person.': 169,
+  'Only reveal a display name and avatar to someone who is already in a room with that person. Requires "Require Sign-in to View Profiles".': 169,
   'Attach Profiles to Invitations': 170,
   "Include the inviter's display name and avatar in an invitation, so the recipient sees who it is from before accepting.": 171,
   'What a stranger can find out about your server: which rooms it hosts, who has an account, and what they look like.': 172,
@@ -202,6 +202,7 @@ const dict = {
   'Synapse could not purge ${room}: ${error}': 220,
   'Still purging': 221,
   'Synapse is still purging ${room} and will finish in the background. The room disappears from the Rooms tab of the Admin Dashboard when it is done.': 222,
+  'Enable Require Sign-in to View Profiles before limiting profiles to shared rooms.': 223,
 } as const
 
 export type I18nKey = keyof typeof dict
