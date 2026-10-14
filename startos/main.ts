@@ -1,5 +1,6 @@
 import { T } from '@start9labs/start-sdk'
 import { writeFile } from 'fs/promises'
+import { appserviceRegistrationYaml } from './fileModels/appserviceRegistration.yaml'
 import { homeserverLogConfig } from './fileModels/homeserver.log.config'
 import { homeserverYaml } from './fileModels/homeserver.yml'
 import { storeJson } from './fileModels/store.json'
@@ -159,6 +160,17 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const config = await homeserverYaml.read().const(effects)
   if (!config) {
     throw new Error('homeserver.yaml not found')
+  }
+
+  // Synapse reads each appservice registration once at startup. Adding one
+  // restarts through the app_service_config_files change above; rewriting an
+  // existing one — a reinstalled bridge with new tokens, a changed sender or
+  // namespace — changes only the registration file, so each is watched here,
+  // or Synapse keeps the old one and rejects the bridge with "as_token was
+  // not accepted".
+  for (const path of config.app_service_config_files) {
+    const id = path.slice(path.lastIndexOf('/') + 1).replace(/\.yaml$/, '')
+    await appserviceRegistrationYaml(id).read().const(effects)
   }
 
   const pendingAdminPassword = await storeJson
