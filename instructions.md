@@ -160,6 +160,8 @@ The **Discoverability** action collapses that into one choice. **Private** stops
 
 **Custom** exposes all ten settings individually. The one most people go looking for is **Search All Local Users** — without it, searching for someone only finds people you already share a room with, which is rarely what you want on a small server where everyone knows each other.
 
+To enable **Only Share Profiles Within Shared Rooms**, also enable **Require Sign-in to View Profiles**. The action rejects the combination without sign-in, which Synapse cannot start with.
+
 ### When people hit rate limits
 
 Synapse deliberately slows anyone down who sends, joins, invites or signs in too fast. The stock settings assume a server open to strangers, and they are easy to trip: inviting a dozen people at once, or running a bot, will hit them.

@@ -9,16 +9,16 @@ Two independent upstreams to check:
 - **Synapse** — [element-hq/synapse](https://github.com/element-hq/synapse). Currently pinned via `dockerTag` in `startos/manifest/index.ts` (e.g. `ghcr.io/element-hq/synapse:v<version>`).
 
   ```
-  gh release view -R element-hq/synapse --json tagName -q .tagName
+  gh api repos/element-hq/synapse/tags --paginate --jq '.[].name'
   ```
 
 - **Ketesa** — [etkecc/ketesa](https://github.com/etkecc/ketesa). Currently pinned via `SYNAPSE_ADMIN_VERSION` in the `Makefile`.
 
   ```
-  gh release view -R etkecc/ketesa --json tagName -q .tagName
+  gh api repos/etkecc/ketesa/tags --paginate --jq '.[].name'
   ```
 
-Compare each result against its current pin; if either has moved ahead, bump that upstream.
+Select the newest stable tag from each list, excluding release candidates and other prereleases. Compare each against its current pin; if either has moved ahead, bump that upstream only after verifying its artifact is published. Synapse can publish a stable tag and image before creating a GitHub release; in that case, read `CHANGES.md` and `docs/upgrade.md` at that tag instead of relying on `gh release view`.
 
 ## Applying the bump
 

@@ -1,6 +1,7 @@
 import { homeserverYaml } from '../../fileModels/homeserver.yml'
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
+import { hasInvalidProfilePrivacy } from '../../utils'
 
 const { InputSpec, Value, Variants } = sdk
 
@@ -127,7 +128,7 @@ export const inputSpec = InputSpec.of({
           limit_profile_requests_to_users_who_share_rooms: toggle(
             i18n('Only Share Profiles Within Shared Rooms'),
             i18n(
-              'Only reveal a display name and avatar to someone who is already in a room with that person.',
+              'Only reveal a display name and avatar to someone who is already in a room with that person. Requires "Require Sign-in to View Profiles".',
             ),
             false,
           ),
@@ -164,8 +165,8 @@ export const discoverability = sdk.Action.withInput(
   inputSpec,
 
   // optionally pre-fill the input form
-  async ({ effects }) => {
-    const yaml = await homeserverYaml.read().const(effects)
+  async () => {
+    const yaml = await homeserverYaml.read().once()
     if (!yaml) return {}
 
     const live = {
@@ -227,6 +228,13 @@ export const discoverability = sdk.Action.withInput(
         return void (await homeserverYaml.merge(effects, settings.public))
       case 'custom': {
         const v = input.preset.value
+        if (hasInvalidProfilePrivacy(v)) {
+          throw new Error(
+            i18n(
+              'Enable Require Sign-in to View Profiles before limiting profiles to shared rooms.',
+            ),
+          )
+        }
         return void (await homeserverYaml.merge(effects, {
           allow_public_rooms_over_federation:
             v.allow_public_rooms_over_federation,

@@ -1,5 +1,15 @@
 import { sdk } from './sdk'
 
+export function hasInvalidProfilePrivacy(config: {
+  require_auth_for_profile_requests?: boolean
+  limit_profile_requests_to_users_who_share_rooms?: boolean
+}) {
+  return (
+    config.limit_profile_requests_to_users_who_share_rooms === true &&
+    config.require_auth_for_profile_requests !== true
+  )
+}
+
 export const homeserverPort = 8008
 export const nginxPort = 80
 export const adminPort = 8080
