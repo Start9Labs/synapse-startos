@@ -315,7 +315,7 @@ server {
           ])
           if (exitCode !== 0) {
             return {
-              result: 'loading' as const,
+              result: 'starting' as const,
               message: i18n('Initializing Postgres'),
             }
           }
