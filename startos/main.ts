@@ -139,6 +139,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     email: smtpCredentials && {
       enable_notifs: true,
       require_transport_security: true,
+      force_tls: smtpCredentials.security === 'tls',
       notif_from: smtpCredentials.from,
       smtp_host: smtpCredentials.host,
       smtp_port: smtpCredentials.port,
