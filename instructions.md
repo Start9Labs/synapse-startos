@@ -107,7 +107,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 - **Import Existing Homeserver** — adopt a homeserver you run elsewhere. See above; only available before the first start.
 - **Rate Limits** — how fast people may send messages, look up profiles, join rooms, invite others and sign in. Pick Normal or Relaxed; pick Custom if you want to set any of them yourself.
 - **Discoverability** — what someone without an account can find out about your server. Pick Private, Normal or Public; pick Custom to decide each setting.
-- **Email/SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials.
+- **Email/SMTP** — email notifications, using either your StartOS system SMTP settings or custom credentials. Match **Connection Security** to your provider: **TLS** uses port 465; **STARTTLS** upgrades the connection on the selected port.
 - **Get Access Token** — return a Matrix access token for a given username and password; useful for programmatic access. The service must be running.
 - **Force-Purge Room** — delete a room and its history from your server when deleting it from the Admin Dashboard fails. It removes everyone here from the room, even members Synapse cannot remove the normal way, and it cannot be undone. Sign in with an admin account; the service must be running.
 - **Register / List / Delete Appservice** — manage Matrix bridges (appservices). Create the user accounts a bridge needs from the **Users** tab of the Admin Dashboard. Leave **Appservice URL** empty for a bot that only sends messages and never needs to hear from the homeserver.

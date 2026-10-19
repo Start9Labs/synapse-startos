@@ -187,7 +187,7 @@ Seven forms over `homeserver.yaml`, all available whether or not the service is 
 - **Registration** governs whether new accounts can be created, which rooms they land in, and whether guests may look around.
 - **Rate Limits** tunes Synapse's throttles, including `rc_profile` for profile lookups. Normal and Relaxed leave that limit to Synapse; Custom reads and writes its sustained rate and burst. Its Custom preset also carries `remote_media_download_per_second` and its burst — bytes rather than counts, and applied per requester, so they throttle one person's media fetching without touching anyone else's.
 - **Discoverability** controls how visible the server and its rooms are to the wider network. In Custom, **Only Share Profiles Within Shared Rooms** requires **Require Sign-in to View Profiles**; the action rejects the invalid combination before writing configuration.
-- **Email/SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours.
+- **Email/SMTP** takes StartOS's system SMTP, your own server, or disabled. Email notifications and transport security are enforced on where the rest of that block is yours. The selected connection security sets `email.force_tls`: TLS uses implicit TLS; STARTTLS upgrades the SMTP connection.
 
 ### App Services — Register Appservice, List Appservices, Delete Appservice
 

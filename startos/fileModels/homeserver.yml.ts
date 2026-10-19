@@ -235,6 +235,7 @@ const shape = z.looseObject({
       enable_notifs: z.literal(true),
       require_transport_security: z.literal(true),
       // set by SMTP config
+      force_tls: z.boolean().catch(false),
       notif_from: z.string(),
       smtp_host: z.string(),
       smtp_pass: z.string().optional(),
