@@ -1,10 +1,10 @@
 # Updating the upstream version
 
-Synapse and Ketesa are versioned independently and bump separately. This package tracks both: Synapse as a Docker image, and Ketesa (the admin dashboard, formerly synapse-admin) as a release tarball downloaded at build time.
+Synapse is the wrapped application, tracked as a Docker image. Ketesa (the admin dashboard, formerly synapse-admin) is versioned independently and downloaded as a release tarball at build time; refresh it alongside a Synapse release or wrapper revision, not as the trigger for a release.
 
 ## Determining the upstream version
 
-Two independent upstreams to check:
+Check the application and bundled dashboard:
 
 - **Synapse** — [element-hq/synapse](https://github.com/element-hq/synapse). Currently pinned via `dockerTag` in `startos/manifest/index.ts` (e.g. `ghcr.io/element-hq/synapse:v<version>`).
 
@@ -18,7 +18,7 @@ Two independent upstreams to check:
   gh api repos/etkecc/ketesa/tags --paginate --jq '.[].name'
   ```
 
-Select the newest stable tag from each list, excluding release candidates and other prereleases. Compare each against its current pin; if either has moved ahead, bump that upstream only after verifying its artifact is published. Synapse can publish a stable tag and image before creating a GitHub release; in that case, read `CHANGES.md` and `docs/upgrade.md` at that tag instead of relying on `gh release view`.
+Select the newest stable tag from each list, excluding release candidates and other prereleases. Compare each against its current pin; bump Synapse when its artifact is published, and refresh Ketesa if needed alongside that release or an approved wrapper change. Synapse can publish a stable tag and image before creating a GitHub release; in that case, read `CHANGES.md` and `docs/upgrade.md` at that tag instead of relying on `gh release view`.
 
 ## Applying the bump
 
