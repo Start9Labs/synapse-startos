@@ -35,7 +35,7 @@
 
 ## Image and Container Runtime
 
-Three upstream images, plus one asset fetched at build time. `nginx` and `postgres` are unmodified; the root `Dockerfile` upgrades `ghcr.io/element-hq/synapse`'s CA store until upstream ships an image built on a fixed one.
+Three unmodified upstream images, plus one asset fetched at build time.
 
 | Property      | Value                                                               |
 | ------------- | ------------------------------------------------------------------- |
@@ -252,7 +252,7 @@ Mixed, with one deliberate exclusion.
 
 ```yaml
 package_id: synapse
-image: ghcr.io/element-hq/synapse + root Dockerfile (CA store upgrade) # plus nginx and postgres
+image: ghcr.io/element-hq/synapse # plus nginx and postgres
 architectures:
   - x86_64
   - aarch64
