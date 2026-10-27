@@ -1,3 +1,4 @@
+import { T } from '@start9labs/start-sdk'
 import { sdk } from './sdk'
 
 export function hasInvalidProfilePrivacy(config: {
@@ -15,6 +16,51 @@ export const nginxPort = 80
 export const adminPort = 8080
 export const postgresUser = 'synapse' as const
 export const postgresDb = 'synapse' as const
+
+export const psql = (
+  effects: T.Effects,
+  password: string,
+  name: string,
+  args: string[],
+) =>
+  sdk.SubContainer.withTemp(
+    effects,
+    { imageId: 'postgres' },
+    sdk.Mounts.of(),
+    name,
+    (pg) =>
+      pg.execFail(
+        [
+          'psql',
+          '-h',
+          '127.0.0.1',
+          '-U',
+          postgresUser,
+          '-d',
+          postgresDb,
+          ...args,
+        ],
+        { env: { PGPASSWORD: password } },
+      ),
+  )
+
+export const accountStanding = async (
+  effects: T.Effects,
+  password: string,
+  user: string,
+) =>
+  (
+    await psql(effects, password, 'find-admin', [
+      '-tAc',
+      `SELECT CASE WHEN deactivated = 1 THEN 'deactivated' WHEN admin = 1 THEN 'admin' ELSE 'user' END FROM users WHERE name = '${sqlLiteral(user)}'`,
+    ])
+  ).stdout
+    .toString()
+    .trim()
+
+export function sqlLiteral(s: string): string {
+  return s.replace(/'/g, "''")
+}
 
 export const mountpoint = '/data'
 

@@ -17,7 +17,7 @@ Fresh-server setup presents two required steps in sequence: choose the server ad
 
 1. Add a public clearnet domain to the Homeserver interface. This is the domain your users will see in their Matrix IDs (e.g. `@you:matrix.example.com`).
 2. Run the **Choose the permanent address/URL of your Synapse Matrix server** task and pick the domain. **This choice is permanent** — it can never be changed, so choose carefully. If that domain is ever removed from the Homeserver interface, StartOS asks for the address again and Synapse won't start until you add the same domain back; any other domain is refused.
-3. Run the **Create a root admin user for your Synapse Matrix homeserver** task. A username (`admin`) and a random password are generated and shown once — copy and save the password before dismissing. If you lose it, run the **Set Admin Password** action later to set a new one.
+3. Run the **Create a root admin user for your Synapse Matrix homeserver** task. Keep the username `admin` or enter your own; a random password is generated and shown once — copy and save it before dismissing. If you lose it, run the **Set Admin Password** action later to set a new one.
 4. Start Synapse. On first start, the admin user is created with that password.
 
 > Already running Matrix somewhere else? Stop after step 1 and follow **Importing an existing homeserver** below, which takes the place of steps 2 through 4.
@@ -99,7 +99,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 
 ### Actions
 
-- **Set Admin Password** — generate a new admin password. Use it to rotate the password or recover if you've lost it. It asks you to confirm first, because it replaces the current password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it. On an imported homeserver it sets the password of `@admin`, creating that account if there is none. If your server already has an `@admin` that is deactivated or not an administrator, the new password is not applied until you make that account an administrator again from the Admin Dashboard, signed in with one of your existing admin accounts.
+- **Set Admin Password** — generate a new password for an administrator account. Use it to rotate the password or recover if you've lost it. Give it the account's username — the one it last set is filled in — or a username no one has yet to create another administrator; while Synapse is running, the result tells you when the username is new. It replaces that account's password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it. It never sets the password of an account that is deactivated or not an administrator: while Synapse is running it says so straight away, and while it is stopped the new password is not applied until you make that account an administrator again from the Admin Dashboard, signed in with one of your existing admin accounts.
 - **Config** — voice and video calls, presence, link previews, notification content, admin contact, and log level.
 - **Federation** — whether your server talks to other homeservers, which ones, and how large a room it will join.
 - **Media** — upload limit, how large an image can be and still get a thumbnail, which thumbnail sizes are prepared, and how long other servers' files are kept.

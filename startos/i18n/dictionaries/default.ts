@@ -203,6 +203,11 @@ const dict = {
   'Still purging': 221,
   'Synapse is still purging ${room} and will finish in the background. The room disappears from the Rooms tab of the Admin Dashboard when it is done.': 222,
   'Enable Require Sign-in to View Profiles before limiting profiles to shared rooms.': 223,
+  'The administrator account to set the password for. If no account has this name, it is created as an administrator; an existing account that is not an active administrator is left unchanged.': 224,
+  'Only lowercase letters, digits and . _ = - / +. Leave out the @ and the server name.': 225,
+  '${user} is deactivated. Choose an active administrator, or a new username to create one.': 226,
+  '${user} is not an administrator. Choose an active administrator, or a new username to create one.': 227,
+  'No account is named ${user}, so it is created as a new administrator with the username and password below. Write them down or save them to a password manager.': 228,
 } as const
 
 export type I18nKey = keyof typeof dict
