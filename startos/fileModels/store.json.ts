@@ -3,6 +3,7 @@ import { sdk } from '../sdk'
 
 const shape = z.looseObject({
   smtp: smtpShape,
+  adminUsername: z.string().catch('admin').default('admin'),
   pendingAdminPassword: z.string().nullable().catch(null).default(null),
   turn: z.boolean().catch(false).default(false),
   // Set by the import action, consumed by the restore-import oneshot on the

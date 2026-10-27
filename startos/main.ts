@@ -7,6 +7,7 @@ import { storeJson } from './fileModels/store.json'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
 import {
+  accountStanding,
   adminPort,
   coturnHostId,
   coturnId,
@@ -19,8 +20,9 @@ import {
   mountpoint,
   nginxPort,
   postgresDb,
-  placeholderServerName,
   postgresUser,
+  psql,
+  sqlLiteral,
 } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
@@ -174,8 +176,12 @@ export const main = sdk.setupMain(async ({ effects }) => {
     await appserviceRegistrationYaml(id).read().const(effects)
   }
 
-  const pendingAdminPassword = await storeJson
-    .read((s) => s.pendingAdminPassword)
+  const pendingAdmin = await storeJson
+    .read((s) =>
+      s.pendingAdminPassword
+        ? { username: s.adminUsername, password: s.pendingAdminPassword }
+        : null,
+    )
     .once()
 
   const pendingImport = await storeJson.read((s) => s.pendingImport).once()
@@ -394,82 +400,52 @@ server {
       subcontainer: synapseSub,
       exec: {
         fn: async (subc) => {
-          if (!pendingAdminPassword) return null
+          if (!pendingAdmin) return null
 
-          const PGPASSWORD = config.database.args.password
-          const psql = (name: string, args: string[]) =>
-            sdk.SubContainer.withTemp(
-              effects,
-              { imageId: 'postgres' },
-              sdk.Mounts.of(),
-              name,
-              (pg) =>
-                pg.execFail(
-                  [
-                    'psql',
-                    '-h',
-                    '127.0.0.1',
-                    '-U',
-                    postgresUser,
-                    '-d',
-                    postgresDb,
-                    ...args,
-                  ],
-                  { env: { PGPASSWORD } },
-                ),
-            )
-
-          // Import repoints the key at the old server's; on an imported server the oldest account is someone's
-          const imported =
-            config.signing_key_path !==
-            `${mountpoint}/${placeholderServerName}.signing.key`
-          const [target, active] = (
-            await psql('find-admin', [
-              '-tAc',
-              imported
-                ? `SELECT name, admin = 1 AND deactivated = 0 FROM users WHERE name = '${sqlLiteral(`@admin:${config.server_name}`)}'`
-                : 'SELECT name, true FROM users ORDER BY creation_ts ASC LIMIT 1',
-            ])
-          ).stdout
-            .toString()
-            .trim()
-            .split('|')
+          const dbPassword = config.database.args.password
+          const target = `@${pendingAdmin.username}:${config.server_name}`
+          const standing = await accountStanding(effects, dbPassword, target)
 
           // nginx waits on this oneshot, so failing here would take the whole homeserver down
-          if (target && active !== 't') {
+          if (standing && standing !== 'admin') {
             console.warn(
               `[!] ${target} exists but is not an active admin; the queued admin password stays pending until it is`,
             )
             return null
           }
 
-          if (target) {
+          if (standing) {
             const hash = (
               await subc.execFail([
                 'hash_password',
                 '-p',
-                pendingAdminPassword,
+                pendingAdmin.password,
                 '-c',
                 '/data/homeserver.yaml',
               ])
             ).stdout
               .toString()
               .trim()
-            await psql('apply-admin-password-update', [
+            await psql(effects, dbPassword, 'apply-admin-password-update', [
               '-c',
               `UPDATE users SET password_hash = '${sqlLiteral(hash)}' WHERE name = '${sqlLiteral(target)}'`,
             ])
           } else {
-            await subc.execFail([
+            const { exitCode, stdout, stderr } = await subc.exec([
               'register_new_matrix_user',
               '--config',
               '/data/homeserver.yaml',
-              '--user',
-              'admin',
+              `--user=${pendingAdmin.username}`,
               '--password',
-              pendingAdminPassword,
+              pendingAdmin.password,
               '--admin',
             ])
+            if (exitCode !== 0) {
+              console.warn(
+                `[!] Synapse refused to create ${target}; the queued admin password stays pending: ${stdout.toString()}${stderr.toString()}`,
+              )
+              return null
+            }
           }
 
           await storeJson.merge(effects, { pendingAdminPassword: null })
@@ -507,7 +483,3 @@ server {
       requires: ['nginx'],
     })
 })
-
-function sqlLiteral(s: string): string {
-  return s.replace(/'/g, "''")
-}

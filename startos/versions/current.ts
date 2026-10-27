@@ -1,18 +1,18 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.163.2:0',
+  version: '1.163.2:1',
   releaseNotes: {
     en_US:
-      'Updated Synapse to 1.163.2. Updates the Pillow image-processing dependency to address critical security vulnerabilities. Full notes: https://github.com/element-hq/synapse/blob/v1.163.2/CHANGES.md',
+      'Set Admin Password asks for the username of the administrator whose password it sets, and says when that username is new and will be created as an administrator. It never changes an account that is deactivated or not an administrator.',
     es_ES:
-      'Actualiza Synapse a 1.163.2. Actualiza la dependencia de procesamiento de imágenes Pillow para corregir vulnerabilidades de seguridad críticas. Notas completas: https://github.com/element-hq/synapse/blob/v1.163.2/CHANGES.md',
+      '«Establecer contraseña de administrador» pide el nombre de usuario del administrador cuya contraseña establece, y avisa cuando ese nombre de usuario es nuevo y se creará como administrador. Nunca modifica una cuenta desactivada o que no sea de administrador.',
     de_DE:
-      'Aktualisiert Synapse auf 1.163.2. Aktualisiert die Bildverarbeitungsbibliothek Pillow, um kritische Sicherheitslücken zu schließen. Vollständige Hinweise: https://github.com/element-hq/synapse/blob/v1.163.2/CHANGES.md',
+      '„Administratorpasswort festlegen“ fragt nach dem Benutzernamen des Administrators, dessen Passwort festgelegt wird, und weist darauf hin, wenn dieser Benutzername neu ist und als Administrator angelegt wird. Ein deaktiviertes Konto oder ein Konto ohne Administratorrechte wird nie verändert.',
     pl_PL:
-      'Zaktualizowano Synapse do 1.163.2. Zaktualizowano bibliotekę przetwarzania obrazów Pillow, aby usunąć krytyczne luki w zabezpieczeniach. Pełne informacje: https://github.com/element-hq/synapse/blob/v1.163.2/CHANGES.md',
+      '„Ustaw hasło administratora” pyta o nazwę użytkownika administratora, którego hasło ustawia, i informuje, gdy ta nazwa jest nowa i zostanie utworzona jako administrator. Nigdy nie zmienia konta dezaktywowanego ani konta, które nie jest administratorem.',
     fr_FR:
-      'Met à jour Synapse vers 1.163.2. Met à jour la bibliothèque de traitement des images Pillow pour corriger des vulnérabilités de sécurité critiques. Notes complètes : https://github.com/element-hq/synapse/blob/v1.163.2/CHANGES.md',
+      "« Définir le mot de passe administrateur » demande le nom d'utilisateur de l'administrateur dont il définit le mot de passe, et signale quand ce nom est nouveau et sera créé en tant qu'administrateur. Il ne modifie jamais un compte désactivé ou qui n'est pas administrateur.",
   },
   migrations: {
     up: async ({ effects }) => {},
