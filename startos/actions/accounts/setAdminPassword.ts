@@ -7,6 +7,13 @@ import { accountStanding } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
+const usernamePattern = {
+  regex: '^[a-z0-9._=/+-]+$',
+  description: i18n(
+    'Only lowercase letters, digits and . _ = - / +. Leave out the @ and the server name.',
+  ),
+}
+
 const inputSpec = InputSpec.of({
   username: Value.text({
     name: i18n('Username'),
@@ -18,14 +25,7 @@ const inputSpec = InputSpec.of({
     default: 'admin',
     placeholder: null,
     masked: false,
-    patterns: [
-      {
-        regex: '^[a-z0-9._=/+-]+$',
-        description: i18n(
-          'Only lowercase letters, digits and . _ = - / +. Leave out the @ and the server name.',
-        ),
-      },
-    ],
+    patterns: [usernamePattern],
     inputmode: 'text',
   }),
 })
@@ -59,6 +59,8 @@ export const setAdminPassword = sdk.Action.withInput(
 
   // the execution function
   async ({ effects, input }) => {
+    if (!input.username) throw new Error(usernamePattern.description)
+
     const homeserver = await homeserverYaml
       .read((h) => ({
         user: `@${input.username}:${h.server_name}`,
