@@ -175,7 +175,7 @@ Both run only while the service is stopped, and both are effectively one-time.
 ### Rooms — Force-Purge Room
 
 - **Force-Purge Room** deletes a room through Synapse's admin API with `purge` and `force_purge` set, then polls the delete until it finishes or five minutes pass. It signs in with the admin credentials it is given and logs that session out afterwards, and needs the service running.
-  - **It covers the room the Admin Dashboard cannot delete.** Synapse's delete first makes each local member leave. When the server's copy of the room lacks an event the leave must reference (`unknown auth event` in the logs), the member stays joined and the purge fails with `Users are still joined to this room`. Ketesa never sends `force_purge`. Members left joined get no leave event, so their clients show the room until they leave it.
+  - **It forces a purge when a normal deletion fails.** Synapse's delete first makes each local member leave. When the server's copy of the room lacks an event the leave must reference (`unknown auth event` in the logs), the member stays joined and the purge fails with `Users are still joined to this room`. Ketesa also offers a force-purge control in its room-deletion dialog. Members left joined get no leave event, so their clients show the room until they leave it.
 
 ### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Email/SMTP
 

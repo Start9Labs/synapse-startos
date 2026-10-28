@@ -136,7 +136,7 @@ Joining a huge public room makes your server download and keep its whole history
 
 The limit is a "complexity" number — roughly the room's size in units of 500 events, so 1 is a small room and 20 is a fairly large one. A new server starts at 5, enough for most community rooms while refusing the largest public ones; Synapse's own default of 1 turns away plenty of ordinary rooms. It only applies the first time someone here joins a given room, and you as the admin are exempt: you can always join a room yourself and everyone else can then follow you in.
 
-If a large room is already slowing your server down, delete it from the **Rooms** tab of the Admin Dashboard, which also deletes its history from your server. If that fails — which happens when your server's copy of the room is missing events it needs to remove your members from it — run **Force-Purge Room** with the room's ID instead.
+If a large room is already slowing your server down, delete it from the **Rooms** tab of the Admin Dashboard, which also deletes its history from your server. If that fails — which happens when your server's copy of the room is missing events it needs to remove your members from it — enable the force-purge option in the dashboard's deletion dialog, or run **Force-Purge Room** with the room's ID. Either forces deletion even when local members cannot leave normally.
 
 ### Voice and video calls
 
