@@ -172,11 +172,6 @@ Both run only while the service is stopped, and both are effectively one-time.
   - **It sets the account its form names**, filled in with the one it last set — `store.json`'s `adminUsername`, `admin` before the first run. An active admin of that name gets the new password; a name no account has is registered as an admin. Any other account — deactivated, or not an admin — is left alone, and the package never promotes or reactivates a user itself. While the database is up, the action looks the account up first: it fails on such an account without writing anything, and its result says when the name is new. While the database is down, the oneshot makes the same checks at the next start: such an account leaves the password pending, with a warning logged on every start until the account is an active admin again. A name Synapse refuses to register, such as one an appservice reserves, is logged and left pending the same way. The oneshot does not fail in either case: nginx waits on it, so failing would take the whole homeserver offline.
 - **Get Access Token** returns a token for an account, and needs the service running.
 
-### Rooms — Force-Purge Room
-
-- **Force-Purge Room** deletes a room through Synapse's admin API with `purge` and `force_purge` set, then polls the delete until it finishes or five minutes pass. It signs in with the admin credentials it is given and logs that session out afterwards, and needs the service running.
-  - **It forces a purge when a normal deletion fails.** Synapse's delete first makes each local member leave. When the server's copy of the room lacks an event the leave must reference (`unknown auth event` in the logs), the member stays joined and the purge fails with `Users are still joined to this room`. Ketesa also offers a force-purge control in its room-deletion dialog. Members left joined get no leave event, so their clients show the room until they leave it.
-
 ### Settings — Config, Federation, Media, Registration, Rate Limits, Discoverability, Email/SMTP
 
 Seven forms over `homeserver.yaml`, all available whether or not the service is running, all applied by the restart they trigger.
@@ -293,7 +288,6 @@ actions:
   - rate-limits # Settings
   - discoverability # Settings
   - manage-smtp # Settings; displayed "Email/SMTP"
-  - force-purge-room # Rooms; only-running; signs in with admin credentials
   - register-appservice # App Services; also driven by dependent packages
   - list-appservices # App Services
   - delete-appservice # App Services
