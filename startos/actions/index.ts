@@ -4,7 +4,6 @@ import { setAdminPassword } from './accounts/setAdminPassword'
 import { deleteAppservice } from './appServices/deleteAppservice'
 import { listAppservices } from './appServices/listAppservices'
 import { registerAppservice } from './appServices/registerAppservice'
-import { forcePurgeRoom } from './rooms/forcePurgeRoom'
 import { config } from './settings/config'
 import { discoverability } from './settings/discoverability'
 import { federation } from './settings/federation'
@@ -27,7 +26,6 @@ export const actions = sdk.Actions.of()
   .addAction(rateLimits)
   .addAction(discoverability)
   .addAction(manageSmtp)
-  .addAction(forcePurgeRoom)
   .addAction(registerAppservice)
   .addAction(listAppservices)
   .addAction(deleteAppservice)
