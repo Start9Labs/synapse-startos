@@ -117,7 +117,7 @@ Federation is off by default. Turn it on through the **Federation** action, opti
 
 Other homeservers reach yours over the **Homeserver** interface on port 443. Your server publishes an address delegation telling them to use it, so there is no second port to open and nothing extra to forward.
 
-If you publish the **Homeserver** interface through StartTunnel to keep your home IP private, also select that tunnel on Synapse's **Outbound Traffic** tab. Requests Synapse makes itself, to other homeservers and for remote media and link previews, otherwise leave through your home router, so those servers see your home IP. If you use the tunnel for another reason, such as a port your router can't forward, there is nothing to change.
+If you publish the **Homeserver** interface through StartTunnel to keep your home IP private, send Synapse's outbound traffic through that tunnel too. Requests Synapse makes itself, to other homeservers and for remote media and link previews, otherwise leave through your home router, so those servers see your home IP. If you use the tunnel for another reason, such as a port your router can't forward, there is nothing to change.
 
 ### Letting other people sign up
 
