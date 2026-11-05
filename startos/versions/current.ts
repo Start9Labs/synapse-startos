@@ -1,20 +1,37 @@
 import { VersionInfo } from '@start9labs/start-sdk'
+import { homeserverYaml } from '../fileModels/homeserver.yml'
+import {
+  discoverabilitySettings,
+  matchesDiscoverabilitySettings,
+} from '../utils'
 
 export const current = VersionInfo.of({
-  version: '1.164.2:0',
+  version: '1.164.2:1',
   releaseNotes: {
     en_US:
-      'Updated Synapse to 1.164.2. Restores the unstable /auth_metadata endpoint so Element X clients can refresh access tokens after upgrading from Synapse 1.162 or earlier. Full notes: https://github.com/element-hq/synapse/blob/v1.164.2/CHANGES.md',
+      'Public Discoverability now lets room moderators publish rooms to the room list; Custom adds a publishing toggle. Existing Public and Private selections are preserved on update, and custom publication rules are left unchanged. Routine proxy request and database checkpoint logs are suppressed. New installs default to Warning logs; existing log levels are kept. Requires StartOS 0.4.1 or later.',
     es_ES:
-      'Actualiza Synapse a 1.164.2. Restaura el endpoint inestable /auth_metadata para que los clientes Element X puedan renovar los tokens de acceso tras actualizar desde Synapse 1.162 o anterior. Notas completas: https://github.com/element-hq/synapse/blob/v1.164.2/CHANGES.md',
+      'El ajuste Público de Descubribilidad permite ahora que los moderadores publiquen salas en la lista; Personalizado añade un interruptor de publicación. Al actualizar se conservan las selecciones Público y Privado, y las reglas de publicación personalizadas no cambian. Se suprimen los registros rutinarios de solicitudes del proxy y de puntos de control de la base de datos. Las instalaciones nuevas usan el nivel Advertencia; se conserva el nivel existente. Requiere StartOS 0.4.1 o posterior.',
     de_DE:
-      'Aktualisiert Synapse auf 1.164.2. Stellt den instabilen Endpunkt /auth_metadata wieder her, damit Element-X-Clients nach einem Upgrade von Synapse 1.162 oder älter ihre Zugriffstokens erneuern können. Vollständige Hinweise: https://github.com/element-hq/synapse/blob/v1.164.2/CHANGES.md',
+      'Die öffentliche Auffindbarkeit erlaubt Raummoderatoren jetzt, Räume in der Raumliste zu veröffentlichen; Benutzerdefiniert bietet einen Veröffentlichungsschalter. Bestehende öffentliche und private Voreinstellungen bleiben beim Update erhalten, eigene Veröffentlichungsregeln unverändert. Routinemeldungen zu Proxy-Anfragen und Datenbank-Checkpoints entfallen. Neue Installationen protokollieren standardmäßig Warnungen; bestehende Protokollstufen bleiben erhalten. Erfordert StartOS 0.4.1 oder neuer.',
     pl_PL:
-      'Aktualizuje Synapse do 1.164.2. Przywraca niestabilny endpoint /auth_metadata, aby klienci Element X mogli odświeżać tokeny dostępu po aktualizacji z Synapse 1.162 lub starszego. Pełne informacje: https://github.com/element-hq/synapse/blob/v1.164.2/CHANGES.md',
+      'Publiczna wykrywalność pozwala teraz moderatorom publikować pokoje na liście; tryb Własny dodaje przełącznik publikowania. Podczas aktualizacji zachowywane są ustawienia Publiczny i Prywatny, a własne reguły publikowania pozostają bez zmian. Rutynowe wpisy o żądaniach proxy i punktach kontrolnych bazy danych są pomijane. Nowe instalacje domyślnie zapisują ostrzeżenia; dotychczasowe poziomy logowania są zachowywane. Wymaga StartOS 0.4.1 lub nowszego.',
     fr_FR:
-      'Met à jour Synapse vers 1.164.2. Rétablit le point de terminaison instable /auth_metadata pour permettre aux clients Element X de renouveler leurs jetons d’accès après une mise à niveau depuis Synapse 1.162 ou une version antérieure. Notes complètes : https://github.com/element-hq/synapse/blob/v1.164.2/CHANGES.md',
+      'La visibilité Publique permet désormais aux modérateurs de publier leurs salons dans la liste ; Personnalisé ajoute un interrupteur de publication. Les préréglages Public et Privé existants sont conservés lors de la mise à jour, et les règles de publication personnalisées restent inchangées. Les journaux courants des requêtes du proxy et des points de contrôle de la base sont supprimés. Les nouvelles installations utilisent le niveau Avertissement ; les niveaux existants sont conservés. Nécessite StartOS 0.4.1 ou ultérieur.',
   },
   migrations: {
-    up: async ({ effects }) => {},
+    up: async ({ effects }) => {
+      await homeserverYaml.update(effects, (config) => {
+        if (!config || config.room_list_publication_rules !== undefined)
+          return null
+        for (const settings of Object.values(discoverabilitySettings)) {
+          const { room_list_publication_rules, ...previousSettings } = settings
+          if (matchesDiscoverabilitySettings(config, previousSettings)) {
+            return { ...config, room_list_publication_rules }
+          }
+        }
+        return null
+      })
+    },
   },
 })

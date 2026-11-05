@@ -136,7 +136,7 @@ const dict = {
   'Publish the Room List Without an Account': 154,
   'Let anyone read the list of public rooms on your server without signing in.': 155,
   'Allow Searching the Room List': 156,
-  'Let the room list be searched rather than only browsed in full.': 157,
+  'Enable the room list for browsing and searching. Turning this off returns an empty list and blocks publishing rooms, even when publishing is allowed below.': 157,
   'User Directory': 158,
   'Let your users search for other people by name. Turning this off removes the search entirely, including between people on your own server.': 159,
   'Search All Local Users': 160,
@@ -196,6 +196,8 @@ const dict = {
   '${user} is deactivated. Choose an active administrator, or a new username to create one.': 226,
   '${user} is not an administrator. Choose an active administrator, or a new username to create one.': 227,
   'No account is named ${user}, so it is created as a new administrator with the username and password below. Write them down or save them to a password manager.': 228,
+  'Allow Publishing to the Room List': 229,
+  'Let room moderators publish their rooms to the room list. Requires Allow Searching the Room List. Replaces any per-user or per-room publication rules with a single allow or deny rule.': 230,
 } as const
 
 export type I18nKey = keyof typeof dict

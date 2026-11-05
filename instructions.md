@@ -100,7 +100,7 @@ The **Admin Dashboard** interface opens Ketesa. Log in with the admin credential
 ### Actions
 
 - **Set Admin Password** — generate a new password for an administrator account. Use it to rotate the password or recover if you've lost it. Give it the account's username — the one it last set is filled in — or a username no one has yet to create another administrator; while Synapse is running, the result tells you when the username is new. It replaces that account's password and restarts Synapse to apply the new one; if the service is stopped, the password is applied the next time you start it. It never sets the password of an account that is deactivated or not an administrator: while Synapse is running it says so straight away, and while it is stopped the new password is not applied until you make that account an administrator again from the Admin Dashboard, signed in with one of your existing admin accounts.
-- **Config** — voice and video calls, presence, link previews, notification content, admin contact, and log level.
+- **Config** — voice and video calls, presence, link previews, notification content, admin contact, and Synapse's log level. Warning is the default for a new server; Info records requests when troubleshooting. The proxy does not duplicate request logs, and routine database checkpoint messages are suppressed. Proxy errors and other database diagnostics are still logged independently of this setting.
 - **Federation** — whether your server talks to other homeservers, which ones, and how large a room it will join.
 - **Media** — upload limit, how large an image can be and still get a thumbnail, which thumbnail sizes are prepared, and how long other servers' files are kept.
 - **Registration** — who may create an account, which rooms they join automatically, and whether guests may look around.
@@ -159,7 +159,11 @@ By default a stranger can learn a certain amount about your homeserver without h
 
 The **Discoverability** action collapses that into one choice. **Private** stops your room list being published or searched, keeps the people-search to your own server, and hides display names and avatars from anyone who is not signed in and does not already share a room. **Public** does the opposite, and is what you want if you are running rooms you would like strangers to find and join. **Normal** leaves Synapse's own settings, which sit between the two.
 
-**Custom** exposes all ten settings individually. The one most people go looking for is **Search All Local Users** — without it, searching for someone only finds people you already share a room with, which is rarely what you want on a small server where everyone knows each other.
+**Public** also lets room moderators publish their rooms to the room list from their Matrix client. **Private** and **Normal** do not allow new publications. Publishing a room lists it for discovery; it does not change who may join it.
+
+**Custom** exposes all eleven settings individually. **Allow Publishing to the Room List** lets room moderators list their rooms. **Allow Searching the Room List** must also be on: turning it off empties the entire list and blocks publishing, not just searching. Saving Custom replaces any manually configured per-user or per-room publication rules with a single allow or deny rule; the publishing toggle is on only for the package's allow-all rule.
+
+The other setting most people go looking for is **Search All Local Users** — without it, searching for someone only finds people you already share a room with, which is rarely what you want on a small server where everyone knows each other.
 
 To enable **Only Share Profiles Within Shared Rooms**, also enable **Require Sign-in to View Profiles**. The action rejects the combination without sign-in, which Synapse cannot start with.
 

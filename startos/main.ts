@@ -204,6 +204,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     listen ${nginxPort} default_server;
     listen [::]:${nginxPort} default_server;
     server_name  _;
+    access_log off;
 
     location = /.well-known/matrix/server {
         default_type application/json;
@@ -234,6 +235,7 @@ server {
     listen       ${adminPort};
     listen       [::]:${adminPort};
     server_name  _;
+    access_log off;
 
     root /var/www/html;
     index index.html index.htm;
@@ -300,7 +302,12 @@ server {
     .addDaemon('postgres', {
       subcontainer: postgresSub,
       exec: {
-        command: sdk.useEntrypoint(['-c', 'listen_addresses=127.0.0.1']),
+        command: sdk.useEntrypoint([
+          '-c',
+          'listen_addresses=127.0.0.1',
+          '-c',
+          'log_checkpoints=off',
+        ]),
         env: {
           POSTGRES_USER: postgresUser,
           POSTGRES_PASSWORD: config.database.args.password,
