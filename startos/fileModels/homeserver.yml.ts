@@ -303,6 +303,17 @@ const shape = z.looseObject({
   allow_public_rooms_over_federation: z.boolean().optional().catch(undefined),
   allow_public_rooms_without_auth: z.boolean().optional().catch(undefined),
   enable_room_list_search: z.boolean().optional().catch(undefined),
+  room_list_publication_rules: z
+    .array(
+      z.looseObject({
+        action: z.enum(['allow', 'deny']),
+        user_id: z.string().optional(),
+        alias: z.string().optional(),
+        room_id: z.string().optional(),
+      }),
+    )
+    .optional()
+    .catch(undefined),
   user_directory: z
     .looseObject({
       enabled: z.boolean().optional(),

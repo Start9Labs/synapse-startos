@@ -3,7 +3,7 @@ import { sdk } from '../sdk'
 
 export const logLevels = ['DEBUG', 'INFO', 'WARNING', 'ERROR'] as const
 export type LogLevel = (typeof logLevels)[number]
-export const defaultLogLevel: LogLevel = 'INFO'
+export const defaultLogLevel: LogLevel = 'WARNING'
 
 const staticConfig = (level: LogLevel) => ({
   version: 1,
