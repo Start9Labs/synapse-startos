@@ -133,11 +133,9 @@ export const mount = sdk.Mounts.of().mountVolume({
 
 // The external Coturn package Synapse advertises to clients for TURN relay.
 export const coturnId = 'coturn'
-export const coturnVersionRange = '>=4.14.0:0'
+export const coturnVersionRange = '>=4.18.0:6'
 export const coturnHostId = 'turn'
 export const coturnInterfaceId = 'turn'
-// Coturn publishes its shared secret at `shared/turn-secret` on its `main`
-// volume. Mounting only that subpath read-only keeps the rest of the volume —
-// turnserver.conf, the coturn database — out of view.
+// Coturn publishes its shared secret at `turn-secret` on its `public` volume.
 export const coturnMountpoint = '/mnt/coturn'
 export const coturnSecretPath = `${coturnMountpoint}/turn-secret`
