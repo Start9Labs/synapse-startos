@@ -123,7 +123,7 @@ One, optional, and only while you have switched TURN on.
 
 **No health check is declared, deliberately.** Coturn's own `TURN Server` check fails until you attach a public domain to it, and naming it here would leave Synapse showing a permanently unmet dependency even though Synapse serves fine without relay. Coturn's own check already says what is missing.
 
-The shared secret is read through a throwaway container that mounts only Coturn's `shared` subpath read-only — so a missing or broken Coturn can never take Synapse's own daemons down, and the rest of Coturn's volume stays out of view.
+The shared secret is read through a throwaway container that mounts only Coturn's `public` volume read-only — so a missing or broken Coturn can never take Synapse's own daemons down, and Coturn's private data stays out of view.
 
 ## Network Access and Interfaces
 

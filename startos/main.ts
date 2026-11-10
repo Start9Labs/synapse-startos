@@ -109,15 +109,15 @@ export const main = sdk.setupMain(async ({ effects }) => {
   }
 
   // Read through a throwaway container so a missing Coturn can never break
-  // Synapse's own daemons, and we only ever see the `shared` subpath.
+  // Synapse's own daemons, and we only ever see Coturn's `public` volume.
   async function readCoturnSecret() {
     const reader = sdk.SubContainer.of(
       effects,
       { imageId: 'nginx' },
       sdk.Mounts.of().mountDependency({
         dependencyId: coturnId,
-        volumeId: 'main',
-        subpath: 'shared',
+        volumeId: 'public',
+        subpath: null,
         mountpoint: coturnMountpoint,
         readonly: true,
       }),
