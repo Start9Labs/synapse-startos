@@ -1,43 +1,38 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '1.165.0:0',
+  version: '1.166.0:0',
   releaseNotes: {
-    en_US: `Updated Synapse to 1.165.0. Requires StartOS 0.4.2 or newer.
+    en_US: `Updated Synapse to 1.166.0.
 
-- Adds stable MatrixRTC transport discovery.
-- Fixes missing room memberships during initial sync and event signature verification failures caused by server key expiry handling.
-- Speeds up username availability checks.
+- Fixes remote media downloads that could fail over federation, and stops failed media downloads and URL previews from leaving empty files behind.
+- Fixes rooms missing from sync and errors when leaving, inviting, banning or kicking in some rooms the server is not in.
 
-Full notes: https://github.com/element-hq/synapse/blob/v1.165.0/CHANGES.md`,
-    es_ES: `Actualiza Synapse a 1.165.0. Requiere StartOS 0.4.2 o posterior.
+Full notes: https://github.com/element-hq/synapse/blob/v1.166.0/CHANGES.md`,
+    es_ES: `Actualiza Synapse a 1.166.0.
 
-- Añade descubrimiento estable de transportes MatrixRTC.
-- Corrige la ausencia de miembros de salas durante la sincronización inicial y los fallos de verificación de firmas de eventos causados por la gestión de la caducidad de claves del servidor.
-- Acelera las comprobaciones de disponibilidad de nombres de usuario.
+- Corrige descargas de medios remotos que podían fallar a través de la federación y evita que las descargas de medios y vistas previas de URL fallidas dejen archivos vacíos.
+- Corrige salas ausentes en la sincronización y errores al salir, invitar, vetar o expulsar en algunas salas en las que el servidor no participa.
 
-Notas completas: https://github.com/element-hq/synapse/blob/v1.165.0/CHANGES.md`,
-    de_DE: `Aktualisiert Synapse auf 1.165.0. Erfordert StartOS 0.4.2 oder neuer.
+Notas completas: https://github.com/element-hq/synapse/blob/v1.166.0/CHANGES.md`,
+    de_DE: `Aktualisiert Synapse auf 1.166.0.
 
-- Fügt die stabile Erkennung von MatrixRTC-Transporten hinzu.
-- Behebt fehlende Raummitgliedschaften bei der ersten Synchronisierung und Fehler bei der Ereignissignaturprüfung durch die Behandlung ablaufender Serverschlüssel.
-- Beschleunigt die Prüfung verfügbarer Benutzernamen.
+- Behebt Downloads entfernter Medien, die über die Föderation fehlschlagen konnten, und verhindert, dass fehlgeschlagene Mediendownloads und URL-Vorschauen leere Dateien hinterlassen.
+- Behebt fehlende Räume bei der Synchronisierung sowie Fehler beim Verlassen, Einladen, Sperren oder Entfernen in manchen Räumen, in denen der Server nicht Mitglied ist.
 
-Vollständige Hinweise: https://github.com/element-hq/synapse/blob/v1.165.0/CHANGES.md`,
-    pl_PL: `Aktualizuje Synapse do 1.165.0. Wymaga StartOS 0.4.2 lub nowszego.
+Vollständige Hinweise: https://github.com/element-hq/synapse/blob/v1.166.0/CHANGES.md`,
+    pl_PL: `Aktualizuje Synapse do 1.166.0.
 
-- Dodaje stabilne wykrywanie transportów MatrixRTC.
-- Naprawia brakujące członkostwa w pokojach podczas pierwszej synchronizacji oraz błędy weryfikacji podpisów zdarzeń spowodowane obsługą wygasania kluczy serwera.
-- Przyspiesza sprawdzanie dostępności nazw użytkowników.
+- Naprawia pobieranie zdalnych multimediów, które mogło kończyć się niepowodzeniem przez federację, i zapobiega pozostawianiu pustych plików przez nieudane pobrania multimediów i podglądy adresów URL.
+- Naprawia brakujące pokoje podczas synchronizacji oraz błędy przy opuszczaniu, zapraszaniu, banowaniu lub wyrzucaniu w niektórych pokojach, w których serwer nie uczestniczy.
 
-Pełne informacje: https://github.com/element-hq/synapse/blob/v1.165.0/CHANGES.md`,
-    fr_FR: `Met à jour Synapse vers 1.165.0. Nécessite StartOS 0.4.2 ou ultérieur.
+Pełne informacje: https://github.com/element-hq/synapse/blob/v1.166.0/CHANGES.md`,
+    fr_FR: `Met à jour Synapse vers 1.166.0.
 
-- Ajoute la découverte stable des transports MatrixRTC.
-- Corrige les adhésions aux salons manquantes lors de la synchronisation initiale et les échecs de vérification des signatures d'événements dus à la gestion de l'expiration des clés du serveur.
-- Accélère la vérification de disponibilité des noms d'utilisateur.
+- Corrige les téléchargements de médias distants qui pouvaient échouer via la fédération, et empêche les téléchargements de médias et aperçus d'URL échoués de laisser des fichiers vides.
+- Corrige des salons absents de la synchronisation et des erreurs lors du départ, de l'invitation, du bannissement ou de l'expulsion dans certains salons dont le serveur ne fait pas partie.
 
-Notes complètes : https://github.com/element-hq/synapse/blob/v1.165.0/CHANGES.md`,
+Notes complètes : https://github.com/element-hq/synapse/blob/v1.166.0/CHANGES.md`,
   },
   migrations: {
     up: async ({ effects }) => {},
